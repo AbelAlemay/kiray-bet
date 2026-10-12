@@ -1,0 +1,44 @@
+/* Maps: darken OpenStreetMap tiles to suit the night theme, and style popups to match. */
+.listings-map {
+  background: var(--surface);
+}
+.listings-map .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.9) saturate(0.6);
+}
+.listings-map .leaflet-popup-content-wrapper,
+.listings-map .leaflet-popup-tip {
+  background: var(--surface);
+  color: var(--foreground);
+}
+.listings-map .leaflet-popup-content a {
+  color: var(--foreground);
+}
+.listings-map .leaflet-popup-content a:hover {
+  color: var(--accent);
+}
+.listings-map .leaflet-control-attribution {
+  background: rgb(20 19 17 / 0.8);
+  color: var(--muted);
+}
+.listings-map .leaflet-control-attribution a {
+  color: var(--muted);
+}
+.listings-map .map-badge {
+  display: grid;
+  place-items: center;
+  border-radius: 9999px;
+  background: #f5c75a;
+  color: #1c1a17;
+  font-weight: 700;
+  font-size: 15px;
+  border: 2px solid #1c1a17;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.5);
+  cursor: pointer;
+}
+.listings-map .leaflet-popup-content {
+  max-height: 50vh;
+  overflow-y: auto;
+}
+.listings-map .leaflet-popup-content a {
+  padding: 4px 0;
+}

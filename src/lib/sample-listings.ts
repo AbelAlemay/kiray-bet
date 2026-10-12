@@ -20,6 +20,9 @@ export type Listing = {
   postedAt: string;
   // Signed links to the photos, cover first. Sample listings have none.
   photos: string[];
+  // Blurred map point (about 1 km), never the exact address.
+  approxLat: number | null;
+  approxLng: number | null;
 };
 
 export const sampleListings: Listing[] = [
@@ -42,6 +45,8 @@ export const sampleListings: Listing[] = [
     hostName: "Dawit",
     postedAt: "2026-10-08",
     photos: [],
+    approxLat: 39.71,
+    approxLng: -104.86,
   },
   {
     id: "2",
@@ -62,6 +67,8 @@ export const sampleListings: Listing[] = [
     hostName: "Selam",
     postedAt: "2026-10-09",
     photos: [],
+    approxLat: 39.64,
+    approxLng: -104.8,
   },
   {
     id: "3",
@@ -82,6 +89,8 @@ export const sampleListings: Listing[] = [
     hostName: "Meron",
     postedAt: "2026-10-10",
     photos: [],
+    approxLat: 39.78,
+    approxLng: -104.83,
   },
   {
     id: "4",
@@ -102,6 +111,8 @@ export const sampleListings: Listing[] = [
     hostName: "Yonas",
     postedAt: "2026-10-05",
     photos: [],
+    approxLat: 39.71,
+    approxLng: -105.08,
   },
   {
     id: "5",
@@ -122,6 +133,8 @@ export const sampleListings: Listing[] = [
     hostName: "Hanna",
     postedAt: "2026-10-03",
     photos: [],
+    approxLat: 39.59,
+    approxLng: -104.88,
   },
   {
     id: "6",
@@ -142,5 +155,7 @@ export const sampleListings: Listing[] = [
     hostName: "Tesfaye",
     postedAt: "2026-10-07",
     photos: [],
+    approxLat: 39.64,
+    approxLng: -104.96,
   },
 ];

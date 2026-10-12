@@ -3,7 +3,13 @@ import { sortOptions, type ListingFilters } from "@/lib/listings";
 import { site } from "@/lib/site";
 import { fieldClass, labelClass } from "./form-styles";
 
-export function SearchFilters({ filters }: { filters: ListingFilters }) {
+const checkboxes = [
+  { name: "pets", label: "Pets allowed" },
+  { name: "parking", label: "Parking" },
+  { name: "utilities", label: "Utilities included" },
+] as const;
+
+export function SearchFilters({ filters, view }: { filters: ListingFilters; view: "list" | "map" }) {
   return (
     <form
       action="/search"
@@ -11,6 +17,7 @@ export function SearchFilters({ filters }: { filters: ListingFilters }) {
       key={JSON.stringify(filters)}
       className="space-y-4 rounded-2xl border border-border bg-surface p-4"
     >
+      {view === "map" && <input type="hidden" name="view" value="map" />}
       <h2 className="font-semibold">
         Filters · <span className="text-muted">ማጣሪያ</span>
       </h2>
@@ -57,6 +64,19 @@ export function SearchFilters({ filters }: { filters: ListingFilters }) {
           ))}
         </select>
       </label>
+      <label className={labelClass}>
+        <span>Available by</span>
+        <input name="availableBy" type="date" defaultValue={filters.availableBy} className={fieldClass} />
+      </label>
+      <fieldset className="space-y-1">
+        <legend className="text-sm font-medium">Must have</legend>
+        {checkboxes.map((c) => (
+          <label key={c.name} className="flex min-h-10 items-center gap-3 text-sm">
+            <input type="checkbox" name={c.name} value="1" defaultChecked={!!filters[c.name]} className="h-5 w-5 accent-brand" />
+            {c.label}
+          </label>
+        ))}
+      </fieldset>
       <label className={labelClass}>
         <span>Sort by</span>
         <select name="sort" defaultValue={filters.sort} className={fieldClass}>

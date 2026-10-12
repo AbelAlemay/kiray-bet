@@ -144,8 +144,8 @@ Private (owner and admin only):
 | 2 | Supabase: tables, security rules, move sample data in | Done |
 | 3 | Accounts: sign up, log in, profile | Done (Google sign-in optional, not set up yet) |
 | 4 | Post a listing with photos + admin approval queue and notifications | Done |
-| 5 | Real search + map with approximate locations | Next |
-| 6 | In-app messaging + address requests | |
+| 5 | Real search + map with approximate locations | Done |
+| 6 | In-app messaging + address requests | Next |
 | 7 | Favorites | |
 | 8 | Amharic | |
 | 9 | Reports, bans, Safety page, Terms, Privacy Policy | |

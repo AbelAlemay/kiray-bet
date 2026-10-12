@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { ListingsMap } from "@/components/ListingsMap";
 import { PaymentWarning } from "@/components/PaymentWarning";
 import { formatDate, formatPrice } from "@/lib/format";
 import { getListing } from "@/lib/listings";
@@ -106,6 +107,33 @@ async function ListingDetail({ params }: { params: Props["params"] }) {
             <h2 className="mb-2 text-xl font-bold">About this home</h2>
             <p className="leading-relaxed">{listing.description}</p>
           </section>
+
+          {listing.approxLat != null && listing.approxLng != null && (
+            <section>
+              <h2 className="mb-2 text-xl font-bold">Where it is · አካባቢ</h2>
+              <ListingsMap
+                pins={[
+                  {
+                    id: listing.id,
+                    title: listing.title,
+                    price: listing.price,
+                    type: listing.type,
+                    neighborhood: listing.neighborhood,
+                    city: listing.city,
+                    lat: listing.approxLat,
+                    lng: listing.approxLng,
+                  },
+                ]}
+                interactive={false}
+                zoom={13}
+                className="h-56 sm:h-72"
+              />
+              <p className="mt-2 text-sm text-muted">
+                🔒 Approximate area in {listing.neighborhood}, {listing.city}. The host shares the
+                exact address with you after you message them.
+              </p>
+            </section>
+          )}
         </div>
 
         <aside className="lg:sticky lg:top-20 lg:self-start">

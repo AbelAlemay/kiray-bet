@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ListingCard } from "@/components/ListingCard";
 import { PaymentWarning } from "@/components/PaymentWarning";
 import { SearchBar } from "@/components/SearchBar";
-import { getLatestListings } from "@/lib/listings";
+import { getCityCounts, getLatestListings } from "@/lib/listings";
 import { site } from "@/lib/site";
 
 const steps = [
@@ -44,7 +44,7 @@ const promises = [
 ];
 
 export default async function Home() {
-  const latest = await getLatestListings(6);
+  const [latest, cityCounts] = await Promise.all([getLatestListings(6), getCityCounts()]);
 
   return (
     <>
@@ -66,7 +66,26 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 pt-12">
+      <section className="mx-auto max-w-6xl px-4 pt-10">
+        <h2 className="mb-3 text-lg font-bold">
+          Homes by city · <span className="text-muted">በከተማ</span>
+        </h2>
+        {/* Scrolls sideways on phones; wraps on wider screens. */}
+        <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-2 sm:mx-0 sm:flex-wrap sm:px-0">
+          {site.cities.map((city) => (
+            <Link
+              key={city}
+              href={`/search?city=${encodeURIComponent(city)}`}
+              className="flex min-h-11 shrink-0 items-center gap-2 rounded-full border border-border bg-surface px-4 font-semibold hover:border-brand"
+            >
+              {city}
+              <span className="rounded-full bg-brand-soft px-2 py-0.5 text-xs text-brand">{cityCounts[city] ?? 0}</span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-4 pt-10">
         <div className="mb-5 flex items-end justify-between gap-4">
           <div>
             <h2 className="text-2xl font-bold">Latest homes</h2>
