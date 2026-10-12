@@ -65,7 +65,9 @@ async function ListingDetail({ params }: { params: Props["params"] }) {
 
   const type = site.listingTypes.find((t) => t.value === listing.type)!;
   const yesNo = (v: boolean) => (v ? "Yes" : "No");
-  const contactHref = `/login?next=/listings/${listing.id}`;
+  // Signs visitors in first (requireUser), then opens the conversation page.
+  const contactHref = `/messages/new?listing=${listing.id}`;
+  const saveHref = `/login?next=/listings/${listing.id}`;
 
   return (
     <>
@@ -116,15 +118,15 @@ async function ListingDetail({ params }: { params: Props["params"] }) {
               Hosted by <span className="font-semibold text-foreground">{listing.hostName}</span> · posted{" "}
               {formatDate(listing.postedAt)}
             </p>
-            {/* Messaging arrives in build step 7; until then contacting requires an account. */}
             <Link
               href={contactHref}
               className="block rounded-xl bg-brand px-4 py-3 text-center font-semibold text-white hover:bg-brand-strong"
             >
               Contact host · ባለቤቱን ያግኙ
             </Link>
+            {/* Saving arrives with favorites (build phase 7). */}
             <Link
-              href={contactHref}
+              href={saveHref}
               className="block rounded-xl border border-border px-4 py-3 text-center font-semibold hover:bg-brand-soft"
             >
               ♡ Save
