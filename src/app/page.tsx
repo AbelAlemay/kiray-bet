@@ -56,7 +56,7 @@ export default async function Home() {
               🔒 Safe & private · ደህንነቱ የተጠበቀ
             </a>
           </div>
-          <h1 className="max-w-2xl text-4xl font-bold leading-tight text-door [text-shadow:0_2px_10px_rgb(0_0_0/0.5),0_1px_2px_rgb(0_0_0/0.4)] sm:text-5xl">
+          <h1 className="max-w-2xl text-4xl font-bold leading-tight text-door [text-shadow:0_3px_0_rgb(0_0_0/0.45),0_4px_16px_rgb(0_0_0/0.75)] sm:text-5xl">
             {site.taglineAm}
           </h1>
           <p className="mt-3 max-w-xl text-lg text-white/85">{site.tagline}.</p>
