@@ -1,38 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --background: #faf7f2;
-  --surface: #ffffff;
-  --foreground: #1c1a17;
-  --muted: #6b645a;
-  --border: #e7e0d5;
-  --brand: #2f5a3f;
-  --brand-strong: #23452f;
-  --brand-soft: #e8eee6;
-  --accent: #e0a526;
-  --danger: #b3261e;
-  color-scheme: light;
-}
-
-/* Dark colors: follow the device unless the visitor picked light with the toggle
-   (data-theme on <html>, set by the script in layout.tsx). Both blocks must match. */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --background: #141311;
-    --surface: #1e1c19;
-    --foreground: #f2eee8;
-    --muted: #a69e92;
-    --border: #34302a;
-    --brand: #538159;
-    --brand-strong: #77a77e;
-    --brand-soft: #222f25;
-    --accent: #f0bb45;
-    --danger: #f2827a;
-    color-scheme: dark;
-  }
-}
-
-:root[data-theme="dark"] {
+  /* The site is always in night mode. */
   --background: #141311;
   --surface: #1e1c19;
   --foreground: #f2eee8;
@@ -57,7 +26,7 @@
   --color-brand-soft: var(--brand-soft);
   --color-accent: var(--accent);
   --color-danger: var(--danger);
-  /* Logo colors, the same in light and dark mode (hero background, door/headline). */
+  /* Logo colors (hero background, door and headline). */
   --color-forest: #447656;
   --color-door: #f5c75a;
   --font-sans: var(--font-geist-sans), var(--font-ethiopic), system-ui, sans-serif;
