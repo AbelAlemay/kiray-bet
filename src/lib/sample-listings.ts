@@ -13,6 +13,11 @@ export type Listing = {
   availableFrom: string;
   utilitiesIncluded: boolean;
   parking: boolean;
+  deposit: number;
+  petsAllowed: boolean;
+  description: string;
+  hostName: string;
+  postedAt: string;
 };
 
 export const sampleListings: Listing[] = [
@@ -28,6 +33,12 @@ export const sampleListings: Listing[] = [
     availableFrom: "2026-11-01",
     utilitiesIncluded: false,
     parking: true,
+    deposit: 2450,
+    petsAllowed: false,
+    description:
+      "Sunny house on a quiet street, a short walk from Havana St shops, restaurants and the bus line. Updated kitchen, washer and dryer, fenced yard and a two-car driveway.",
+    hostName: "Dawit",
+    postedAt: "2026-10-08",
   },
   {
     id: "2",
@@ -41,6 +52,12 @@ export const sampleListings: Listing[] = [
     availableFrom: "2026-10-20",
     utilitiesIncluded: true,
     parking: true,
+    deposit: 800,
+    petsAllowed: false,
+    description:
+      "Fully separate basement with its own entrance, kitchenette and bathroom. Utilities and Wi-Fi are included. Off-street parking for one car.",
+    hostName: "Selam",
+    postedAt: "2026-10-09",
   },
   {
     id: "3",
@@ -54,6 +71,12 @@ export const sampleListings: Listing[] = [
     availableFrom: "2026-10-15",
     utilitiesIncluded: true,
     parking: false,
+    deposit: 400,
+    petsAllowed: false,
+    description:
+      "Furnished bedroom in a calm, clean home. Shared kitchen and bathroom. Utilities and internet included. Close to the bus to downtown and DIA.",
+    hostName: "Meron",
+    postedAt: "2026-10-10",
   },
   {
     id: "4",
@@ -67,6 +90,12 @@ export const sampleListings: Listing[] = [
     availableFrom: "2026-12-01",
     utilitiesIncluded: false,
     parking: true,
+    deposit: 1750,
+    petsAllowed: true,
+    description:
+      "Second-floor apartment, a 5-minute walk to the W line light rail. In-unit laundry, one assigned parking spot and a small balcony.",
+    hostName: "Yonas",
+    postedAt: "2026-10-05",
   },
   {
     id: "5",
@@ -80,6 +109,12 @@ export const sampleListings: Listing[] = [
     availableFrom: "2026-11-15",
     utilitiesIncluded: false,
     parking: true,
+    deposit: 2900,
+    petsAllowed: true,
+    description:
+      "Spacious family home in a good school district. Large backyard, finished basement, attached garage and central air.",
+    hostName: "Hanna",
+    postedAt: "2026-10-03",
   },
   {
     id: "6",
@@ -93,5 +128,11 @@ export const sampleListings: Listing[] = [
     availableFrom: "2026-10-25",
     utilitiesIncluded: true,
     parking: false,
+    deposit: 600,
+    petsAllowed: false,
+    description:
+      "Open-plan basement studio with its own bathroom and small kitchen. Utilities included. Street parking only.",
+    hostName: "Tesfaye",
+    postedAt: "2026-10-07",
   },
 ];

@@ -1,6 +1,6 @@
 export const site = {
   name: "ኪራይ ቤት",
-  nameLatin: "Kiray Bet",
+  nameLatin: "KirayBet",
   tagline: "Homes for rent in Denver, from our community",
   taglineAm: "በዴንቨር ለኪራይ የሚሆኑ ቤቶች",
   cities: ["Aurora", "Denver", "Lakewood", "Englewood", "Centennial", "Littleton", "Thornton"],

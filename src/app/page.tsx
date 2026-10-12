@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ListingCard } from "@/components/ListingCard";
+import { PaymentWarning } from "@/components/PaymentWarning";
 import { SearchBar } from "@/components/SearchBar";
 import { sampleListings } from "@/lib/sample-listings";
 import { site } from "@/lib/site";
@@ -22,14 +23,37 @@ const steps = [
   },
 ];
 
+// Keep these concrete and true; never promise that data "can't be stolen".
+const promises = [
+  {
+    title: "We never ask for your phone number",
+    text: "Hosts and renters talk through messages inside the site, and your email is never shown to anyone.",
+  },
+  {
+    title: "Exact address only with the host's approval",
+    text: "Listings show the neighborhood and an approximate map area. The host chooses who sees the address.",
+  },
+  {
+    title: "Every listing is checked by a person",
+    text: "New listings are reviewed before they appear, so fake and copied listings don't go live.",
+  },
+  {
+    title: "Report anything suspicious",
+    text: "One tap reports a listing or a message. Scammers are removed and banned.",
+  },
+];
+
 export default function Home() {
   return (
     <>
       <section className="bg-gradient-to-br from-brand-strong via-brand to-emerald-600 text-white">
         <div className="mx-auto max-w-6xl px-4 pb-14 pt-12 sm:pt-20">
-          <p className="mb-3 inline-block rounded-full bg-white/15 px-3 py-1 text-sm">
-            Denver · Aurora · Lakewood · Englewood
-          </p>
+          <div className="mb-3 flex flex-wrap gap-2 text-sm">
+            <p className="rounded-full bg-white/15 px-3 py-1">Denver · Aurora · Lakewood · Englewood</p>
+            <a href="#safety" className="rounded-full bg-white/15 px-3 py-1 transition hover:bg-white/25">
+              🔒 Safe & private · ደህንነቱ የተጠበቀ
+            </a>
+          </div>
           <h1 className="max-w-2xl text-4xl font-bold leading-tight sm:text-5xl">
             {site.taglineAm}
           </h1>
@@ -72,6 +96,33 @@ export default function Home() {
             </li>
           ))}
         </ol>
+      </section>
+
+      <section id="safety" className="mx-auto max-w-6xl scroll-mt-20 px-4 pt-16">
+        <div className="rounded-2xl border border-border bg-surface p-6 sm:p-8">
+          <p className="text-sm font-semibold text-brand">🔒 Safe & private · ደህንነቱ የተጠበቀ</p>
+          <h2 className="mt-1 text-2xl font-bold">Your information stays private</h2>
+          <p className="mt-1 max-w-2xl text-muted">
+            Rental scams are common in online groups. {site.nameLatin} is built so hosts and renters
+            can connect without giving their personal details to strangers.
+          </p>
+          <ul className="mt-6 grid gap-4 sm:grid-cols-2">
+            {promises.map((p) => (
+              <li key={p.title} className="flex gap-3">
+                <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-full bg-brand-soft text-brand">
+                  ✓
+                </span>
+                <div>
+                  <h3 className="font-semibold">{p.title}</h3>
+                  <p className="text-sm text-muted">{p.text}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+          <div className="mt-6">
+            <PaymentWarning />
+          </div>
+        </div>
       </section>
 
       <section className="mx-auto max-w-6xl px-4 pt-16">

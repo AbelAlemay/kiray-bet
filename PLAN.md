@@ -1,77 +1,163 @@
-# Habesha Homes Denver — Project Plan
+# ኪራይ ቤት · KirayBet — Project Plan
 
 A rental marketplace for the Habesha (Ethiopian & Eritrean) community in the Denver metro
-area. Landlords can list houses, apartments, basements and rooms. Renters can search and
-contact them, in English or Amharic.
+area. Hosts can list houses, apartments, basements and rooms. Renters can search and
+message them, in English or Amharic.
 
-## 1. Who uses it
-- **Landlords / hosts** list a whole house, an apartment, a basement unit or a single room.
+**Our core promise: safe and private.** Personal information is never shown publicly,
+every listing is reviewed by a person, and all contact happens inside the site.
+
+## 1. Decisions made (Oct 11, 2026)
+| Topic | Decision |
+|---|---|
+| Name | **KirayBet** (ኪራይ ቤት). kiraybet.com is taken (registered Apr 2025, no website); kiraybet.net and kiraybet.org are available. |
+| Contact | **In-app messaging only.** Emails are never shown to other users. |
+| Phone numbers | **Never collected.** We don't ask for them at all. |
+| Listing approval | **Every listing is reviewed by the admin before it goes live.** Admin is notified of each new listing by **email and Telegram**. |
+| Address privacy | Public sees only the neighborhood and an approximate map area. The exact address is shared only after the renter asks **and the host approves**. |
+| Area | Denver metro only at launch. |
+| Login | Email link + Google. |
+| Language | English and Amharic side by side. Amharic font: **Menbere**. |
+| Accounts | **Only hosts create full accounts.** Renters browse with no account and just confirm their email (email link or Google) when they tap "Contact host". No password, no profile. |
+| Money | **No payments on the site, ever.** Warn users not to pay by Zelle, Cash App, Venmo or any other way before seeing the home and signing a lease. |
+| Lease agreements | Proposed: hosts generate a lease from the site, both sides e-sign, signed copy stored. Under discussion; see section 4. |
+
+## 2. Who uses it
+- **Hosts** list a whole house, an apartment, a basement unit or a single room.
 - **Renters** search, save favorites and message hosts.
-- **Admin (you)** approves or removes listings, handles reports and bans scammers.
+- **Admin** approves or rejects listings, handles reports and bans scammers.
 
-## 2. MVP features (version 1)
-1. Sign up / log in (email or Google, plus phone number)
-2. Create, edit and delete a listing: title, type, price, deposit, bedrooms and baths,
-   address and area, available date, utilities included, parking, photos, description
-3. Browse and search: filter by city (Aurora, Denver, Lakewood, Englewood, Centennial...),
-   price, bedrooms, type and move-in date
-4. Map view of listings
-5. Listing detail page with a photo gallery and a "Contact host" button
-6. In-app messaging between renter and host
-7. Saved / favorite listings
-8. English ⇄ Amharic language toggle (Tigrinya later)
-9. Report a listing, plus an admin page to moderate
-10. Mobile-first design, since most users will be on their phones
+## 3. Security & privacy (top priority)
+What we protect and how:
 
-## 3. Later (version 2+)
-- Verified host badge (ID or phone check)
+**Personal information**
+- Phone numbers are never collected. Emails live in a private table that only the owner and the admin can
+  read. Database security rules (Supabase Row Level Security) are on for every table, and no
+  table is readable without a rule that allows it.
+- Exact address and exact map position live in a separate private table. The public listing
+  stores only the neighborhood and a deliberately blurred map point.
+- Address requests: renter asks, host approves or declines, and only then can that renter
+  read the address. The host can revoke access.
+- Location data (GPS) is stripped from every uploaded photo, because phone photos can
+  reveal the exact address.
+
+**Messaging**
+- Only the two people in a conversation (and the admin, when a conversation is reported) can
+  read its messages.
+- Messages are encrypted in transit (HTTPS) and at rest (Supabase disk encryption). They are
+  not end-to-end encrypted, so we never claim that.
+- Warnings in the chat when someone shares a phone number, link, or asks for money
+  ("Never send a deposit before seeing the home").
+
+**Stopping scammers**
+- Email must be verified before a user can post or send messages.
+- Bot protection (Cloudflare Turnstile) on sign-up and on posting.
+- Rate limits on new messages and new listings.
+- Every listing is reviewed before it goes live; edits to price, photos or address go back
+  for review.
+- "Report" button on every listing, conversation and profile; admin can ban users.
+
+**Admin account and site**
+- Admin account protected with two-factor login (Supabase MFA).
+- Security headers (Content Security Policy, HTTPS-only), uploads checked for type and size.
+- Secret keys only on the server, never in the browser.
+- Dependencies kept up to date; security review before launch.
+
+**Money**
+- The site never processes payments. A payment warning appears on the home page, every
+  listing and (later) in chat. Messages mentioning Zelle, Cash App, Venmo, wire transfers or
+  gift cards trigger the warning automatically.
+
+**Telling users**
+- A "Safe & private" section on the home page and a full Safety page explaining exactly what
+  we protect, plus scam-avoidance tips.
+- Short privacy reminders where it matters: listing page, posting form, chat.
+- Promises must be concrete and true ("we never show your phone number"), never absolute
+  ("your data can never be stolen").
+
+## 4. Lease agreements (proposed)
+- Host fills in the terms (rent, deposit, dates, rules) from the listing; the renter fills in
+  their own legal name. Both e-sign on the site, then a locked PDF is stored and both can
+  download it.
+- Template must be drafted or reviewed by a Colorado landlord-tenant lawyer. The site
+  provides the form only; it is not a party and gives no legal advice.
+- English version is the binding one; an Amharic version can be provided for reference.
+- Leases hold the most sensitive data on the site, so they are readable only by the host and
+  renter, stored in private storage, and deletable on request after a retention period.
+
+## 5. MVP features (version 1)
+1. Sign up / log in, profile (first name, preferred language)
+2. Post, edit, delete a listing with photos; "My listings" page; mark as rented
+3. Admin approval queue with an email and Telegram notification for each new listing
+4. Browse and search with filters, plus a map with approximate locations
+5. Listing detail page with photo gallery
+6. In-app messaging between renter and host, with unread notifications by email
+7. Address request and host approval
+8. Saved / favorite listings
+9. English and Amharic
+10. Report listings, conversations and users; admin moderation and bans
+11. Safety page, Terms of Service, Privacy Policy
+12. Mobile-first design
+
+## 6. Later (version 2+)
+- Verified host badge (ID check)
 - Roommate-finder posts ("looking for a room")
-- Paid "featured" listings (Stripe) as the revenue model
-- Email and SMS alerts for new matching listings
+- Paid "featured" listings (Stripe)
+- Alerts for new matching listings
 - Reviews and ratings
-- Mobile app (React Native or a PWA)
+- Mobile app (PWA first)
+- Other cities
 
-## 4. Recommended tech stack
-| Layer        | Choice                                          | Why                                       |
-|--------------|-------------------------------------------------|-------------------------------------------|
-| Frontend     | **Next.js (React) + TypeScript + Tailwind CSS** | Fast, SEO-friendly, easy to deploy        |
-| Backend / DB | **Supabase** (Postgres, Auth, Storage)          | Login, database and photo storage in one; free tier |
-| Maps         | Mapbox or Leaflet + OpenStreetMap               | Leaflet is free                           |
-| i18n         | next-intl                                       | English and Amharic translations          |
-| Hosting      | Vercel                                          | Free tier, one-click deploys              |
-| Payments     | Stripe (phase 2)                                | Featured listings                         |
+## 7. Tech stack
+| Layer        | Choice                                             |
+|--------------|----------------------------------------------------|
+| Frontend     | Next.js 16 + TypeScript + Tailwind CSS              |
+| Backend / DB | Supabase (Postgres, Auth, Storage, Realtime for chat) |
+| Email        | Resend (admin notifications, new-message emails)    |
+| Admin alerts | Telegram bot (new listings, reports)               |
+| Bot defense  | Cloudflare Turnstile                                |
+| Maps         | Leaflet + OpenStreetMap                             |
+| Hosting      | Vercel                                              |
 
-## 5. Data model (first draft)
-- **users**: id, name, email, phone, language, role (renter/host/admin), verified, created_at
-- **listings**: id, host_id, title, description, type (house/apartment/basement/room),
-  price, deposit, bedrooms, bathrooms, city, neighborhood, address, lat, lng,
-  available_from, utilities_included, parking, pets_allowed, status (pending/active/rented), created_at
-- **listing_photos**: id, listing_id, url, order
+## 8. Data model
+Public (readable by anyone, only approved listings):
+- **listings**: id, host_id, title, description, type, price, deposit, bedrooms, bathrooms,
+  city, neighborhood, approx_lat, approx_lng, available_from, utilities_included, parking,
+  pets_allowed, status (pending/active/rejected/rented), reviewed_at, created_at
+- **listing_photos**: id, listing_id, path, order
+- **profiles**: id, display_name (first name only), role (renter/host/admin), created_at
+
+Private (owner and admin only):
+- **private_profiles**: user_id, email, language, banned
+- **listing_addresses**: listing_id, street_address, unit, zip, exact_lat, exact_lng
+- **address_requests**: id, listing_id, renter_id, status (pending/approved/declined/revoked)
+- **conversations**: id, listing_id, renter_id, host_id, created_at
+- **messages**: id, conversation_id, sender_id, body, created_at, read_at
 - **favorites**: user_id, listing_id
-- **conversations / messages**: id, listing_id, sender_id, receiver_id, body, created_at, read
-- **reports**: id, listing_id, reporter_id, reason, status
+- **reports**: id, target_type (listing/conversation/user), target_id, reporter_id, reason, status
 
-## 6. Build steps
-| Step | What                                                                 |
-|------|----------------------------------------------------------------------|
-| 0    | Choose the name and brand colors, then set up the Next.js project, Supabase and Git |
-| 1    | Design the pages: Home, Search, Listing, Post a listing, Messages, Profile, Admin |
-| 2    | Authentication (sign up, log in, profile)                            |
-| 3    | Database tables and security rules in Supabase                       |
-| 4    | Post a listing, with photo upload                                    |
-| 5    | Browse, search, filters and map                                      |
-| 6    | Listing detail page and favorites                                    |
-| 7    | Messaging                                                            |
-| 8    | Amharic translation                                                  |
-| 9    | Admin moderation and reporting                                       |
-| 10   | Testing, domain name and launch on Vercel                            |
-| 11   | Promote it in community Facebook and Telegram groups and at churches and restaurants |
+## 9. Build phases
+| # | Phase | Status |
+|---|---|---|
+| 0 | Name, brand, Next.js project | Done |
+| 1 | Home, Search, Listing detail pages (sample data) | Done |
+| 2 | Supabase: tables, security rules, move sample data in | Next |
+| 3 | Accounts: sign up, log in, profile | |
+| 4 | Post a listing with photos + admin approval queue and notifications | |
+| 5 | Real search + map with approximate locations | |
+| 6 | In-app messaging + address requests | |
+| 7 | Favorites | |
+| 8 | Amharic | |
+| 9 | Reports, bans, Safety page, Terms, Privacy Policy | |
+| 10 | Security review, domain, launch on Vercel | |
+| 11 | Promote in community Facebook and Telegram groups, churches and restaurants | |
 
-## 7. Legal note: Fair Housing
-The **Fair Housing Act** and **Colorado law** forbid housing ads that state a preference
-based on national origin, race or religion. The site can be *community-focused*: Amharic
-language, cultural branding and promotion in Habesha spaces. However:
-- Listings must be open to everyone, and hosts may not write "Habesha only" or "Ethiopians only".
-- Add a Fair Housing notice to the listing form and filter for prohibited phrases.
-- Roommate and shared-room listings have more flexibility under the law.
-- Have a lawyer review the Terms of Service before launch.
+## 10. Legal notes
+- **Fair Housing:** the Fair Housing Act and Colorado law forbid ads that state a preference
+  based on national origin, race or religion. The site can be community-focused (Amharic,
+  cultural branding, promotion in Habesha spaces), but listings must be open to everyone.
+  Hosts may not write "Habesha only". Show a Fair Housing notice on the listing form and
+  block prohibited phrases. Roommate listings have more flexibility.
+- **Privacy:** Colorado has a consumer privacy law; the Privacy Policy must say what we
+  collect, why, and how users can delete their account and data.
+- Have a lawyer review the Terms of Service and Privacy Policy before launch.

@@ -8,6 +8,10 @@ export function Footer() {
           {site.name} · {site.nameLatin}
         </p>
         <p>
+          <strong>Your privacy comes first.</strong> We never ask for your phone number, your email is
+          never shown to other users, and exact addresses are shared only with the host&apos;s approval.
+        </p>
+        <p>
           <strong>Equal Housing Opportunity.</strong> All listings on {site.nameLatin} are open to
           everyone. Hosts may not state a preference based on race, color, national origin,
           religion, sex, familial status, disability, or any other class protected under the Fair

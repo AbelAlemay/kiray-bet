@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Listing } from "@/lib/sample-listings";
+import { formatDate, formatPrice } from "@/lib/format";
 import { site } from "@/lib/site";
 
 const typeColors: Record<Listing["type"], string> = {
@@ -8,10 +9,6 @@ const typeColors: Record<Listing["type"], string> = {
   basement: "from-amber-700 to-amber-500",
   room: "from-rose-700 to-rose-500",
 };
-
-function formatDate(iso: string) {
-  return new Date(iso + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" });
-}
 
 export function ListingCard({ listing }: { listing: Listing }) {
   const type = site.listingTypes.find((t) => t.value === listing.type)!;
@@ -27,7 +24,7 @@ export function ListingCard({ listing }: { listing: Listing }) {
           {type.label} · {type.labelAm}
         </span>
         <span className="absolute bottom-3 right-3 rounded-lg bg-black/60 px-2.5 py-1 text-sm font-bold text-white">
-          ${listing.price.toLocaleString()}/mo
+          {formatPrice(listing.price)}/mo
         </span>
       </div>
       <div className="space-y-1.5 p-4">
