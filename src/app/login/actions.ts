@@ -29,18 +29,23 @@ export async function emailSignIn(prev: LoginState, formData: FormData): Promise
     return { step: "email", error: "Please enter a valid email address." };
   }
 
+  // Supabase checks the Turnstile token before sending any email.
+  const captchaToken = String(formData.get("turnstileToken") ?? "") || undefined;
   const supabase = await createServerSupabase();
   const { error } = await supabase.auth.signInWithOtp({
     email,
-    options: { emailRedirectTo: callbackUrl(next), shouldCreateUser: true },
+    options: { emailRedirectTo: callbackUrl(next), shouldCreateUser: true, captchaToken },
   });
   if (error) {
+    const back = prev.step === "code" ? prev : { step: "email" as const };
     return {
-      step: "email",
+      ...back,
       error:
         error.status === 429
           ? "Too many emails sent. Please wait a few minutes and try again."
-          : "We couldn't send the email. Please try again.",
+          : error.code === "captcha_failed"
+            ? "We couldn't confirm you're not a bot. Please try again."
+            : "We couldn't send the email. Please try again.",
     };
   }
   return { step: "code", email };

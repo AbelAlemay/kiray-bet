@@ -8,6 +8,7 @@ import { geocodeAddress, inDenverMetro } from "@/lib/geocode";
 import { listingAlert, notifyAdmin } from "@/lib/notify";
 import { parseListingForm, type AddressInput, type ListingErrors } from "@/lib/listing-rules";
 import { createServerSupabase } from "@/lib/supabase/server";
+import { passedBotCheck } from "@/lib/turnstile";
 
 // All listing changes run as the signed-in host, so the database's rules apply:
 // hosts only touch their own listings, and edits send a listing back to review.
@@ -32,6 +33,10 @@ export async function createListing(_prev: ListingFormState, formData: FormData)
   const parsed = parseListingForm(formData, user.id);
   if ("errors" in parsed) return { errors: parsed.errors };
   const { listing, address, photos } = parsed;
+
+  if (!(await passedBotCheck(formData))) {
+    return { errors: { form: "We couldn't confirm you're not a bot. Please try again." } };
+  }
 
   const located = await locate(address, listing.city);
   if ("error" in located) return { errors: { street: located.error } };

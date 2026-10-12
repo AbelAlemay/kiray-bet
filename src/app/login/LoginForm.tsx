@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { fieldClass, labelClass, primaryButtonClass } from "@/components/form-styles";
+import { Turnstile } from "@/components/Turnstile";
 import { emailSignIn, signInWithGoogle, type LoginState } from "./actions";
 
 export function LoginForm({ next, googleEnabled }: { next: string; googleEnabled: boolean }) {
@@ -41,6 +42,7 @@ export function LoginForm({ next, googleEnabled }: { next: string; googleEnabled
         <form action={action} className="text-center text-sm text-muted">
           <input type="hidden" name="email" value={state.email} />
           <input type="hidden" name="next" value={next} />
+          <Turnstile resetKey={state} />
           Didn&apos;t get it? Check spam, or{" "}
           <button disabled={pending} className="font-semibold text-brand hover:underline">
             send a new code
@@ -71,6 +73,7 @@ export function LoginForm({ next, googleEnabled }: { next: string; googleEnabled
       )}
       <form action={action} className="space-y-4">
         <input type="hidden" name="next" value={next} />
+        <Turnstile resetKey={state} />
         <label className={labelClass}>
           <span>Email · ኢሜይል</span>
           <input

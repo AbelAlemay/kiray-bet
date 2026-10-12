@@ -3,6 +3,7 @@
 import { startTransition, useActionState, useState, type ReactNode } from "react";
 import { fieldClass, labelClass, primaryButtonClass } from "@/components/form-styles";
 import { site } from "@/lib/site";
+import { Turnstile } from "@/components/Turnstile";
 import type { ListingFormState } from "@/app/listings/actions";
 import { PhotoPicker, type Photo } from "./PhotoPicker";
 
@@ -199,6 +200,7 @@ export function ListingForm({
           {` ${site.nameLatin}`} never handles money; don&apos;t ask renters to pay before they see the
           home and sign a lease.
         </p>
+        {!editing && <Turnstile resetKey={state} />}
         {errors.form && (
           <p role="alert" className="text-danger">
             {errors.form}

@@ -142,9 +142,9 @@ Private (owner and admin only):
 | 0 | Name, brand, Next.js project | Done |
 | 1 | Home, Search, Listing detail pages (sample data) | Done |
 | 2 | Supabase: tables, security rules, move sample data in | Done |
-| 3 | Accounts: sign up, log in, profile | In progress: email sign-in works; waiting on Resend (code emails) and Google setup |
-| 4 | Post a listing with photos + admin approval queue and notifications | |
-| 5 | Real search + map with approximate locations | |
+| 3 | Accounts: sign up, log in, profile | Done (Google sign-in optional, not set up yet) |
+| 4 | Post a listing with photos + admin approval queue and notifications | Done |
+| 5 | Real search + map with approximate locations | Next |
 | 6 | In-app messaging + address requests | |
 | 7 | Favorites | |
 | 8 | Amharic | |
@@ -152,7 +152,22 @@ Private (owner and admin only):
 | 10 | Security review, domain, launch on Vercel | |
 | 11 | Promote in community Facebook and Telegram groups, churches and restaurants | |
 
-## 10. Legal notes
+## 10. Before launch checklist
+Things set up for development that must change before real users arrive:
+- [ ] Buy the domain (kiraybet.net or .org) and point it at Vercel.
+- [ ] Resend: verify the domain, send from e.g. hello@kiraybet.net (now: onboarding@resend.dev,
+      which only delivers to the account owner). Update the sender in Supabase SMTP settings
+      and ALERT_FROM_EMAIL.
+- [ ] Supabase Auth: set site_url and additional_redirect_urls in supabase/config.toml to the
+      real domain, then `npx supabase config push`.
+- [ ] Cloudflare Turnstile: create real keys for the domain (now: test keys that always pass),
+      update .env.local / Vercel env, and `npx supabase config push`.
+- [ ] Remove the sample listings and fake hosts from supabase/seed.sql data in the database.
+- [ ] Set NEXT_PUBLIC_SITE_URL to the real domain in Vercel.
+- [ ] Optional: Google sign-in (Google Cloud OAuth client, then NEXT_PUBLIC_GOOGLE_SIGN_IN=on).
+- [ ] Security review, Terms of Service and Privacy Policy reviewed by a lawyer.
+
+## 11. Legal notes
 - **Fair Housing:** the Fair Housing Act and Colorado law forbid ads that state a preference
   based on national origin, race or religion. The site can be community-focused (Amharic,
   cultural branding, promotion in Habesha spaces), but listings must be open to everyone.
