@@ -29,14 +29,20 @@ export type ListingFormValues = {
 
 function Field({ label, error, hint, children }: { label: string; error?: string; hint?: string; children: ReactNode }) {
   return (
-    <label className={labelClass}>
-      <span>{label}</span>
+    <label className={`${labelClass} ${pairedFieldClass}`}>
+      <span className="self-end">{label}</span>
       {children}
       {hint && !error && <span className="block text-xs font-normal text-muted">{hint}</span>}
       {error && <span role="alert" className="block text-xs font-normal text-danger">{error}</span>}
     </label>
   );
 }
+
+// Two fields side by side, laid out as shared rows (label, box, hint) so the boxes
+// line up even when one label wraps or only one field has a hint.
+const pairClass = "grid grid-cols-2 gap-x-4";
+// Inside a pair each Field spans the pair's three rows; elsewhere this is inert.
+const pairedFieldClass = "[.grid-cols-2>&]:row-span-3 [.grid-cols-2>&]:grid [.grid-cols-2>&]:grid-rows-subgrid [.grid-cols-2>&]:space-y-0 [.grid-cols-2>&]:gap-y-1";
 
 function Section({ title, titleAm, children }: { title: string; titleAm: string; children: ReactNode }) {
   return (
@@ -102,7 +108,7 @@ export function ListingForm({
         <Field label="Title" error={errors.title} hint="For example: Bright 2-bed apartment near light rail">
           <input name="title" required minLength={5} maxLength={100} defaultValue={initial?.title} className={fieldClass} />
         </Field>
-        <div className="grid grid-cols-2 items-end gap-4">
+        <div className={pairClass}>
           <Field label="Bedrooms · መኝታ" error={errors.bedrooms}>
             <input name="bedrooms" type="number" min={0} max={20} required defaultValue={initial?.bedrooms} className={fieldClass} />
           </Field>
@@ -131,7 +137,7 @@ export function ListingForm({
       </Section>
 
       <Section title="Rent and dates" titleAm="ኪራይና ቀን">
-        <div className="grid grid-cols-2 items-end gap-4">
+        <div className={pairClass}>
           <Field label="Rent ($/month)" error={errors.price}>
             <input name="price" type="number" min={1} step={1} required inputMode="numeric" defaultValue={initial?.price} className={fieldClass} />
           </Field>
@@ -155,7 +161,7 @@ export function ListingForm({
       </Section>
 
       <Section title="Location" titleAm="አድራሻ">
-        <div className="grid grid-cols-2 items-end gap-4">
+        <div className={pairClass}>
           <Field label="City" error={errors.city}>
             <select name="city" required defaultValue={initial?.city ?? ""} className={fieldClass}>
               <option value="" disabled>
@@ -178,7 +184,7 @@ export function ListingForm({
           <Field label="Street address" error={errors.street}>
             <input name="street" required maxLength={100} autoComplete="street-address" defaultValue={initial?.street} className={fieldClass} />
           </Field>
-          <div className="grid grid-cols-2 items-end gap-4">
+          <div className={pairClass}>
             <Field label="Unit (optional)" error={errors.unit}>
               <input name="unit" maxLength={20} placeholder="Apt 4, Basement…" defaultValue={initial?.unit} className={fieldClass} />
             </Field>
