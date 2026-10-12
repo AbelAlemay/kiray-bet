@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Suspense } from "react";
 import { requireUser, safeNext } from "@/lib/auth";
 import { signOut } from "../login/actions";
@@ -27,6 +28,12 @@ async function Account({ searchParams }: { searchParams: Props["searchParams"] }
         )}
         <AccountForm user={user} next={next} />
       </div>
+      <Link
+        href="/listings/mine"
+        className="flex items-center justify-between rounded-2xl border border-border bg-surface p-5 font-semibold hover:bg-brand-soft"
+      >
+        My listings · የእኔ ቤቶች <span aria-hidden>→</span>
+      </Link>
       <div className="rounded-2xl border border-border bg-surface p-6 text-sm sm:p-8">
         <p className="text-muted">Signed in as</p>
         <p className="font-semibold">{user.email}</p>

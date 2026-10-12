@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -29,6 +30,35 @@ function Fact({ label, labelAm, value }: { label: string; labelAm: string; value
   );
 }
 
+// Cover photo large, the rest as a grid. Placeholder when a listing has no photos.
+function PhotoGallery({ photos, title }: { photos: string[]; title: string }) {
+  if (photos.length === 0) {
+    return (
+      <div className="grid h-72 grid-cols-4 grid-rows-2 gap-2 overflow-hidden rounded-2xl sm:h-96">
+        <div className="col-span-4 row-span-2 bg-gradient-to-br from-brand-strong to-brand sm:col-span-3" />
+        <div className="hidden bg-brand/70 sm:block" />
+        <div className="hidden bg-brand/50 sm:block" />
+      </div>
+    );
+  }
+  return (
+    <div className="grid grid-cols-2 gap-2 overflow-hidden rounded-2xl sm:grid-cols-4">
+      {photos.map((src, i) => (
+        <div key={src} className={`relative bg-border/50 ${i === 0 ? "col-span-2 row-span-2 aspect-[4/3]" : "aspect-[4/3]"}`}>
+          <Image
+            src={src}
+            alt={i === 0 ? title : `${title}, photo ${i + 1}`}
+            fill
+            priority={i === 0}
+            sizes={i === 0 ? "(min-width: 1024px) 50vw, 100vw" : "(min-width: 640px) 25vw, 50vw"}
+            className="object-cover"
+          />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 async function ListingDetail({ params }: { params: Props["params"] }) {
   const listing = await getListing((await params).id);
   if (!listing) notFound();
@@ -39,12 +69,7 @@ async function ListingDetail({ params }: { params: Props["params"] }) {
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
       <div className="space-y-6">
-        {/* Photo gallery placeholder until uploads exist (build step 4) */}
-        <div className="grid h-72 grid-cols-4 grid-rows-2 gap-2 overflow-hidden rounded-2xl sm:h-96">
-          <div className="col-span-4 row-span-2 bg-gradient-to-br from-brand-strong to-brand sm:col-span-3" />
-          <div className="hidden bg-brand/70 sm:block" />
-          <div className="hidden bg-brand/50 sm:block" />
-        </div>
+        <PhotoGallery photos={listing.photos} title={listing.title} />
 
         <div>
           <p className="text-sm font-semibold text-brand">

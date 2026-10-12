@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { Listing } from "@/lib/sample-listings";
 import { formatDate, formatPrice } from "@/lib/format";
@@ -18,8 +19,16 @@ export function ListingCard({ listing }: { listing: Listing }) {
       href={`/listings/${listing.id}`}
       className="group overflow-hidden rounded-2xl border border-border bg-surface transition hover:-translate-y-0.5 hover:shadow-lg"
     >
-      {/* Photo placeholder until uploads exist (build step 4) */}
       <div className={`relative h-40 bg-gradient-to-br ${typeColors[listing.type]}`}>
+        {listing.photos[0] && (
+          <Image
+            src={listing.photos[0]}
+            alt=""
+            fill
+            sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+            className="object-cover"
+          />
+        )}
         <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-xs font-semibold text-gray-900">
           {type.label} · {type.labelAm}
         </span>

@@ -18,6 +18,8 @@ export type Listing = {
   description: string;
   hostName: string;
   postedAt: string;
+  // Signed links to the photos, cover first. Sample listings have none.
+  photos: string[];
 };
 
 export const sampleListings: Listing[] = [
@@ -39,6 +41,7 @@ export const sampleListings: Listing[] = [
       "Sunny house on a quiet street, a short walk from Havana St shops, restaurants and the bus line. Updated kitchen, washer and dryer, fenced yard and a two-car driveway.",
     hostName: "Dawit",
     postedAt: "2026-10-08",
+    photos: [],
   },
   {
     id: "2",
@@ -58,6 +61,7 @@ export const sampleListings: Listing[] = [
       "Fully separate basement with its own entrance, kitchenette and bathroom. Utilities and Wi-Fi are included. Off-street parking for one car.",
     hostName: "Selam",
     postedAt: "2026-10-09",
+    photos: [],
   },
   {
     id: "3",
@@ -77,6 +81,7 @@ export const sampleListings: Listing[] = [
       "Furnished bedroom in a calm, clean home. Shared kitchen and bathroom. Utilities and internet included. Close to the bus to downtown and DIA.",
     hostName: "Meron",
     postedAt: "2026-10-10",
+    photos: [],
   },
   {
     id: "4",
@@ -96,6 +101,7 @@ export const sampleListings: Listing[] = [
       "Second-floor apartment, a 5-minute walk to the W line light rail. In-unit laundry, one assigned parking spot and a small balcony.",
     hostName: "Yonas",
     postedAt: "2026-10-05",
+    photos: [],
   },
   {
     id: "5",
@@ -115,6 +121,7 @@ export const sampleListings: Listing[] = [
       "Spacious family home in a good school district. Large backyard, finished basement, attached garage and central air.",
     hostName: "Hanna",
     postedAt: "2026-10-03",
+    photos: [],
   },
   {
     id: "6",
@@ -134,5 +141,6 @@ export const sampleListings: Listing[] = [
       "Open-plan basement studio with its own bathroom and small kitchen. Utilities included. Street parking only.",
     hostName: "Tesfaye",
     postedAt: "2026-10-07",
+    photos: [],
   },
 ];

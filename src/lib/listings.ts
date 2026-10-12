@@ -50,7 +50,8 @@ export function parseFilters(params: RawParams): ListingFilters {
 
 const listingColumns =
   "id, title, type, price, deposit, bedrooms, bathrooms, city, neighborhood, available_from, " +
-  "utilities_included, parking, pets_allowed, description, created_at, host:profiles!listings_host_id_fkey(display_name)";
+  "utilities_included, parking, pets_allowed, description, created_at, host:profiles!listings_host_id_fkey(display_name), " +
+  "listing_photos(path, order)";
 
 type ListingRow = {
   id: string;
@@ -69,9 +70,30 @@ type ListingRow = {
   description: string;
   created_at: string;
   host: { display_name: string | null } | null;
+  listing_photos: { path: string; order: number }[];
 };
 
-function toListing(row: ListingRow): Listing {
+type PublicClient = NonNullable<ReturnType<typeof createPublicClient>>;
+
+// The photo bucket is private, so pages get signed links. They last a day, well past
+// how long these cached results are kept.
+async function toListings(supabase: PublicClient, rows: ListingRow[]): Promise<Listing[]> {
+  const paths = rows.flatMap((r) => r.listing_photos.map((p) => p.path));
+  const { data: signed } = paths.length
+    ? await supabase.storage.from("listing-photos").createSignedUrls(paths, 60 * 60 * 24)
+    : { data: [] };
+  const urls = new Map((signed ?? []).map((s) => [s.path, s.signedUrl]));
+
+  return rows.map((row) => ({
+    ...toListing(row),
+    photos: [...row.listing_photos]
+      .sort((a, b) => a.order - b.order)
+      .map((p) => urls.get(p.path))
+      .filter((url): url is string => !!url),
+  }));
+}
+
+function toListing(row: ListingRow): Omit<Listing, "photos"> {
   return {
     id: row.id,
     title: row.title,
@@ -113,7 +135,7 @@ export async function getListings(filters: ListingFilters): Promise<Listing[]> {
 
     const { data, error } = await query.limit(100).overrideTypes<ListingRow[], { merge: false }>();
     if (error) throw new Error(`Couldn't load listings: ${error.message}`);
-    return data.map(toListing);
+    return toListings(supabase, data);
   }
 
   const results = sampleListings.filter(
@@ -151,7 +173,7 @@ export async function getListing(id: string): Promise<Listing | undefined> {
       .maybeSingle()
       .overrideTypes<ListingRow, { merge: false }>();
     if (error) throw new Error(`Couldn't load listing: ${error.message}`);
-    return data ? toListing(data) : undefined;
+    return data ? (await toListings(supabase, [data]))[0] : undefined;
   }
 
   return sampleListings.find((l) => l.id === id);

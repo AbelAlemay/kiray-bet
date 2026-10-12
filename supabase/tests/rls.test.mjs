@@ -10,10 +10,10 @@ const db = new PGlite();
 
 // Minimal stand-in for what Supabase provides.
 await db.exec(`
-  create role anon nologin; create role authenticated nologin; create role service_role nologin;
+  create role anon nologin; create role authenticated nologin; create role service_role nologin bypassrls;
   grant usage on schema public to anon, authenticated, service_role;
   alter default privileges in schema public grant all on tables to anon, authenticated, service_role;
-  create schema auth; grant usage on schema auth to anon, authenticated;
+  create schema auth; grant usage on schema auth to anon, authenticated, service_role;
   create table auth.users (id uuid primary key, instance_id uuid, aud text, role text, email text,
     encrypted_password text, email_confirmed_at timestamptz, raw_app_meta_data jsonb,
     raw_user_meta_data jsonb, created_at timestamptz, updated_at timestamptz);
@@ -21,6 +21,15 @@ await db.exec(`
     $$ select coalesce(nullif(current_setting('request.jwt.claims', true), ''), 'null')::jsonb $$;
   create function auth.uid() returns uuid language sql stable as
     $$ select nullif(auth.jwt() ->> 'sub', '')::uuid $$;
+  create schema storage; grant usage on schema storage to anon, authenticated;
+  create table storage.buckets (id text primary key, name text, public boolean,
+    file_size_limit bigint, allowed_mime_types text[]);
+  create table storage.objects (id uuid primary key default gen_random_uuid(),
+    bucket_id text references storage.buckets, name text, owner uuid default auth.uid());
+  grant select, insert, delete on storage.objects to anon, authenticated;
+  alter table storage.objects enable row level security;
+  create function storage.foldername(name text) returns text[] language sql immutable as
+    $$ select (string_to_array(name, '/'))[1:array_length(string_to_array(name, '/'), 1) - 1] $$;
 `);
 for (const file of readdirSync(`${dir}migrations`).sort()) {
   await db.exec(readFileSync(`${dir}migrations/${file}`, "utf8"));
@@ -33,11 +42,13 @@ const check = (name, ok, detail = "") => {
   console.log(`${ok ? "PASS" : "FAIL"}  ${name}${ok ? "" : "  " + detail}`);
 };
 
-// Run SQL as a given user (null = anonymous visitor).
+// Run SQL as a given user (null = anonymous visitor, SERVER = the server's admin key).
+const SERVER = "service_role";
 async function as(uid, sql, params = []) {
-  const claims = uid ? { sub: uid, role: "authenticated" } : { role: "anon" };
+  const role = uid === SERVER ? "service_role" : uid ? "authenticated" : "anon";
+  const claims = uid && uid !== SERVER ? { sub: uid, role } : { role };
   return db.transaction(async (tx) => {
-    await tx.exec(`set local role ${uid ? "authenticated" : "anon"}`);
+    await tx.exec(`set local role ${role}`);
     await tx.query(`select set_config('request.jwt.claims', $1, true)`, [JSON.stringify(claims)]);
     return (await tx.query(sql, params)).rows;
   });
@@ -105,8 +116,22 @@ await as(RUTH, `insert into listing_addresses (listing_id, street_address, zip, 
 rows = await as(RUTH, `select status, approx_lat from listings where id = $1`, [RL]);
 check("address added: blurred + back to review", rows[0].status === "pending" && rows[0].approx_lat === 39.7);
 await as(ADMIN, `update listings set status = 'active' where id = $1`, [RL]);
-await as(RUTH, `insert into listing_photos (listing_id, path) values ($1, 'x.jpg')`, [RL]);
+const photo = `${RUTH}/${RL}/1.jpg`;
+check("can't upload into someone else's folder", await fails(SAMI,
+  `insert into storage.objects (bucket_id, name) values ('listing-photos', $1)`, [photo]));
+await as(RUTH, `insert into storage.objects (bucket_id, name) values ('listing-photos', $1)`, [photo]);
+check("photo row must point into own listing folder", await fails(RUTH,
+  `insert into listing_photos (listing_id, path) values ($1, $2)`, [RL, `${SAMI}/${RL}/1.jpg`]));
+await as(RUTH, `insert into listing_photos (listing_id, path) values ($1, $2)`, [RL, photo]);
 check("photo added goes back to review", (await as(RUTH, `select status from listings where id = $1`, [RL]))[0].status === "pending");
+const seePhoto = (uid) => as(uid, `select 1 from storage.objects where name = $1`, [photo]);
+check("public can't see photos of a pending listing", (await seePhoto(null)).length === 0);
+check("host sees own pending photo", (await seePhoto(RUTH)).length === 1);
+await as(ADMIN, `update listings set status = 'active' where id = $1`, [RL]);
+check("public sees photos once approved", (await seePhoto(null)).length === 1);
+check("others can't delete a host's photo", (await as(SAMI, `delete from storage.objects where name = $1 returning id`, [photo])).length === 0);
+await as(RUTH, `update listings set price = 950 where id = $1`, [RL]);
+check("photos hidden again while edit is reviewed", (await seePhoto(null)).length === 0);
 check("other user can't edit listing", (await as(SAMI, `update listings set price = 1 where id = $1 returning id`, [L1])).length === 0);
 
 // Messaging
@@ -138,6 +163,10 @@ await as(DAWIT, `update address_requests set status = 'approved' where id = $1`,
 check("approved renter sees address", (await as(SAMI, `select 1 from listing_addresses where listing_id = $1`, [L1])).length === 1);
 await as(DAWIT, `update address_requests set status = 'revoked' where id = $1`, [AR]);
 check("revoked renter loses address", (await as(SAMI, `select 1 from listing_addresses where listing_id = $1`, [L1])).length === 0);
+
+// Server (admin key)
+rows = await as(SERVER, `update listings set status = 'rejected' where id = $1 returning status, reviewed_at`, [RL]);
+check("server key can review listings", rows[0]?.status === "rejected" && rows[0]?.reviewed_at);
 
 // Bans
 await db.query(`update private_profiles set banned = true where user_id = $1`, [SAMI]);
