@@ -1,10 +1,7 @@
 import Link from "next/link";
 import { sortOptions, type ListingFilters } from "@/lib/listings";
 import { site } from "@/lib/site";
-
-const fieldClass =
-  "w-full rounded-xl border border-border bg-surface px-3 py-2.5 text-foreground outline-none focus:border-brand";
-const labelClass = "block space-y-1 text-sm font-medium";
+import { fieldClass, labelClass } from "./form-styles";
 
 export function SearchFilters({ filters }: { filters: ListingFilters }) {
   return (

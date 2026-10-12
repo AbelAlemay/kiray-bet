@@ -16,7 +16,7 @@ every listing is reviewed by a person, and all contact happens inside the site.
 | Listing approval | **Every listing is reviewed by the admin before it goes live.** Admin is notified of each new listing by **email and Telegram**. |
 | Address privacy | Public sees only the neighborhood and an approximate map area. The exact address is shared only after the renter asks **and the host approves**. |
 | Area | Denver metro only at launch. |
-| Login | Email link + Google. |
+| Login | Email link + 6-digit code, and Google. Same flow signs up new users. |
 | Language | English and Amharic side by side. Amharic font: **Menbere**. |
 | Accounts | **Only hosts create full accounts.** Renters browse with no account and just confirm their email (email link or Google) when they tap "Contact host". No password, no profile. |
 | Money | **No payments on the site, ever.** Warn users not to pay by Zelle, Cash App, Venmo or any other way before seeing the home and signing a lease. |
@@ -141,8 +141,8 @@ Private (owner and admin only):
 |---|---|---|
 | 0 | Name, brand, Next.js project | Done |
 | 1 | Home, Search, Listing detail pages (sample data) | Done |
-| 2 | Supabase: tables, security rules, move sample data in | Done in code (security rules tested); waiting on a Supabase project |
-| 3 | Accounts: sign up, log in, profile | Next |
+| 2 | Supabase: tables, security rules, move sample data in | Done |
+| 3 | Accounts: sign up, log in, profile | In progress: email sign-in works; waiting on Resend (code emails) and Google setup |
 | 4 | Post a listing with photos + admin approval queue and notifications | |
 | 5 | Real search + map with approximate locations | |
 | 6 | In-app messaging + address requests | |

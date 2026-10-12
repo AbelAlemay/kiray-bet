@@ -23,6 +23,9 @@ Without Supabase keys the site shows the sample listings in `src/lib/sample-list
    ```
 3. Copy `.env.example` to `.env.local` and fill in the project URL and publishable key
    (Project Settings → API Keys). Restart `npm run dev`.
+4. Auth settings (allowed return addresses, code length and expiry) live in
+   `supabase/config.toml`. Preview with `npx supabase config diff`, apply with
+   `npx supabase config push`.
 
 ## Database
 

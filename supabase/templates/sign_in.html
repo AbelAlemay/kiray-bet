@@ -1,0 +1,23 @@
+<div style="font-family: -apple-system, Segoe UI, Roboto, sans-serif; max-width: 480px; margin: 0 auto; color: #1f2937;">
+  <h2 style="margin: 0 0 4px;">ኪራይ ቤት · KirayBet</h2>
+  <p style="margin: 0 0 24px; color: #6b7280;">Sign in · ይግቡ</p>
+
+  <p>Your sign-in code is:</p>
+  <p style="font-size: 32px; font-weight: bold; letter-spacing: 6px; margin: 8px 0 24px;">{{ .Token }}</p>
+
+  <p>Or tap this button to sign in on this device:</p>
+  <p>
+    <a href="{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=email&next={{ .RedirectTo }}"
+       style="display: inline-block; background: #047857; color: #ffffff; padding: 12px 20px; border-radius: 10px; text-decoration: none; font-weight: 600;">
+      Sign in to KirayBet
+    </a>
+  </p>
+
+  <p style="color: #6b7280; font-size: 14px; margin-top: 24px;">
+    The code and button work for 15 minutes. If you didn't ask to sign in, you can ignore this email.
+  </p>
+  <p style="color: #6b7280; font-size: 14px;">
+    KirayBet will never ask for your password, a payment, or this code by phone or message.
+    ይህንን ኮድ ለማንም አያጋሩ።
+  </p>
+</div>
