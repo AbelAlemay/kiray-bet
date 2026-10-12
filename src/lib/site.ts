@@ -2,7 +2,7 @@ export const site = {
   name: "ኪራይ ቤት",
   nameLatin: "KirayBet",
   tagline: "Homes for rent in Denver, from our community",
-  taglineAm: "በዴንቨር ለኪራይ የሚሆኑ ቤቶች",
+  taglineAm: "የሚከራዩ ቤቶች በዴንቨር እና አካባቢው",
   cities: ["Aurora", "Denver", "Lakewood", "Englewood", "Centennial", "Littleton", "Thornton"],
   listingTypes: [
     { value: "house", label: "House", labelAm: "ሙሉ ቤት" },

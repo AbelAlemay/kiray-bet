@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="220" viewBox="0 0 220 220">
+  <g fill="none" stroke="#14281b" stroke-opacity="0.45" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <!-- house -->
+    <path d="M18 46 36 30l18 16M23 42v20h26V42M32 62v-9h8v9"/>
+    <!-- apartment block -->
+    <path d="M128 20h30v44h-30zM135 29h5M146 29h5M135 39h5M146 39h5M135 49h5M146 49h5M140 64v-7h6v7"/>
+    <!-- small house with chimney, tilted -->
+    <g transform="rotate(-8 85 110)">
+      <path d="M70 112 85 99l15 13M74 109v16h22v-16M92 104v-6h4v9"/>
+    </g>
+    <!-- key -->
+    <path d="M178 112a6 6 0 1 0 0.1 0M184 112h18M196 112v5M201 112v4"/>
+    <!-- wide house -->
+    <path d="M16 160 40 144l24 16M22 156v22h36v-22M30 166h7v6h-7zM44 178v-11h7v11"/>
+    <!-- small house, tilted -->
+    <g transform="rotate(10 160 175)">
+      <path d="M146 176 160 164l14 12M150 173v15h20v-15M157 188v-7h6v7"/>
+    </g>
+    <!-- tiny houses -->
+    <path d="M100 196 108 189l8 7M103 194v8h10v-8"/>
+    <path d="M196 54 203 48l7 6M198 52v7h10v-7"/>
+  </g>
+</svg>

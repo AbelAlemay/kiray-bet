@@ -44,22 +44,70 @@ export async function twoStep(prev: TwoStepState, formData: FormData): Promise<T
   redirect("/admin");
 }
 
-export async function approveListing(formData: FormData) {
-  await requireAdmin();
-  const id = String(formData.get("listingId") ?? "");
-  const supabase = await createServerSupabase();
-  await supabase.from("listings").update({ status: "active", review_note: null }).eq("id", id).eq("status", "pending");
-  updateTag("listings");
-  redirect("/admin?done=approved");
+// Every admin action returns to the tab it came from.
+function back(formData: FormData, done: string): never {
+  const tab = String(formData.get("tab") ?? "review");
+  redirect(`/admin?tab=${encodeURIComponent(tab)}&done=${done}`);
 }
 
+function note(formData: FormData) {
+  return String(formData.get("note") ?? "").trim().slice(0, 500);
+}
+
+// Approve a pending listing, or put a rejected one live.
+export async function approveListing(formData: FormData) {
+  await requireAdmin();
+  const supabase = await createServerSupabase();
+  await supabase
+    .from("listings")
+    .update({ status: "active", review_note: null })
+    .eq("id", String(formData.get("listingId")))
+    .in("status", ["pending", "rejected"]);
+  updateTag("listings");
+  back(formData, "approved");
+}
+
+// Reject a pending listing, or take down a live/rented one. The host sees the note.
 export async function rejectListing(formData: FormData) {
   await requireAdmin();
-  const id = String(formData.get("listingId") ?? "");
-  const note = String(formData.get("note") ?? "").trim().slice(0, 500);
-  if (!note) redirect(`/admin?error=note#${id}`);
+  const reason = note(formData);
+  if (!reason) back(formData, "note-missing");
   const supabase = await createServerSupabase();
-  await supabase.from("listings").update({ status: "rejected", review_note: note }).eq("id", id).eq("status", "pending");
+  await supabase
+    .from("listings")
+    .update({ status: "rejected", review_note: reason })
+    .eq("id", String(formData.get("listingId")));
   updateTag("listings");
-  redirect("/admin?done=rejected");
+  back(formData, "rejected");
+}
+
+export async function deleteListingAsAdmin(formData: FormData) {
+  await requireAdmin();
+  const id = String(formData.get("listingId"));
+  const supabase = await createServerSupabase();
+  const { data: photos } = await supabase.from("listing_photos").select("path").eq("listing_id", id);
+  if (photos?.length) await supabase.storage.from("listing-photos").remove(photos.map((p) => p.path));
+  await supabase.from("listings").delete().eq("id", id);
+  updateTag("listings");
+  back(formData, "deleted");
+}
+
+// Banning blocks posting and messaging, and takes the user's listings down.
+export async function setBanned(formData: FormData) {
+  const admin = await requireAdmin();
+  const userId = String(formData.get("userId"));
+  const banned = formData.get("banned") === "true";
+  if (userId === admin.id) back(formData, "self");
+
+  const supabase = await createServerSupabase();
+  await supabase.from("private_profiles").update({ banned }).eq("user_id", userId);
+  if (banned) {
+    await supabase
+      .from("listings")
+      .update({ status: "rejected", review_note: note(formData) || "Account suspended." })
+      .eq("host_id", userId)
+      .in("status", ["pending", "active", "rented"]);
+    updateTag("listings");
+  }
+  back(formData, banned ? "banned" : "unbanned");
 }

@@ -89,7 +89,7 @@ check("sign-up stores first name only, role renter", rows[0]?.display_name === "
 rows = await as(RUTH, `select user_id from private_profiles`);
 check("user sees only own private profile", rows.length === 1 && rows[0].user_id === RUTH);
 check("user can't make self admin", await fails(RUTH, `update profiles set role = 'admin' where id = $1`, [RUTH]));
-check("user can't ban/unban self", await fails(RUTH, `update private_profiles set banned = false`));
+check("user can't ban/unban self", await fails(RUTH, `update private_profiles set banned = true where user_id = $1`, [RUTH]));
 
 // Hosting flow
 const insertListing = `insert into listings (host_id, title, description, type, price, bedrooms, bathrooms, city, neighborhood, available_from)
@@ -133,6 +133,8 @@ check("host sees own pending photo", (await seePhoto(RUTH)).length === 1);
 await as(ADMIN, `update listings set status = 'active' where id = $1`, [RL]);
 check("public sees photos once approved", (await seePhoto(null)).length === 1);
 check("others can't delete a host's photo", (await as(SAMI, `delete from storage.objects where name = $1 returning id`, [photo])).length === 0);
+await as(RUTH, `insert into storage.objects (bucket_id, name) values ('listing-photos', $1)`, [`${RUTH}/${RL}/2.jpg`]);
+check("admin can delete a host's photo", (await as(ADMIN, `delete from storage.objects where name = $1 returning id`, [`${RUTH}/${RL}/2.jpg`])).length === 1);
 await as(RUTH, `update listings set price = 950 where id = $1`, [RL]);
 check("photos hidden again while edit is reviewed", (await seePhoto(null)).length === 0);
 check("other user can't edit listing", (await as(SAMI, `update listings set price = 1 where id = $1 returning id`, [L1])).length === 0);
@@ -182,7 +184,12 @@ rows = await as(SERVER, `update listings set status = 'rejected' where id = $1 r
 check("server key can review listings", rows[0]?.status === "rejected" && rows[0]?.reviewed_at);
 
 // Bans
-await db.query(`update private_profiles set banned = true where user_id = $1`, [SAMI]);
+check("user can't ban someone else", (await as(RUTH, `update private_profiles set banned = true where user_id = $1 returning user_id`, [SAMI])).length === 0);
+check("user can't ban/unban themselves", await fails(SAMI, `update private_profiles set banned = true where user_id = $1`, [SAMI]));
+check("user can still change own language", (await as(SAMI, `update private_profiles set language = 'am' where user_id = $1 returning user_id`, [SAMI])).length === 1);
+check("admin without two-step login can't ban", (await as(ADMIN, `update private_profiles set banned = true where user_id = $1 returning user_id`, [SAMI], { aal: "aal1" })).length === 0);
+check("admin bans a user", (await as(ADMIN, `update private_profiles set banned = true where user_id = $1 returning user_id`, [SAMI])).length === 1);
+check("banned user can't unban themselves", await fails(SAMI, `update private_profiles set banned = false where user_id = $1`, [SAMI]));
 check("banned user can't message", await fails(SAMI,
   `insert into messages (conversation_id, sender_id, body) values ($1, $2, 'hi')`, [C, SAMI]));
 

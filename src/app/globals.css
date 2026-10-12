@@ -6,9 +6,9 @@
   --foreground: #1c1a17;
   --muted: #6b645a;
   --border: #e7e0d5;
-  --brand: #146b3a;
-  --brand-strong: #0e5029;
-  --brand-soft: #e3f1e8;
+  --brand: #2f5a3f;
+  --brand-strong: #23452f;
+  --brand-soft: #e8eee6;
   --accent: #e0a526;
   --danger: #b3261e;
 }
@@ -20,9 +20,9 @@
     --foreground: #f2eee8;
     --muted: #a69e92;
     --border: #34302a;
-    --brand: #3fae6a;
-    --brand-strong: #5cc584;
-    --brand-soft: #1b3325;
+    --brand: #538159;
+    --brand-strong: #77a77e;
+    --brand-soft: #222f25;
     --accent: #f0bb45;
     --danger: #f2827a;
   }
@@ -39,6 +39,9 @@
   --color-brand-soft: var(--brand-soft);
   --color-accent: var(--accent);
   --color-danger: var(--danger);
+  /* Logo colors, the same in light and dark mode (hero background, door/headline). */
+  --color-forest: #2f5a3f;
+  --color-door: #e0a526;
   --font-sans: var(--font-geist-sans), var(--font-ethiopic), system-ui, sans-serif;
   --font-ethiopic: var(--font-ethiopic);
 }

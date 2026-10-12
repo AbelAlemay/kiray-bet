@@ -48,7 +48,7 @@ export default async function Home() {
 
   return (
     <>
-      <section className="bg-gradient-to-br from-brand-strong via-brand to-emerald-600 text-white">
+      <section className="bg-forest bg-[url(/house-pattern.svg)] bg-[length:80px] text-white">
         <div className="mx-auto max-w-6xl px-4 pb-14 pt-12 sm:pt-20">
           <div className="mb-3 flex flex-wrap gap-2 text-sm">
             <p className="rounded-full bg-white/15 px-3 py-1">Denver · Aurora · Lakewood · Englewood</p>
@@ -56,7 +56,7 @@ export default async function Home() {
               🔒 Safe & private · ደህንነቱ የተጠበቀ
             </a>
           </div>
-          <h1 className="max-w-2xl text-4xl font-bold leading-tight sm:text-5xl">
+          <h1 className="max-w-2xl text-4xl font-bold leading-tight text-door sm:text-5xl">
             {site.taglineAm}
           </h1>
           <p className="mt-3 max-w-xl text-lg text-white/85">{site.tagline}.</p>
