@@ -2,8 +2,10 @@
 
 import { updateTag } from "next/cache";
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { geocodeAddress, inDenverMetro } from "@/lib/geocode";
+import { listingAlert, notifyAdmin } from "@/lib/notify";
 import { parseListingForm, type AddressInput, type ListingErrors } from "@/lib/listing-rules";
 import { createServerSupabase } from "@/lib/supabase/server";
 
@@ -57,7 +59,7 @@ export async function createListing(_prev: ListingFormState, formData: FormData)
     return { errors: { form: saveFailed } };
   }
 
-  // TODO(phase 4): notify the admin by email and Telegram.
+  after(() => notifyAdmin(listingAlert("new", listing, user.name)));
   redirect("/listings/mine?posted=1");
 }
 
@@ -115,9 +117,11 @@ export async function updateListing(_prev: ListingFormState, formData: FormData)
     if (removed.length) await supabase.storage.from(bucket).remove(removed);
   }
 
-  const { data: after } = await supabase.from("listings").select("status").eq("id", id).single();
+  const { data: saved } = await supabase.from("listings").select("status").eq("id", id).single();
+  const sentToReview = saved?.status === "pending" && current.status !== "pending";
+  if (sentToReview) after(() => notifyAdmin(listingAlert("edited", listing, user.name)));
   updateTag("listings");
-  redirect(`/listings/mine?updated=${after?.status === "pending" && current.status !== "pending" ? "review" : "1"}`);
+  redirect(`/listings/mine?updated=${sentToReview ? "review" : "1"}`);
 }
 
 export async function deleteListing(formData: FormData) {
