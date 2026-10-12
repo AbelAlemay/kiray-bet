@@ -40,8 +40,8 @@
   --color-accent: var(--accent);
   --color-danger: var(--danger);
   /* Logo colors, the same in light and dark mode (hero background, door/headline). */
-  --color-forest: #2f5a3f;
-  --color-door: #e0a526;
+  --color-forest: #447656;
+  --color-door: #f5c75a;
   --font-sans: var(--font-geist-sans), var(--font-ethiopic), system-ui, sans-serif;
   --font-ethiopic: var(--font-ethiopic);
 }
