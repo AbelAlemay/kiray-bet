@@ -25,6 +25,7 @@ type Row = {
   price: number;
   city: string;
   neighborhood: string;
+  review_note: string | null;
   listing_photos: { path: string; order: number }[];
 };
 
@@ -44,7 +45,7 @@ async function MyListings({ searchParams }: { searchParams: PageProps<"/listings
   const supabase = await createServerSupabase();
   const { data } = await supabase
     .from("listings")
-    .select("id, title, status, price, city, neighborhood, listing_photos(path, order)")
+    .select("id, title, status, price, city, neighborhood, review_note, listing_photos(path, order)")
     .eq("host_id", user.id)
     .order("created_at", { ascending: false })
     .overrideTypes<Row[], { merge: false }>();
@@ -104,6 +105,11 @@ async function MyListings({ searchParams }: { searchParams: PageProps<"/listings
                   <p className="text-sm text-muted">
                     {formatPrice(l.price)}/mo · {l.neighborhood}, {l.city}
                   </p>
+                  {l.status === "rejected" && l.review_note && (
+                    <p className="mt-1 text-sm text-danger">
+                      Reviewer&apos;s note: {l.review_note}. Edit the listing to fix it and resubmit.
+                    </p>
+                  )}
                 </div>
                 <div className="self-center">
                   <ListingActions id={l.id} status={l.status} />

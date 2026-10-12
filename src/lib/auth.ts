@@ -11,6 +11,8 @@ export type CurrentUser = {
   name: string | null;
   role: "renter" | "host" | "admin";
   language: "en" | "am";
+  // "aal2" once this session was confirmed with an authenticator app code.
+  twoStepVerified: boolean;
 };
 
 // The signed-in user, or null. Verifies the session token (getClaims), then loads the
@@ -26,6 +28,7 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
   const { data } = await supabase.auth.getClaims();
   const userId = data?.claims.sub;
   if (!userId) return null;
+  const twoStepVerified = data.claims.aal === "aal2";
 
   const [{ data: profile }, { data: privateProfile }] = await Promise.all([
     supabase.from("profiles").select("display_name, role").eq("id", userId).single(),
@@ -39,6 +42,7 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
     name: profile.display_name,
     role: profile.role,
     language: privateProfile.language,
+    twoStepVerified,
   };
 });
 

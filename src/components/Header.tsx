@@ -18,9 +18,16 @@ async function AccountLink() {
   const user = await getCurrentUser();
   if (!user) return <SignInLink />;
   return (
-    <Link href="/account" className={`${navLinkClass} font-semibold`}>
-      {user.name ?? "Account"}
-    </Link>
+    <>
+      {user.role === "admin" && (
+        <Link href="/admin" className={navLinkClass}>
+          Admin
+        </Link>
+      )}
+      <Link href="/account" className={`${navLinkClass} font-semibold`}>
+        {user.name ?? "Account"}
+      </Link>
+    </>
   );
 }
 

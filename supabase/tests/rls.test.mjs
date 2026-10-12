@@ -44,17 +44,18 @@ const check = (name, ok, detail = "") => {
 
 // Run SQL as a given user (null = anonymous visitor, SERVER = the server's admin key).
 const SERVER = "service_role";
-async function as(uid, sql, params = []) {
+// Signed-in users are "aal2" (confirmed with an authenticator app) unless `aal` says otherwise.
+async function as(uid, sql, params = [], { aal = "aal2" } = {}) {
   const role = uid === SERVER ? "service_role" : uid ? "authenticated" : "anon";
-  const claims = uid && uid !== SERVER ? { sub: uid, role } : { role };
+  const claims = uid && uid !== SERVER ? { sub: uid, role, aal } : { role };
   return db.transaction(async (tx) => {
     await tx.exec(`set local role ${role}`);
     await tx.query(`select set_config('request.jwt.claims', $1, true)`, [JSON.stringify(claims)]);
     return (await tx.query(sql, params)).rows;
   });
 }
-async function fails(uid, sql, params) {
-  try { await as(uid, sql, params); return false; } catch { return true; }
+async function fails(uid, sql, params, opts) {
+  try { await as(uid, sql, params, opts); return false; } catch { return true; }
 }
 async function newUser(id, name) {
   await db.query(`insert into auth.users (id, email, raw_user_meta_data) values ($1, $2, $3)`,
@@ -104,6 +105,8 @@ check("anon can't see pending listing", (await as(null, `select 1 from listings 
 check("host can't approve own listing", await fails(RUTH, `update listings set status = 'active' where id = $1`, [RL]));
 check("host can't set approx location", await fails(RUTH, `update listings set approx_lat = 1 where id = $1`, [RL]));
 
+check("admin without two-step login can't approve", (await as(ADMIN,
+  `update listings set status = 'active' where id = $1 returning id`, [RL], { aal: "aal1" })).length === 0);
 rows = await as(ADMIN, `update listings set status = 'active' where id = $1 returning status, reviewed_at`, [RL]);
 check("admin approves, reviewed_at set", rows[0].status === "active" && rows[0].reviewed_at);
 rows = await as(RUTH, `update listings set status = 'rented' where id = $1 returning status`, [RL]);
@@ -150,6 +153,8 @@ check("host sees renter's first name", (await as(DAWIT, `select 1 from profiles 
 check("admin can't read unreported chat", (await as(ADMIN, `select 1 from messages`)).length === 0);
 await as(SAMI, `insert into reports (target_type, target_id, reporter_id, reason) values ('conversation', $1, $2, 'Asked for deposit by Zelle')`, [C, SAMI]);
 check("admin reads chat once reported", (await as(ADMIN, `select 1 from messages`)).length === 1);
+check("admin without two-step login can't read reported chat",
+  (await as(ADMIN, `select 1 from messages`, [], { aal: "aal1" })).length === 0);
 check("sender can't mark own message read", (await as(SAMI, `update messages set read_at = now() returning id`)).length === 0);
 check("recipient marks read", (await as(DAWIT, `update messages set read_at = now() returning id`)).length === 1);
 check("can't edit message body", await fails(DAWIT, `update messages set body = 'x'`));
@@ -163,6 +168,14 @@ await as(DAWIT, `update address_requests set status = 'approved' where id = $1`,
 check("approved renter sees address", (await as(SAMI, `select 1 from listing_addresses where listing_id = $1`, [L1])).length === 1);
 await as(DAWIT, `update address_requests set status = 'revoked' where id = $1`, [AR]);
 check("revoked renter loses address", (await as(SAMI, `select 1 from listing_addresses where listing_id = $1`, [L1])).length === 0);
+
+// Review notes
+check("host can't write a review note", await fails(RUTH, `update listings set review_note = 'ok' where id = $1`, [RL]));
+rows = await as(ADMIN, `update listings set status = 'rejected', review_note = 'Photos are blurry' where id = $1 returning status`, [RL]);
+check("admin rejects with a note", rows[0]?.status === "rejected");
+check("host reads the note", (await as(RUTH, `select review_note from listings where id = $1`, [RL]))[0]?.review_note === "Photos are blurry");
+rows = await as(RUTH, `update listings set description = 'Clear new photos, quiet room near the bus line.' where id = $1 returning status`, [RL]);
+check("host edit resubmits a rejected listing", rows[0]?.status === "pending");
 
 // Server (admin key)
 rows = await as(SERVER, `update listings set status = 'rejected' where id = $1 returning status, reviewed_at`, [RL]);
