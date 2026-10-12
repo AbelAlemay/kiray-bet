@@ -1,6 +1,6 @@
 import type { ListingType } from "./site";
 
-// Placeholder data until Supabase is connected (build step 3).
+// Fallback data shown until Supabase is configured. Mirrors supabase/seed.sql.
 export type Listing = {
   id: string;
   title: string;

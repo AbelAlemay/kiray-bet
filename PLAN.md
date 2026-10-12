@@ -141,8 +141,8 @@ Private (owner and admin only):
 |---|---|---|
 | 0 | Name, brand, Next.js project | Done |
 | 1 | Home, Search, Listing detail pages (sample data) | Done |
-| 2 | Supabase: tables, security rules, move sample data in | Next |
-| 3 | Accounts: sign up, log in, profile | |
+| 2 | Supabase: tables, security rules, move sample data in | Done in code (security rules tested); waiting on a Supabase project |
+| 3 | Accounts: sign up, log in, profile | Next |
 | 4 | Post a listing with photos + admin approval queue and notifications | |
 | 5 | Real search + map with approximate locations | |
 | 6 | In-app messaging + address requests | |

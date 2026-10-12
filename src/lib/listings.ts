@@ -1,8 +1,12 @@
+import { cacheLife, cacheTag } from "next/cache";
 import { sampleListings, type Listing } from "./sample-listings";
 import { site, type ListingType } from "./site";
+import { createPublicClient } from "./supabase/public";
 
-// Data access for listings. Backed by sample data for now; swap these
-// function bodies for Supabase queries in build step 3.
+// Data access for public listings. Reads approved listings from Supabase, or the
+// sample data when Supabase isn't configured yet (see .env.example).
+// Cached under the "listings" tag; call revalidateTag("listings") after a listing
+// is approved, edited or removed.
 
 export type ListingFilters = {
   city?: string;
@@ -44,7 +48,74 @@ export function parseFilters(params: RawParams): ListingFilters {
   };
 }
 
+const listingColumns =
+  "id, title, type, price, deposit, bedrooms, bathrooms, city, neighborhood, available_from, " +
+  "utilities_included, parking, pets_allowed, description, created_at, host:profiles!listings_host_id_fkey(display_name)";
+
+type ListingRow = {
+  id: string;
+  title: string;
+  type: ListingType;
+  price: number;
+  deposit: number;
+  bedrooms: number;
+  bathrooms: number;
+  city: string;
+  neighborhood: string;
+  available_from: string;
+  utilities_included: boolean;
+  parking: boolean;
+  pets_allowed: boolean;
+  description: string;
+  created_at: string;
+  host: { display_name: string | null } | null;
+};
+
+function toListing(row: ListingRow): Listing {
+  return {
+    id: row.id,
+    title: row.title,
+    type: row.type,
+    price: row.price,
+    deposit: row.deposit,
+    bedrooms: row.bedrooms,
+    bathrooms: Number(row.bathrooms),
+    city: row.city,
+    neighborhood: row.neighborhood,
+    availableFrom: row.available_from,
+    utilitiesIncluded: row.utilities_included,
+    parking: row.parking,
+    petsAllowed: row.pets_allowed,
+    description: row.description,
+    hostName: row.host?.display_name ?? "Host",
+    postedAt: row.created_at.slice(0, 10),
+  };
+}
+
+const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export async function getListings(filters: ListingFilters): Promise<Listing[]> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("listings");
+
+  const supabase = createPublicClient();
+  if (supabase) {
+    let query = supabase.from("listings").select(listingColumns).eq("status", "active");
+    if (filters.city) query = query.eq("city", filters.city);
+    if (filters.type) query = query.eq("type", filters.type);
+    if (filters.maxPrice) query = query.lte("price", filters.maxPrice);
+    if (filters.minBedrooms) query = query.gte("bedrooms", filters.minBedrooms);
+    query =
+      filters.sort === "newest"
+        ? query.order("created_at", { ascending: false })
+        : query.order("price", { ascending: filters.sort === "price-asc" });
+
+    const { data, error } = await query.limit(100).overrideTypes<ListingRow[], { merge: false }>();
+    if (error) throw new Error(`Couldn't load listings: ${error.message}`);
+    return data.map(toListing);
+  }
+
   const results = sampleListings.filter(
     (l) =>
       (!filters.city || l.city === filters.city) &&
@@ -60,6 +131,28 @@ export async function getListings(filters: ListingFilters): Promise<Listing[]> {
   });
 }
 
+export async function getLatestListings(count: number): Promise<Listing[]> {
+  return (await getListings({ sort: "newest" })).slice(0, count);
+}
+
 export async function getListing(id: string): Promise<Listing | undefined> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("listings", `listing-${id}`);
+
+  const supabase = createPublicClient();
+  if (supabase) {
+    if (!uuidPattern.test(id)) return undefined;
+    const { data, error } = await supabase
+      .from("listings")
+      .select(listingColumns)
+      .eq("id", id)
+      .eq("status", "active")
+      .maybeSingle()
+      .overrideTypes<ListingRow, { merge: false }>();
+    if (error) throw new Error(`Couldn't load listing: ${error.message}`);
+    return data ? toListing(data) : undefined;
+  }
+
   return sampleListings.find((l) => l.id === id);
 }

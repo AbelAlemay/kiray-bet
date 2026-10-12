@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ListingCard } from "@/components/ListingCard";
 import { PaymentWarning } from "@/components/PaymentWarning";
 import { SearchBar } from "@/components/SearchBar";
-import { sampleListings } from "@/lib/sample-listings";
+import { getLatestListings } from "@/lib/listings";
 import { site } from "@/lib/site";
 
 const steps = [
@@ -43,7 +43,9 @@ const promises = [
   },
 ];
 
-export default function Home() {
+export default async function Home() {
+  const latest = await getLatestListings(6);
+
   return (
     <>
       <section className="bg-gradient-to-br from-brand-strong via-brand to-emerald-600 text-white">
@@ -75,7 +77,7 @@ export default function Home() {
           </Link>
         </div>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {sampleListings.map((listing) => (
+          {latest.map((listing) => (
             <ListingCard key={listing.id} listing={listing} />
           ))}
         </div>
