@@ -28,7 +28,7 @@ export function ConfirmButton({
 
   if (!open) {
     return (
-      <button type="button" onClick={() => setOpen(true)} className={`rounded-lg border px-3 py-1.5 text-sm font-semibold hover:bg-brand-soft ${tone}`}>
+      <button type="button" onClick={() => setOpen(true)} className={`inline-flex min-h-10 items-center rounded-lg border px-3 text-sm font-semibold hover:bg-brand-soft ${tone}`}>
         {label}
       </button>
     );
@@ -51,10 +51,10 @@ export function ConfirmButton({
         />
       )}
       <div className="flex gap-2">
-        <button className={`rounded-lg px-3 py-1.5 font-semibold text-white ${danger ? "bg-danger" : "bg-brand"} hover:opacity-90`}>
+        <button className={`min-h-10 rounded-lg px-3 font-semibold text-white ${danger ? "bg-danger" : "bg-brand"} hover:opacity-90`}>
           {confirmLabel}
         </button>
-        <button type="button" onClick={() => setOpen(false)} className="rounded-lg border border-border px-3 py-1.5 font-semibold hover:bg-surface">
+        <button type="button" onClick={() => setOpen(false)} className="min-h-10 rounded-lg border border-border px-3 font-semibold hover:bg-surface">
           Cancel
         </button>
       </div>

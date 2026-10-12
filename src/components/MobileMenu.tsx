@@ -8,7 +8,7 @@ export function MobileMenu({ children }: { children: ReactNode }) {
 
   return (
     <details ref={menu} className="group lg:hidden">
-      <summary className="cursor-pointer list-none rounded-lg border border-border px-3 py-2 text-sm font-semibold hover:bg-brand-soft [&::-webkit-details-marker]:hidden">
+      <summary className="cursor-pointer list-none whitespace-nowrap rounded-lg border border-border px-3 py-2.5 text-sm font-semibold hover:bg-brand-soft [&::-webkit-details-marker]:hidden">
         <span className="group-open:hidden">☰ Menu</span>
         <span className="hidden group-open:inline">✕ Close</span>
       </summary>
@@ -16,7 +16,7 @@ export function MobileMenu({ children }: { children: ReactNode }) {
         onClick={(e) => {
           if ((e.target as HTMLElement).closest("a, button") && menu.current) menu.current.open = false;
         }}
-        className="absolute inset-x-0 top-full flex flex-col gap-1 border-b border-border bg-surface p-3 text-sm shadow-lg"
+        className="absolute inset-x-0 top-full flex max-h-[calc(100dvh-4rem)] flex-col gap-1 overflow-y-auto border-b border-border bg-surface p-3 text-base shadow-lg [&_a]:py-3 [&_button]:py-3"
       >
         {children}
       </nav>

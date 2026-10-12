@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Menbere } from "next/font/google";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -26,6 +26,14 @@ export const metadata: Metadata = {
   description: site.tagline,
 };
 
+// Colors the phone's browser bar to match the (always dark) site.
+// viewportFit "cover" lets bottom bars pad for the iPhone home indicator.
+export const viewport: Viewport = {
+  themeColor: "#141311",
+  colorScheme: "dark",
+  viewportFit: "cover",
+};
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
@@ -33,7 +41,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       data-scroll-behavior="smooth"
       className={`${geistSans.variable} ${ethiopic.variable} h-full antialiased motion-safe:scroll-smooth`}
     >
-      <body className="min-h-full flex flex-col font-sans">
+      {/* Pages with a fixed bottom bar on phones (data-bottom-bar) get room below the footer. */}
+      <body className="min-h-full flex flex-col font-sans has-[[data-bottom-bar]]:pb-24 lg:has-[[data-bottom-bar]]:pb-0">
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />

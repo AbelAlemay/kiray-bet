@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { FiltersPanel } from "@/components/FiltersPanel";
 import { ListingCard } from "@/components/ListingCard";
 import { SearchFilters } from "@/components/SearchFilters";
 import { getListings, parseFilters } from "@/lib/listings";
@@ -15,7 +16,11 @@ async function Results({ searchParams }: { searchParams: PageProps<"/search">["s
   return (
     <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
       <aside className="lg:sticky lg:top-20 lg:self-start">
-        <SearchFilters filters={filters} />
+        <FiltersPanel
+          activeCount={[filters.city, filters.type, filters.maxPrice, filters.minBedrooms].filter(Boolean).length}
+        >
+          <SearchFilters filters={filters} />
+        </FiltersPanel>
       </aside>
       <div>
         <p className="mb-4 text-sm text-muted" aria-live="polite">
@@ -54,9 +59,9 @@ function ResultsSkeleton() {
 
 export default function SearchPage({ searchParams }: PageProps<"/search">) {
   return (
-    <div className="mx-auto max-w-6xl px-4 pt-8">
-      <h1 className="text-3xl font-bold">Homes for rent</h1>
-      <p className="mb-6 text-muted">ለኪራይ የሚሆኑ ቤቶች · Denver metro</p>
+    <div className="mx-auto max-w-6xl px-4 pt-6 sm:pt-8">
+      <h1 className="text-2xl font-bold sm:text-3xl">Homes for rent</h1>
+      <p className="mb-4 text-muted sm:mb-6">ለኪራይ የሚሆኑ ቤቶች · Denver metro</p>
       <Suspense fallback={<ResultsSkeleton />}>
         <Results searchParams={searchParams} />
       </Suspense>

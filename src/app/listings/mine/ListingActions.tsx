@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { deleteListing, setRented } from "../actions";
 
-const buttonClass = "rounded-lg border border-border px-3 py-1.5 text-sm font-semibold hover:bg-brand-soft";
+const buttonClass = "inline-flex min-h-10 items-center rounded-lg border border-border px-3 text-sm font-semibold hover:bg-brand-soft";
 
 export function ListingActions({ id, status }: { id: string; status: "pending" | "active" | "rejected" | "rented" }) {
   const [confirming, setConfirming] = useState(false);
@@ -18,7 +18,7 @@ export function ListingActions({ id, status }: { id: string; status: "pending" |
         <div className="flex gap-2">
           <form action={deleteListing}>
             <input type="hidden" name="listingId" value={id} />
-            <button className="rounded-lg bg-danger px-3 py-1.5 font-semibold text-white hover:opacity-90">
+            <button className="min-h-10 rounded-lg bg-danger px-3 font-semibold text-white hover:opacity-90">
               Yes, delete
             </button>
           </form>

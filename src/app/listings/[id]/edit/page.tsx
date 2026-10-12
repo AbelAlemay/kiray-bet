@@ -70,10 +70,10 @@ async function EditListing({ params }: { params: Props["params"] }) {
 export default function EditListingPage({ params }: Props) {
   return (
     <div className="mx-auto max-w-2xl px-4 pt-8">
-      <Link href="/listings/mine" className="mb-4 inline-block text-sm text-muted hover:text-foreground">
+      <Link href="/listings/mine" className="mb-2 inline-block py-2 text-sm text-muted hover:text-foreground">
         ← My listings
       </Link>
-      <h1 className="mb-6 text-3xl font-bold">Edit listing · ማስተካከያ</h1>
+      <h1 className="mb-6 text-2xl font-bold sm:text-3xl">Edit listing · ማስተካከያ</h1>
       <Suspense fallback={<div className="h-96 animate-pulse rounded-2xl bg-border/50" />}>
         <EditListing params={params} />
       </Suspense>

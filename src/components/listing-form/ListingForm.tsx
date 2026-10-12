@@ -100,7 +100,7 @@ export function ListingForm({
         <Field label="Title" error={errors.title} hint="For example: Bright 2-bed apartment near light rail">
           <input name="title" required minLength={5} maxLength={100} defaultValue={initial?.title} className={fieldClass} />
         </Field>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 items-end gap-4">
           <Field label="Bedrooms · መኝታ" error={errors.bedrooms}>
             <input name="bedrooms" type="number" min={0} max={20} required defaultValue={initial?.bedrooms} className={fieldClass} />
           </Field>
@@ -129,7 +129,7 @@ export function ListingForm({
       </Section>
 
       <Section title="Rent and dates" titleAm="ኪራይና ቀን">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 items-end gap-4">
           <Field label="Rent ($/month)" error={errors.price}>
             <input name="price" type="number" min={1} step={1} required inputMode="numeric" defaultValue={initial?.price} className={fieldClass} />
           </Field>
@@ -153,7 +153,7 @@ export function ListingForm({
       </Section>
 
       <Section title="Location" titleAm="አድራሻ">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 items-end gap-4">
           <Field label="City" error={errors.city}>
             <select name="city" required defaultValue={initial?.city ?? ""} className={fieldClass}>
               <option value="" disabled>
@@ -176,7 +176,7 @@ export function ListingForm({
           <Field label="Street address" error={errors.street}>
             <input name="street" required maxLength={100} autoComplete="street-address" defaultValue={initial?.street} className={fieldClass} />
           </Field>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 items-end gap-4">
             <Field label="Unit (optional)" error={errors.unit}>
               <input name="unit" maxLength={20} placeholder="Apt 4, Basement…" defaultValue={initial?.unit} className={fieldClass} />
             </Field>

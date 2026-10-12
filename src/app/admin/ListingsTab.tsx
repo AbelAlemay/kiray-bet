@@ -66,7 +66,7 @@ export async function ListingsTab({ tab }: { tab: ListingTab }) {
             </div>
             <div className="flex w-full flex-wrap items-start gap-2 sm:w-auto sm:max-w-xs sm:justify-end">
               {tab === "live" && (
-                <Link href={`/listings/${l.id}`} className="rounded-lg border border-border px-3 py-1.5 text-sm font-semibold hover:bg-brand-soft">
+                <Link href={`/listings/${l.id}`} className="inline-flex min-h-10 items-center rounded-lg border border-border px-3 text-sm font-semibold hover:bg-brand-soft">
                   View
                 </Link>
               )}
@@ -74,7 +74,7 @@ export async function ListingsTab({ tab }: { tab: ListingTab }) {
                 <form action={approveListing}>
                   <input type="hidden" name="listingId" value={l.id} />
                   <input type="hidden" name="tab" value={tab} />
-                  <button className="rounded-lg border border-border px-3 py-1.5 text-sm font-semibold hover:bg-brand-soft">
+                  <button className="inline-flex min-h-10 items-center rounded-lg border border-border px-3 text-sm font-semibold hover:bg-brand-soft">
                     Approve
                   </button>
                 </form>

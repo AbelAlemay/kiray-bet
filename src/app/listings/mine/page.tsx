@@ -126,9 +126,9 @@ async function MyListings({ searchParams }: { searchParams: PageProps<"/listings
 export default function MyListingsPage({ searchParams }: PageProps<"/listings/mine">) {
   return (
     <div className="mx-auto max-w-3xl px-4 pt-8">
-      <div className="mb-6 flex items-end justify-between gap-4">
-        <h1 className="text-3xl font-bold">My listings · የእኔ ቤቶች</h1>
-        <Link href="/listings/new" className="rounded-xl bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-strong">
+      <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+        <h1 className="text-2xl font-bold sm:text-3xl">My listings · የእኔ ቤቶች</h1>
+        <Link href="/listings/new" className="whitespace-nowrap rounded-xl bg-brand px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-strong">
           + Post a home
         </Link>
       </div>

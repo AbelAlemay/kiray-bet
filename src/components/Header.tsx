@@ -62,7 +62,7 @@ function PostLink() {
   return (
     <Link
       href="/listings/new"
-      className="whitespace-nowrap rounded-lg bg-brand px-3 py-2 font-semibold text-white hover:bg-brand-strong"
+      className="block whitespace-nowrap rounded-lg bg-brand px-3 py-2.5 font-semibold text-white hover:bg-brand-strong"
     >
       Post a home
     </Link>

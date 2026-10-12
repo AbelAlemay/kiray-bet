@@ -65,77 +65,99 @@ async function ListingDetail({ params }: { params: Props["params"] }) {
 
   const type = site.listingTypes.find((t) => t.value === listing.type)!;
   const yesNo = (v: boolean) => (v ? "Yes" : "No");
+  const contactHref = `/login?next=/listings/${listing.id}`;
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
-      <div className="space-y-6">
-        <PhotoGallery photos={listing.photos} title={listing.title} />
+    <>
+      <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
+        <div className="space-y-6">
+          <PhotoGallery photos={listing.photos} title={listing.title} />
 
-        <div>
-          <p className="text-sm font-semibold text-brand">
-            {type.label} · {type.labelAm}
-          </p>
-          <h1 className="mt-1 text-3xl font-bold">{listing.title}</h1>
-          <p className="mt-1 text-muted">
-            {listing.neighborhood}, {listing.city}, CO
-          </p>
-          <p className="mt-2 text-sm text-muted">
-            🔒 The exact address is private. The host shares it with you after you message them.
-          </p>
+          <div>
+            <p className="text-sm font-semibold text-brand">
+              {type.label} · {type.labelAm}
+            </p>
+            <h1 className="mt-1 text-3xl font-bold">{listing.title}</h1>
+            <p className="mt-1 text-muted">
+              {listing.neighborhood}, {listing.city}, CO
+            </p>
+            <p className="mt-2 text-sm text-muted">
+              🔒 The exact address is private. The host shares it with you after you message them.
+            </p>
+          </div>
+
+          <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <Fact label="Bedrooms" labelAm="መኝታ ክፍል" value={String(listing.bedrooms)} />
+            <Fact label="Bathrooms" labelAm="መታጠቢያ" value={String(listing.bathrooms)} />
+            <Fact label="Deposit" labelAm="ቅድመ ክፍያ" value={formatPrice(listing.deposit)} />
+            <Fact
+              label="Available"
+              labelAm="የሚገኝበት"
+              value={formatDate(listing.availableFrom, { month: "short", day: "numeric", year: "numeric" })}
+            />
+            <Fact label="Utilities incl." labelAm="መብራት/ውሃ" value={yesNo(listing.utilitiesIncluded)} />
+            <Fact label="Parking" labelAm="መኪና ማቆሚያ" value={yesNo(listing.parking)} />
+            <Fact label="Pets allowed" labelAm="የቤት እንስሳ" value={yesNo(listing.petsAllowed)} />
+          </dl>
+
+          <section>
+            <h2 className="mb-2 text-xl font-bold">About this home</h2>
+            <p className="leading-relaxed">{listing.description}</p>
+          </section>
         </div>
 
-        <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <Fact label="Bedrooms" labelAm="መኝታ ክፍል" value={String(listing.bedrooms)} />
-          <Fact label="Bathrooms" labelAm="መታጠቢያ" value={String(listing.bathrooms)} />
-          <Fact label="Deposit" labelAm="ቅድመ ክፍያ" value={formatPrice(listing.deposit)} />
-          <Fact
-            label="Available"
-            labelAm="የሚገኝበት"
-            value={formatDate(listing.availableFrom, { month: "short", day: "numeric", year: "numeric" })}
-          />
-          <Fact label="Utilities incl." labelAm="መብራት/ውሃ" value={yesNo(listing.utilitiesIncluded)} />
-          <Fact label="Parking" labelAm="መኪና ማቆሚያ" value={yesNo(listing.parking)} />
-          <Fact label="Pets allowed" labelAm="የቤት እንስሳ" value={yesNo(listing.petsAllowed)} />
-        </dl>
-
-        <section>
-          <h2 className="mb-2 text-xl font-bold">About this home</h2>
-          <p className="leading-relaxed">{listing.description}</p>
-        </section>
+        <aside className="lg:sticky lg:top-20 lg:self-start">
+          <div className="space-y-4 rounded-2xl border border-border bg-surface p-5 shadow-sm">
+            <p>
+              <span className="text-3xl font-bold">{formatPrice(listing.price)}</span>
+              <span className="text-muted"> /month</span>
+            </p>
+            <p className="text-sm text-muted">
+              Hosted by <span className="font-semibold text-foreground">{listing.hostName}</span> · posted{" "}
+              {formatDate(listing.postedAt)}
+            </p>
+            {/* Messaging arrives in build step 7; until then contacting requires an account. */}
+            <Link
+              href={contactHref}
+              className="block rounded-xl bg-brand px-4 py-3 text-center font-semibold text-white hover:bg-brand-strong"
+            >
+              Contact host · ባለቤቱን ያግኙ
+            </Link>
+            <Link
+              href={contactHref}
+              className="block rounded-xl border border-border px-4 py-3 text-center font-semibold hover:bg-brand-soft"
+            >
+              ♡ Save
+            </Link>
+            {/* "Report this listing" link arrives with moderation in build step 9. */}
+            <ul className="space-y-1 text-xs text-muted">
+              <li>🔒 No phone numbers needed. You chat privately inside {site.nameLatin}.</li>
+              <li>✓ This listing was reviewed before it went live.</li>
+            </ul>
+            <PaymentWarning compact />
+          </div>
+        </aside>
       </div>
 
-      <aside className="lg:sticky lg:top-20 lg:self-start">
-        <div className="space-y-4 rounded-2xl border border-border bg-surface p-5 shadow-sm">
-          <p>
-            <span className="text-3xl font-bold">{formatPrice(listing.price)}</span>
-            <span className="text-muted"> /month</span>
+      {/* Phones: price and contact always in reach at the bottom of the screen. */}
+      <div data-bottom-bar className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-surface/95 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur lg:hidden">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3">
+          <p className="leading-tight">
+            <span className="text-xl font-bold">{formatPrice(listing.price)}</span>
+            <span className="text-sm text-muted"> /month</span>
+            <span className="block text-xs text-muted">
+              {listing.neighborhood}, {listing.city}
+            </span>
           </p>
-          <p className="text-sm text-muted">
-            Hosted by <span className="font-semibold text-foreground">{listing.hostName}</span> · posted{" "}
-            {formatDate(listing.postedAt)}
-          </p>
-          {/* Messaging arrives in build step 7; until then contacting requires an account. */}
           <Link
-            href={`/login?next=/listings/${listing.id}`}
-            className="block rounded-xl bg-brand px-4 py-3 text-center font-semibold text-white hover:bg-brand-strong"
+            href={contactHref}
+            className="whitespace-nowrap rounded-xl bg-brand px-5 py-3 font-semibold text-white hover:bg-brand-strong"
           >
-            Contact host · ባለቤቱን ያግኙ
+            Contact host
           </Link>
-          <Link
-            href={`/login?next=/listings/${listing.id}`}
-            className="block rounded-xl border border-border px-4 py-3 text-center font-semibold hover:bg-brand-soft"
-          >
-            ♡ Save
-          </Link>
-          {/* "Report this listing" link arrives with moderation in build step 9. */}
-          <ul className="space-y-1 text-xs text-muted">
-            <li>🔒 No phone numbers needed. You chat privately inside {site.nameLatin}.</li>
-            <li>✓ This listing was reviewed before it went live.</li>
-          </ul>
-          <PaymentWarning compact />
         </div>
-      </aside>
-    </div>
+      </div>
+    </>
   );
 }
 
@@ -155,7 +177,7 @@ function DetailSkeleton() {
 export default function ListingPage({ params }: Props) {
   return (
     <div className="mx-auto max-w-6xl px-4 pt-6">
-      <Link href="/search" className="mb-4 inline-block text-sm text-muted hover:text-foreground">
+      <Link href="/search" className="mb-2 inline-block py-2 text-sm text-muted hover:text-foreground">
         ← Back to search
       </Link>
       <Suspense fallback={<DetailSkeleton />}>
