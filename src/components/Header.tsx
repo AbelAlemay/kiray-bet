@@ -5,6 +5,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { site } from "@/lib/site";
 import { Logo } from "./Logo";
 import { MobileMenu } from "./MobileMenu";
+import { ThemeToggle } from "./ThemeToggle";
 
 const linkClass = "rounded-lg px-3 py-2 hover:bg-brand-soft";
 
@@ -91,6 +92,9 @@ export function Header() {
           <span className="ml-1">
             <PostLink />
           </span>
+          <span className="ml-1">
+            <ThemeToggle />
+          </span>
         </nav>
 
         {/* Small screens: Post button plus a menu */}
@@ -98,6 +102,7 @@ export function Header() {
           <span className="text-sm">
             <PostLink />
           </span>
+          <ThemeToggle />
           <MobileMenu>
             <MainLinks />
             <hr className="my-1 border-border" />

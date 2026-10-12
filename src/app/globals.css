@@ -11,10 +11,13 @@
   --brand-soft: #e8eee6;
   --accent: #e0a526;
   --danger: #b3261e;
+  color-scheme: light;
 }
 
+/* Dark colors: follow the device unless the visitor picked light with the toggle
+   (data-theme on <html>, set by the script in layout.tsx). Both blocks must match. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --background: #141311;
     --surface: #1e1c19;
     --foreground: #f2eee8;
@@ -25,7 +28,22 @@
     --brand-soft: #222f25;
     --accent: #f0bb45;
     --danger: #f2827a;
+    color-scheme: dark;
   }
+}
+
+:root[data-theme="dark"] {
+  --background: #141311;
+  --surface: #1e1c19;
+  --foreground: #f2eee8;
+  --muted: #a69e92;
+  --border: #34302a;
+  --brand: #538159;
+  --brand-strong: #77a77e;
+  --brand-soft: #222f25;
+  --accent: #f0bb45;
+  --danger: #f2827a;
+  color-scheme: dark;
 }
 
 @theme inline {
