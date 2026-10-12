@@ -4,7 +4,9 @@ import { useState } from "react";
 import { maxPhotos } from "@/lib/listing-rules";
 import { createBrowserSupabase } from "@/lib/supabase/browser";
 
-type Photo = { path: string; preview: string };
+// `saved` photos already belong to the listing: removing one only takes effect when the
+// form is saved. New uploads that get removed are deleted from storage right away.
+export type Photo = { path: string; preview: string; saved?: boolean };
 
 const bucket = "listing-photos";
 const maxSide = 1600;
@@ -27,15 +29,17 @@ async function toCleanJpeg(file: File): Promise<Blob> {
 export function PhotoPicker({
   userId,
   listingId,
+  initialPhotos,
   error,
   onBusyChange,
 }: {
   userId: string;
   listingId: string;
+  initialPhotos: Photo[];
   error?: string;
   onBusyChange: (busy: boolean) => void;
 }) {
-  const [photos, setPhotos] = useState<Photo[]>([]);
+  const [photos, setPhotos] = useState<Photo[]>(initialPhotos);
   const [uploading, setUploading] = useState(0);
   const [problem, setProblem] = useState<string | null>(null);
 
@@ -67,6 +71,7 @@ export function PhotoPicker({
 
   function remove(photo: Photo) {
     setPhotos((current) => current.filter((p) => p !== photo));
+    if (photo.saved) return;
     URL.revokeObjectURL(photo.preview);
     void createBrowserSupabase().storage.from(bucket).remove([photo.path]);
   }
@@ -83,7 +88,7 @@ export function PhotoPicker({
       <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {photos.map((photo, i) => (
           <li key={photo.path} className="relative overflow-hidden rounded-xl border border-border">
-            {/* eslint-disable-next-line @next/next/no-img-element -- local preview (blob URL) */}
+            {/* eslint-disable-next-line @next/next/no-img-element -- local preview or short-lived signed link */}
             <img src={photo.preview} alt={`Photo ${i + 1}`} className="aspect-[4/3] w-full object-cover" />
             {i === 0 && (
               <span className="absolute left-2 top-2 rounded-full bg-black/70 px-2 py-0.5 text-xs text-white">

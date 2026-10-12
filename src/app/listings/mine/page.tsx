@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { requireUser } from "@/lib/auth";
 import { formatPrice } from "@/lib/format";
 import { createServerSupabase } from "@/lib/supabase/server";
+import { ListingActions } from "./ListingActions";
 
 export const metadata: Metadata = {
   title: "My listings",
@@ -29,7 +30,15 @@ type Row = {
 
 async function MyListings({ searchParams }: { searchParams: PageProps<"/listings/mine">["searchParams"] }) {
   const user = await requireUser("/listings/mine");
-  const { posted } = await searchParams;
+  const { posted, updated, deleted } = await searchParams;
+  const notice =
+    updated === "review"
+      ? "Saved. Your changes are waiting for a quick review; the listing is hidden until they're approved."
+      : updated
+        ? "Saved. · ተቀምጧል"
+        : deleted
+          ? "Listing deleted."
+          : null;
 
   // The host's own client: the database returns only this host's listings (any status).
   const supabase = await createServerSupabase();
@@ -61,6 +70,11 @@ async function MyListings({ searchParams }: { searchParams: PageProps<"/listings
           </p>
         </div>
       )}
+      {notice && (
+        <p role="status" className="rounded-2xl bg-brand-soft p-4 text-sm font-semibold">
+          {notice}
+        </p>
+      )}
       {listings.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-border p-10 text-center">
           <p className="font-semibold">You haven&apos;t posted any homes yet.</p>
@@ -75,7 +89,7 @@ async function MyListings({ searchParams }: { searchParams: PageProps<"/listings
             const cover = [...l.listing_photos].sort((a, b) => a.order - b.order)[0];
             const src = cover && coverUrl.get(cover.path);
             return (
-              <li key={l.id} className="flex gap-4 rounded-2xl border border-border bg-surface p-3">
+              <li key={l.id} className="flex flex-wrap gap-4 rounded-2xl border border-border bg-surface p-3 sm:flex-nowrap">
                 {src ? (
                   // eslint-disable-next-line @next/next/no-img-element -- short-lived signed link
                   <img src={src} alt="" className="h-20 w-28 shrink-0 rounded-lg object-cover" />
@@ -91,11 +105,9 @@ async function MyListings({ searchParams }: { searchParams: PageProps<"/listings
                     {formatPrice(l.price)}/mo · {l.neighborhood}, {l.city}
                   </p>
                 </div>
-                {l.status === "active" && (
-                  <Link href={`/listings/${l.id}`} className="self-center text-sm font-semibold text-brand hover:underline">
-                    View
-                  </Link>
-                )}
+                <div className="self-center">
+                  <ListingActions id={l.id} status={l.status} />
+                </div>
               </li>
             );
           })}

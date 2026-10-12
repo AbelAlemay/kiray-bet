@@ -3,8 +3,28 @@
 import { startTransition, useActionState, useState, type ReactNode } from "react";
 import { fieldClass, labelClass, primaryButtonClass } from "@/components/form-styles";
 import { site } from "@/lib/site";
-import { createListing } from "./actions";
-import { PhotoPicker } from "./PhotoPicker";
+import type { ListingFormState } from "@/app/listings/actions";
+import { PhotoPicker, type Photo } from "./PhotoPicker";
+
+// What the form starts with when editing an existing listing.
+export type ListingFormValues = {
+  title: string;
+  description: string;
+  type: string;
+  price: number;
+  deposit: number;
+  bedrooms: number;
+  bathrooms: number;
+  city: string;
+  neighborhood: string;
+  availableFrom: string;
+  utilitiesIncluded: boolean;
+  parking: boolean;
+  petsAllowed: boolean;
+  street: string;
+  unit: string;
+  zip: string;
+};
 
 function Field({ label, error, hint, children }: { label: string; error?: string; hint?: string; children: ReactNode }) {
   return (
@@ -28,8 +48,24 @@ function Section({ title, titleAm, children }: { title: string; titleAm: string;
   );
 }
 
-export function ListingForm({ userId, listingId, today }: { userId: string; listingId: string; today: string }) {
-  const [state, action, pending] = useActionState(createListing, {});
+// Used for both posting (no `initial`) and editing a listing.
+export function ListingForm({
+  userId,
+  listingId,
+  today,
+  initial,
+  initialPhotos = [],
+  saveAction,
+}: {
+  userId: string;
+  listingId: string;
+  today: string;
+  initial?: ListingFormValues;
+  initialPhotos?: Photo[];
+  saveAction: (prev: ListingFormState, formData: FormData) => Promise<ListingFormState>;
+}) {
+  const [state, action, pending] = useActionState(saveAction, {});
+  const editing = !!initial;
   const [uploading, setUploading] = useState(false);
   const errors = state.errors ?? {};
 
@@ -49,7 +85,7 @@ export function ListingForm({ userId, listingId, today }: { userId: string; list
 
       <Section title="The home" titleAm="ቤቱ">
         <Field label="Type of home" error={errors.type}>
-          <select name="type" required defaultValue="" className={fieldClass}>
+          <select name="type" required defaultValue={initial?.type ?? ""} className={fieldClass}>
             <option value="" disabled>
               Choose…
             </option>
@@ -61,14 +97,14 @@ export function ListingForm({ userId, listingId, today }: { userId: string; list
           </select>
         </Field>
         <Field label="Title" error={errors.title} hint="For example: Bright 2-bed apartment near light rail">
-          <input name="title" required minLength={5} maxLength={100} className={fieldClass} />
+          <input name="title" required minLength={5} maxLength={100} defaultValue={initial?.title} className={fieldClass} />
         </Field>
         <div className="grid grid-cols-2 gap-4">
           <Field label="Bedrooms · መኝታ" error={errors.bedrooms}>
-            <input name="bedrooms" type="number" min={0} max={20} required className={fieldClass} />
+            <input name="bedrooms" type="number" min={0} max={20} required defaultValue={initial?.bedrooms} className={fieldClass} />
           </Field>
           <Field label="Bathrooms · መታጠቢያ" error={errors.bathrooms}>
-            <input name="bathrooms" type="number" min={0} max={20} step={0.5} required className={fieldClass} />
+            <input name="bathrooms" type="number" min={0} max={20} step={0.5} required defaultValue={initial?.bathrooms} className={fieldClass} />
           </Field>
         </div>
         <Field
@@ -76,17 +112,17 @@ export function ListingForm({ userId, listingId, today }: { userId: string; list
           error={errors.description}
           hint="What's included, what's nearby, house rules. No phone numbers or payment details."
         >
-          <textarea name="description" required minLength={20} maxLength={4000} rows={6} className={fieldClass} />
+          <textarea name="description" required minLength={20} maxLength={4000} rows={6} defaultValue={initial?.description} className={fieldClass} />
         </Field>
         <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
           <label className="flex items-center gap-2">
-            <input type="checkbox" name="utilitiesIncluded" className="h-4 w-4 accent-brand" /> Utilities included
+            <input type="checkbox" name="utilitiesIncluded" defaultChecked={initial?.utilitiesIncluded} className="h-4 w-4 accent-brand" /> Utilities included
           </label>
           <label className="flex items-center gap-2">
-            <input type="checkbox" name="parking" className="h-4 w-4 accent-brand" /> Parking
+            <input type="checkbox" name="parking" defaultChecked={initial?.parking} className="h-4 w-4 accent-brand" /> Parking
           </label>
           <label className="flex items-center gap-2">
-            <input type="checkbox" name="petsAllowed" className="h-4 w-4 accent-brand" /> Pets allowed
+            <input type="checkbox" name="petsAllowed" defaultChecked={initial?.petsAllowed} className="h-4 w-4 accent-brand" /> Pets allowed
           </label>
         </div>
       </Section>
@@ -94,25 +130,31 @@ export function ListingForm({ userId, listingId, today }: { userId: string; list
       <Section title="Rent and dates" titleAm="ኪራይና ቀን">
         <div className="grid grid-cols-2 gap-4">
           <Field label="Rent ($/month)" error={errors.price}>
-            <input name="price" type="number" min={1} step={1} required inputMode="numeric" className={fieldClass} />
+            <input name="price" type="number" min={1} step={1} required inputMode="numeric" defaultValue={initial?.price} className={fieldClass} />
           </Field>
           <Field label="Deposit ($)" error={errors.deposit}>
-            <input name="deposit" type="number" min={0} step={1} defaultValue={0} inputMode="numeric" className={fieldClass} />
+            <input name="deposit" type="number" min={0} step={1} defaultValue={initial?.deposit ?? 0} inputMode="numeric" className={fieldClass} />
           </Field>
         </div>
         <Field label="Available from" error={errors.availableFrom}>
-          <input name="availableFrom" type="date" required defaultValue={today} className={fieldClass} />
+          <input name="availableFrom" type="date" required defaultValue={initial?.availableFrom ?? today} className={fieldClass} />
         </Field>
       </Section>
 
       <Section title="Photos" titleAm="ፎቶዎች">
-        <PhotoPicker userId={userId} listingId={listingId} error={errors.photos} onBusyChange={setUploading} />
+        <PhotoPicker
+          userId={userId}
+          listingId={listingId}
+          initialPhotos={initialPhotos}
+          error={errors.photos}
+          onBusyChange={setUploading}
+        />
       </Section>
 
       <Section title="Location" titleAm="አድራሻ">
         <div className="grid grid-cols-2 gap-4">
           <Field label="City" error={errors.city}>
-            <select name="city" required defaultValue="" className={fieldClass}>
+            <select name="city" required defaultValue={initial?.city ?? ""} className={fieldClass}>
               <option value="" disabled>
                 Choose…
               </option>
@@ -122,7 +164,7 @@ export function ListingForm({ userId, listingId, today }: { userId: string; list
             </select>
           </Field>
           <Field label="Neighborhood" error={errors.neighborhood} hint="Shown publicly">
-            <input name="neighborhood" required maxLength={60} className={fieldClass} />
+            <input name="neighborhood" required maxLength={60} defaultValue={initial?.neighborhood} className={fieldClass} />
           </Field>
         </div>
         <div className="space-y-4 rounded-xl bg-brand-soft p-4">
@@ -131,14 +173,14 @@ export function ListingForm({ userId, listingId, today }: { userId: string; list
             area of about 1 km, and you choose which renters get the address.
           </p>
           <Field label="Street address" error={errors.street}>
-            <input name="street" required maxLength={100} autoComplete="street-address" className={fieldClass} />
+            <input name="street" required maxLength={100} autoComplete="street-address" defaultValue={initial?.street} className={fieldClass} />
           </Field>
           <div className="grid grid-cols-2 gap-4">
             <Field label="Unit (optional)" error={errors.unit}>
-              <input name="unit" maxLength={20} placeholder="Apt 4, Basement…" className={fieldClass} />
+              <input name="unit" maxLength={20} placeholder="Apt 4, Basement…" defaultValue={initial?.unit} className={fieldClass} />
             </Field>
             <Field label="ZIP code" error={errors.zip}>
-              <input name="zip" required inputMode="numeric" pattern="\d{5}" maxLength={5} autoComplete="postal-code" className={fieldClass} />
+              <input name="zip" required inputMode="numeric" pattern="\d{5}" maxLength={5} autoComplete="postal-code" defaultValue={initial?.zip} className={fieldClass} />
             </Field>
           </div>
         </div>
@@ -151,7 +193,9 @@ export function ListingForm({ userId, listingId, today }: { userId: string; list
           source of income (such as Section 8).
         </p>
         <p className="text-muted">
-          Every listing is checked by a person before it appears, usually within a day.
+          {editing
+            ? "Changing anything other than the available date sends the listing back for a quick review; it's hidden until approved."
+            : "Every listing is checked by a person before it appears, usually within a day."}
           {` ${site.nameLatin}`} never handles money; don&apos;t ask renters to pay before they see the
           home and sign a lease.
         </p>
@@ -166,7 +210,13 @@ export function ListingForm({ userId, listingId, today }: { userId: string; list
           </p>
         )}
         <button disabled={pending || uploading} className={primaryButtonClass}>
-          {pending ? "Submitting…" : uploading ? "Waiting for photos…" : "Submit for review · ለግምገማ ይላኩ"}
+          {pending
+            ? "Saving…"
+            : uploading
+              ? "Waiting for photos…"
+              : editing
+                ? "Save changes · ለውጦችን ያስቀምጡ"
+                : "Submit for review · ለግምገማ ይላኩ"}
         </button>
       </div>
     </form>

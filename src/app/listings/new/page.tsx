@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { requireUser } from "@/lib/auth";
-import { ListingForm } from "./ListingForm";
+import { ListingForm } from "@/components/listing-form/ListingForm";
+import { createListing } from "../actions";
 
 export const metadata: Metadata = {
   title: "Post a home",
@@ -13,7 +14,7 @@ async function NewListing() {
   // Chosen up front so photos can upload into this listing's folder before it's saved.
   const listingId = crypto.randomUUID();
   const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/Denver" }); // YYYY-MM-DD
-  return <ListingForm userId={user.id} listingId={listingId} today={today} />;
+  return <ListingForm userId={user.id} listingId={listingId} today={today} saveAction={createListing} />;
 }
 
 export default function NewListingPage() {
