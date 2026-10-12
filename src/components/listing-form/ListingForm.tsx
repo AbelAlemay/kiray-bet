@@ -3,7 +3,7 @@
 import { startTransition, useActionState, useState, type ReactNode } from "react";
 import { fieldClass, labelClass, primaryButtonClass } from "@/components/form-styles";
 import { site } from "@/lib/site";
-import { Turnstile } from "@/components/Turnstile";
+import { Turnstile, useBotCheck } from "@/components/Turnstile";
 import type { ListingFormState } from "@/app/listings/actions";
 import { PhotoPicker, type Photo } from "./PhotoPicker";
 
@@ -67,6 +67,8 @@ export function ListingForm({
 }) {
   const [state, action, pending] = useActionState(saveAction, {});
   const editing = !!initial;
+  const bot = useBotCheck();
+  const botWaiting = !editing && bot.waiting;
   const [uploading, setUploading] = useState(false);
   const errors = state.errors ?? {};
 
@@ -200,7 +202,7 @@ export function ListingForm({
           {` ${site.nameLatin}`} never handles money; don&apos;t ask renters to pay before they see the
           home and sign a lease.
         </p>
-        {!editing && <Turnstile resetKey={state} />}
+        {!editing && <Turnstile resetKey={state} onToken={bot.onToken} />}
         {errors.form && (
           <p role="alert" className="text-danger">
             {errors.form}
@@ -211,11 +213,13 @@ export function ListingForm({
             Please fix the highlighted fields above.
           </p>
         )}
-        <button disabled={pending || uploading} className={primaryButtonClass}>
+        <button disabled={pending || uploading || botWaiting} className={primaryButtonClass}>
           {pending
             ? "Saving…"
             : uploading
               ? "Waiting for photos…"
+              : botWaiting
+                ? "Checking your browser…"
               : editing
                 ? "Save changes · ለውጦችን ያስቀምጡ"
                 : "Submit for review · ለግምገማ ይላኩ"}

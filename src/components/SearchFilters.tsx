@@ -71,7 +71,10 @@ export function SearchFilters({ filters }: { filters: ListingFilters }) {
         <button className="flex-1 rounded-xl bg-brand px-4 py-2.5 font-semibold text-white hover:bg-brand-strong">
           Apply · ፈልግ
         </button>
-        <Link href="/search" className="px-2 py-2.5 text-sm text-muted hover:text-foreground hover:underline">
+        <Link
+          href="/search"
+          className="rounded-xl border border-border px-4 py-2.5 font-semibold text-muted hover:bg-brand-soft hover:text-foreground"
+        >
           Clear
         </Link>
       </div>

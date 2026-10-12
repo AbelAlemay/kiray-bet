@@ -2,11 +2,12 @@
 
 import { useActionState } from "react";
 import { fieldClass, labelClass, primaryButtonClass } from "@/components/form-styles";
-import { Turnstile } from "@/components/Turnstile";
+import { Turnstile, useBotCheck } from "@/components/Turnstile";
 import { sendContactMessage } from "./actions";
 
 export function ContactForm() {
   const [state, action, pending] = useActionState(sendContactMessage, {});
+  const bot = useBotCheck();
 
   if (state.sent) {
     return (
@@ -42,14 +43,14 @@ export function ContactForm() {
         <span>Message · መልዕክት</span>
         <textarea name="message" required minLength={10} maxLength={3000} rows={6} className={fieldClass} />
       </label>
-      <Turnstile resetKey={state} />
+      <Turnstile resetKey={state} onToken={bot.onToken} />
       {state.error && (
         <p role="alert" className="text-sm text-danger">
           {state.error}
         </p>
       )}
-      <button disabled={pending} className={primaryButtonClass}>
-        {pending ? "Sending…" : "Send message · ይላኩ"}
+      <button disabled={pending || bot.waiting} className={primaryButtonClass}>
+        {pending ? "Sending…" : bot.waiting ? "Checking your browser…" : "Send message · ይላኩ"}
       </button>
     </form>
   );

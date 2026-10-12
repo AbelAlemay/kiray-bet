@@ -2,11 +2,12 @@
 
 import { useActionState } from "react";
 import { fieldClass, labelClass, primaryButtonClass } from "@/components/form-styles";
-import { Turnstile } from "@/components/Turnstile";
+import { Turnstile, useBotCheck } from "@/components/Turnstile";
 import { emailSignIn, signInWithGoogle, type LoginState } from "./actions";
 
 export function LoginForm({ next, googleEnabled }: { next: string; googleEnabled: boolean }) {
   const [state, action, pending] = useActionState(emailSignIn, { step: "email" } as LoginState);
+  const bot = useBotCheck();
 
   if (state.step === "code") {
     return (
@@ -42,9 +43,9 @@ export function LoginForm({ next, googleEnabled }: { next: string; googleEnabled
         <form action={action} className="text-center text-sm text-muted">
           <input type="hidden" name="email" value={state.email} />
           <input type="hidden" name="next" value={next} />
-          <Turnstile resetKey={state} />
+          <Turnstile resetKey={state} onToken={bot.onToken} />
           Didn&apos;t get it? Check spam, or{" "}
-          <button disabled={pending} className="font-semibold text-brand hover:underline">
+          <button disabled={pending || bot.waiting} className="font-semibold text-brand hover:underline disabled:opacity-60">
             send a new code
           </button>
           {" · "}
@@ -73,7 +74,7 @@ export function LoginForm({ next, googleEnabled }: { next: string; googleEnabled
       )}
       <form action={action} className="space-y-4">
         <input type="hidden" name="next" value={next} />
-        <Turnstile resetKey={state} />
+        <Turnstile resetKey={state} onToken={bot.onToken} />
         <label className={labelClass}>
           <span>Email · ኢሜይል</span>
           <input
@@ -86,8 +87,8 @@ export function LoginForm({ next, googleEnabled }: { next: string; googleEnabled
           />
         </label>
         {state.error && <p role="alert" className="text-sm text-danger">{state.error}</p>}
-        <button disabled={pending} className={primaryButtonClass}>
-          {pending ? "Sending…" : "Email me a sign-in code"}
+        <button disabled={pending || bot.waiting} className={primaryButtonClass}>
+          {pending ? "Sending…" : bot.waiting ? "Checking your browser…" : "Email me a sign-in code"}
         </button>
         <p className="text-xs text-muted">
           No password needed. New here? This creates your account. We never show your email to
