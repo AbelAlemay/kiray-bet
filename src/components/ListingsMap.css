@@ -42,3 +42,41 @@
 .listings-map .leaflet-popup-content a {
   padding: 4px 0;
 }
+.listings-map .map-price span {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  border: 2px solid #1c1a17;
+  background: #f5c75a;
+  color: #1c1a17;
+  padding: 0 10px;
+  font-weight: 700;
+  font-size: 13px;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.5);
+  transform: translateX(-50%);
+  margin-left: 50%;
+}
+.listings-map .map-price {
+  cursor: pointer;
+}
+.listings-map .leaflet-marker-icon.map-price:hover span,
+.listings-map .leaflet-marker-icon.map-price:focus span {
+  background: #fff;
+}
+.listings-map .map-price b {
+  font-weight: 700;
+}
+.listings-map .map-price .short,
+.listings-map.short-prices .map-price .full {
+  display: none;
+}
+.listings-map.short-prices .map-price .short {
+  display: inline;
+}
+.listings-map.short-prices .map-price span {
+  padding: 0 7px;
+  min-height: 26px;
+}

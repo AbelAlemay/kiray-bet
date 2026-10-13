@@ -2,7 +2,8 @@ import Link from "next/link";
 import { ListingCard } from "@/components/ListingCard";
 import { PaymentWarning } from "@/components/PaymentWarning";
 import { SearchBar } from "@/components/SearchBar";
-import { getCityCounts, getLatestListings } from "@/lib/listings";
+import { ListingsMap } from "@/components/ListingsMap";
+import { getCityCounts, getLatestListings, getListingPins } from "@/lib/listings";
 import { site } from "@/lib/site";
 
 const steps = [
@@ -44,7 +45,11 @@ const promises = [
 ];
 
 export default async function Home() {
-  const [latest, cityCounts] = await Promise.all([getLatestListings(6), getCityCounts()]);
+  const [latest, cityCounts, pins] = await Promise.all([
+    getLatestListings(6),
+    getCityCounts(),
+    getListingPins({ sort: "newest", page: 1 }),
+  ]);
 
   return (
     <>
@@ -84,6 +89,21 @@ export default async function Home() {
           ))}
         </div>
       </section>
+
+      {pins.length > 0 && (
+        <section className="mx-auto max-w-6xl px-4 pt-10">
+          <div className="mb-3 flex items-end justify-between gap-4">
+            <h2 className="text-lg font-bold">
+              Homes on the map · <span className="text-muted">በካርታ</span>
+            </h2>
+            <Link href="/search?view=map" className="py-2 text-sm font-semibold text-brand hover:underline">
+              Open full map →
+            </Link>
+          </div>
+          <ListingsMap pins={pins} className="h-72 sm:h-96" />
+          <p className="mt-2 text-xs text-muted">🔒 Approximate areas only. Exact addresses are shared by the host.</p>
+        </section>
+      )}
 
       <section className="mx-auto max-w-6xl px-4 pt-10">
         <div className="mb-5 flex items-end justify-between gap-4">

@@ -14,19 +14,26 @@ import {
   parseFilters,
   type ListingFilters,
 } from "@/lib/listings";
+import type { Listing } from "@/lib/sample-listings";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Browse homes for rent",
 };
 
-type View = "list" | "map";
+// List only, list with the map beside it ("both"), or the map only.
+type View = "list" | "both" | "map";
+const views: { id: View; label: string }[] = [
+  { id: "list", label: "☰ List" },
+  { id: "both", label: "◫ List + Map" },
+  { id: "map", label: "🗺 Map" },
+];
 
-// Search URL for these filters, keeping the List/Map choice.
+// Search URL for these filters, keeping the view choice.
 function searchHref(filters: Partial<ListingFilters>, view: View) {
   const href = filtersToQuery(filters);
-  if (view !== "map") return href;
-  return href + (href.includes("?") ? "&" : "?") + "view=map";
+  if (view === "list") return href;
+  return href + (href.includes("?") ? "&" : "?") + `view=${view}`;
 }
 
 // One removable chip per active filter, each linking to the search without it.
@@ -49,17 +56,62 @@ function activeFilterChips(filters: ListingFilters, view: View) {
   }));
 }
 
-const toggleClass = "flex-1 rounded-lg px-4 py-2 text-center text-sm font-semibold sm:flex-none";
+const toggleClass = "flex-1 whitespace-nowrap rounded-lg px-3 py-2 text-center text-sm font-semibold sm:flex-none";
+
+function MapNote() {
+  return (
+    <p className="text-xs text-muted">
+      🔒 Pins show each home&apos;s approximate area (about 1 km), never the exact address. Zoom in to
+      see homes that share an area.
+    </p>
+  );
+}
+
+// Listing cards plus "Show more".
+function ListingGrid({
+  listings,
+  total,
+  filters,
+  view,
+  columns,
+}: {
+  listings: Listing[];
+  total: number;
+  filters: ListingFilters;
+  view: View;
+  columns: string;
+}) {
+  return (
+    <>
+      <div className={`grid gap-5 ${columns}`}>
+        {listings.map((listing) => (
+          <ListingCard key={listing.id} listing={listing} />
+        ))}
+      </div>
+      {listings.length < total && (
+        <div className="mt-6 text-center">
+          <Link
+            href={searchHref({ ...filters, page: filters.page + 1 }, view)}
+            scroll={false}
+            className="inline-flex min-h-11 items-center rounded-xl border border-border bg-surface px-6 font-semibold hover:bg-brand-soft"
+          >
+            Show more ({Math.min(pageSize, total - listings.length)} of {total - listings.length} more)
+          </Link>
+        </div>
+      )}
+    </>
+  );
+}
 
 async function Results({ searchParams }: { searchParams: PageProps<"/search">["searchParams"] }) {
   const params = await searchParams;
   const filters = parseFilters(params);
-  const view: View = params.view === "map" ? "map" : "list";
+  const view: View = params.view === "map" || params.view === "both" ? params.view : "list";
   const chips = activeFilterChips(filters, view);
 
   const [{ listings, total }, pins] = await Promise.all([
-    view === "list" ? getListings(filters) : Promise.resolve({ listings: [], total: 0 }),
-    view === "map" ? getListingPins({ ...filters, page: 1 }) : Promise.resolve([]),
+    view !== "map" ? getListings(filters) : Promise.resolve({ listings: [], total: 0 }),
+    view !== "list" ? getListingPins({ ...filters, page: 1 }) : Promise.resolve([]),
   ]);
   const count = view === "map" ? pins.length : total;
 
@@ -77,14 +129,14 @@ async function Results({ searchParams }: { searchParams: PageProps<"/search">["s
             {filters.city && ` in ${filters.city}`}
           </p>
           <nav aria-label="View" className="flex w-full gap-1 rounded-xl border border-border bg-surface p-1 sm:w-auto">
-            {(["list", "map"] as const).map((v) => (
+            {views.map((v) => (
               <Link
-                key={v}
-                href={searchHref({ ...filters, page: 1 }, v)}
-                aria-current={v === view ? "page" : undefined}
-                className={`${toggleClass} ${v === view ? "bg-brand text-white" : "text-muted hover:text-foreground"}`}
+                key={v.id}
+                href={searchHref({ ...filters, page: 1 }, v.id)}
+                aria-current={v.id === view ? "page" : undefined}
+                className={`${toggleClass} ${v.id === view ? "bg-brand text-white" : "text-muted hover:text-foreground"}`}
               >
-                {v === "list" ? "☰ List" : "🗺 Map"}
+                {v.label}
               </Link>
             ))}
           </nav>
@@ -119,30 +171,21 @@ async function Results({ searchParams }: { searchParams: PageProps<"/search">["s
         ) : view === "map" ? (
           <div className="space-y-2">
             <ListingsMap pins={pins} />
-            <p className="text-xs text-muted">
-              🔒 Circles show each home&apos;s approximate area (about 1 km), never the exact address.
-              Tap a circle to see the homes there.
-            </p>
+            <MapNote />
+          </div>
+        ) : view === "both" ? (
+          // Phones: map on top, list below. Wide screens: list left, map right (stays in view).
+          <div className="grid gap-5 lg:grid-cols-2">
+            <div className="space-y-2 lg:sticky lg:top-20 lg:order-2 lg:self-start">
+              <ListingsMap pins={pins} className="h-72 lg:h-[calc(100vh-7rem)]" />
+              <MapNote />
+            </div>
+            <div className="lg:order-1">
+              <ListingGrid listings={listings} total={total} filters={filters} view={view} columns="sm:grid-cols-2 lg:grid-cols-1 2xl:grid-cols-2" />
+            </div>
           </div>
         ) : (
-          <>
-            <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-              {listings.map((listing) => (
-                <ListingCard key={listing.id} listing={listing} />
-              ))}
-            </div>
-            {listings.length < total && (
-              <div className="mt-6 text-center">
-                <Link
-                  href={searchHref({ ...filters, page: filters.page + 1 }, view)}
-                  scroll={false}
-                  className="inline-flex min-h-11 items-center rounded-xl border border-border bg-surface px-6 font-semibold hover:bg-brand-soft"
-                >
-                  Show more ({Math.min(pageSize, total - listings.length)} of {total - listings.length} more)
-                </Link>
-              </div>
-            )}
-          </>
+          <ListingGrid listings={listings} total={total} filters={filters} view={view} columns="sm:grid-cols-2 xl:grid-cols-3" />
         )}
       </div>
     </div>

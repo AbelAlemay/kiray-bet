@@ -9,7 +9,7 @@ const checkboxes = [
   { name: "utilities", label: "Utilities included" },
 ] as const;
 
-export function SearchFilters({ filters, view }: { filters: ListingFilters; view: "list" | "map" }) {
+export function SearchFilters({ filters, view }: { filters: ListingFilters; view: "list" | "both" | "map" }) {
   return (
     <form
       action="/search"
@@ -17,7 +17,7 @@ export function SearchFilters({ filters, view }: { filters: ListingFilters; view
       key={JSON.stringify(filters)}
       className="space-y-4 rounded-2xl border border-border bg-surface p-4"
     >
-      {view === "map" && <input type="hidden" name="view" value="map" />}
+      {view !== "list" && <input type="hidden" name="view" value={view} />}
       <h2 className="font-semibold">
         Filters · <span className="text-muted">ማጣሪያ</span>
       </h2>
