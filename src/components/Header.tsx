@@ -5,7 +5,9 @@ import { getCurrentUser } from "@/lib/auth";
 import { getUnreadCount } from "@/lib/conversations";
 import { site } from "@/lib/site";
 import { Logo } from "./Logo";
+import { WithCount } from "./CountBadge";
 import { MobileMenu } from "./MobileMenu";
+import { SavedLink } from "./SavedLink";
 
 const linkClass = "whitespace-nowrap rounded-lg px-3 py-2 hover:bg-brand-soft lg:px-2 xl:px-3";
 
@@ -44,17 +46,12 @@ async function AccountLinks() {
           Admin
         </Link>
       )}
-      <Link href="/saved" className={linkClass}>
-        ♡ Saved
-      </Link>
+      <SavedLink className={linkClass} />
       <Link href="/listings/mine" className={linkClass}>
         My listings
       </Link>
       <Link href="/messages" className={linkClass} aria-label={unread ? `Messages, ${unread} unread` : undefined}>
-        Messages
-        {unread > 0 && (
-          <span className="ml-1.5 rounded-full bg-door px-1.5 py-0.5 text-xs font-bold text-[#1c1a17]">{unread}</span>
-        )}
+        <WithCount count={unread}>Messages</WithCount>
       </Link>
       <Link href="/account" className={`${linkClass} font-semibold`}>
         {user.name ?? "Account"}
@@ -64,6 +61,20 @@ async function AccountLinks() {
       </form>
     </>
   );
+}
+
+// Unread count on the closed phone menu button, so new messages aren't hidden.
+async function MenuBadge() {
+  const user = await getCurrentUser();
+  if (!user) return null;
+  const unread = await getUnreadCount(user.id);
+  return unread > 0 ? (
+    <span className="ml-1.5 inline-grid h-[18px] min-w-[18px] place-items-center rounded-full bg-red-600 px-1 align-[2px] text-[11px] font-bold leading-none text-white">
+      <span className="sr-only">, </span>
+      {unread > 99 ? "99+" : unread}
+      <span className="sr-only"> unread messages</span>
+    </span>
+  ) : null;
 }
 
 function PostLink() {
@@ -106,7 +117,13 @@ export function Header() {
           <span className="text-sm">
             <PostLink />
           </span>
-          <MobileMenu>
+          <MobileMenu
+            badge={
+              <Suspense>
+                <MenuBadge />
+              </Suspense>
+            }
+          >
             <MainLinks />
             <hr className="my-1 border-border" />
             <Suspense fallback={<SignInLink />}>

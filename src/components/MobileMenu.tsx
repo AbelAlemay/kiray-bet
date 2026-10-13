@@ -3,13 +3,14 @@
 import { useRef, type ReactNode } from "react";
 
 // Collapsible menu for small screens. Closes when a link or button inside is used.
-export function MobileMenu({ children }: { children: ReactNode }) {
+// `badge` (e.g. the unread message count) shows on the closed Menu button.
+export function MobileMenu({ children, badge }: { children: ReactNode; badge?: ReactNode }) {
   const menu = useRef<HTMLDetailsElement>(null);
 
   return (
     <details ref={menu} className="group lg:hidden">
       <summary className="cursor-pointer list-none whitespace-nowrap rounded-lg border border-border px-3 py-2.5 text-sm font-semibold hover:bg-brand-soft [&::-webkit-details-marker]:hidden">
-        <span className="group-open:hidden">☰ Menu</span>
+        <span className="group-open:hidden">☰ Menu{badge}</span>
         <span className="hidden group-open:inline">✕ Close</span>
       </summary>
       <nav
