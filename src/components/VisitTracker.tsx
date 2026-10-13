@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
+import { randomId } from "@/lib/random-id";
 
 // Counts page views for the admin dashboard. A random id in a first-party cookie lets
 // repeat views count as one visitor; no IP address or personal data is sent.
@@ -13,7 +14,7 @@ const cookieName = "kb_vid";
 function visitorId() {
   const existing = document.cookie.match(new RegExp(`(?:^|; )${cookieName}=([0-9a-f-]{36})`))?.[1];
   if (existing) return existing;
-  const id = crypto.randomUUID();
+  const id = randomId();
   document.cookie = `${cookieName}=${id}; path=/; max-age=31536000; SameSite=Lax`;
   return id;
 }

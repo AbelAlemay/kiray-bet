@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { maxPhotos } from "@/lib/listing-rules";
+import { randomId } from "@/lib/random-id";
 import { createBrowserSupabase } from "@/lib/supabase/browser";
 
 // `saved` photos already belong to the listing: removing one only takes effect when the
@@ -55,7 +56,7 @@ export function PhotoPicker({
     for (const file of chosen) {
       try {
         const jpeg = await toCleanJpeg(file);
-        const path = `${userId}/${listingId}/${crypto.randomUUID()}.jpg`;
+        const path = `${userId}/${listingId}/${randomId()}.jpg`;
         const { error } = await supabase.storage
           .from(bucket)
           .upload(path, jpeg, { contentType: "image/jpeg", upsert: false });
