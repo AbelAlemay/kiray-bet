@@ -163,6 +163,7 @@ async function ListingDetail({ params }: { params: Props["params"] }) {
             <SaveButton listingId={listing.id} variant="button" />
             {/* "Report this listing" link arrives with moderation in build step 9. */}
             <ul className="space-y-1 text-xs text-muted">
+              <li>✉ No account needed in advance: just confirm your email to send a message.</li>
               <li>🔒 No phone numbers needed. You chat privately inside {site.nameLatin}.</li>
               <li>✓ This listing was reviewed before it went live.</li>
             </ul>

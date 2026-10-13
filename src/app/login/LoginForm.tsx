@@ -91,8 +91,8 @@ export function LoginForm({ next, googleEnabled }: { next: string; googleEnabled
           {pending ? "Sending…" : bot.waiting ? "Checking your browser…" : "Email me a sign-in code"}
         </button>
         <p className="text-xs text-muted">
-          No password needed. New here? This creates your account. We never show your email to
-          other users and never ask for your phone number.
+          First time here? This code also creates your free account. We never show your email
+          to other users and never ask for your phone number.
         </p>
       </form>
     </div>

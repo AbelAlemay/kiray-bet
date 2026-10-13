@@ -27,7 +27,7 @@ function MainLinks() {
 function SignInLink() {
   return (
     <Link href="/login" className={linkClass}>
-      Log in
+      Sign in / Join
     </Link>
   );
 }
