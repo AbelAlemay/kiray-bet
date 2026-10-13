@@ -1,13 +1,51 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useState, type ReactNode } from "react";
 import { fieldClass, labelClass, primaryButtonClass } from "@/components/form-styles";
 import { Turnstile, useBotCheck } from "@/components/Turnstile";
 import { emailSignIn, signInWithGoogle, type LoginState } from "./actions";
 
+// Seconds left of a wait, counting down live. Give the component using it a new `key`
+// for each result so it starts again from the new number.
+function useCountdown(seconds = 0) {
+  const [left, setLeft] = useState(seconds);
+  useEffect(() => {
+    if (seconds <= 0) return;
+    const end = Date.now() + seconds * 1000;
+    const timer = setInterval(() => {
+      const remaining = Math.max(0, Math.ceil((end - Date.now()) / 1000));
+      setLeft(remaining);
+      if (remaining === 0) clearInterval(timer);
+    }, 250);
+    return () => clearInterval(timer);
+  }, [seconds]);
+  return left;
+}
+
+function Countdown({ seconds, children }: { seconds?: number; children: (left: number) => ReactNode }) {
+  return children(useCountdown(seconds));
+}
+
+const clock = (seconds: number) => `0:${String(seconds).padStart(2, "0")}`;
+
+// An error message; a "wait a minute" error shows the seconds left and disappears at zero.
+function ErrorMessage({ state, left }: { state: LoginState; left: number }) {
+  if (!state.error) return null;
+  const waiting = state.retryAfter !== undefined && state.error.includes("once a minute");
+  if (waiting && left === 0) return null;
+  return (
+    <p role="alert" className="text-sm text-danger">
+      {state.error}
+      {waiting && ` Please try again in ${left} second${left === 1 ? "" : "s"}.`}
+    </p>
+  );
+}
+
 export function LoginForm({ next, googleEnabled }: { next: string; googleEnabled: boolean }) {
   const [state, action, pending] = useActionState(emailSignIn, { step: "email" } as LoginState);
   const bot = useBotCheck();
+  // New key per result, so countdowns restart from the latest number.
+  const resultKey = JSON.stringify(state);
 
   if (state.step === "code") {
     return (
@@ -19,40 +57,49 @@ export function LoginForm({ next, googleEnabled }: { next: string; googleEnabled
             Enter the code below, or tap the button in the email.
           </p>
         </div>
-        <form action={action} className="space-y-4">
-          <input type="hidden" name="intent" value="verify" />
-          <input type="hidden" name="next" value={next} />
-          <label className={labelClass}>
-            <span>6-digit code · ኮድ</span>
-            <input
-              name="code"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              pattern="[0-9 ]{6,7}"
-              maxLength={7}
-              required
-              autoFocus
-              className={`${fieldClass} text-center text-2xl tracking-[0.4em]`}
-            />
-          </label>
-          {state.error && <p role="alert" className="text-sm text-danger">{state.error}</p>}
-          <button disabled={pending} className={primaryButtonClass}>
-            {pending ? "Checking…" : "Sign in · ይግቡ"}
-          </button>
-        </form>
-        <form action={action} className="text-center text-sm text-muted">
-          <input type="hidden" name="email" value={state.email} />
-          <input type="hidden" name="next" value={next} />
-          <Turnstile resetKey={state} onToken={bot.onToken} />
-          Didn&apos;t get it? Check spam, or{" "}
-          <button disabled={pending || bot.waiting} className="font-semibold text-brand hover:underline disabled:opacity-60">
-            send a new code
-          </button>
-          {" · "}
-          <button name="intent" value="restart" className="font-semibold text-brand hover:underline">
-            use another email
-          </button>
-        </form>
+        <Countdown key={resultKey} seconds={state.retryAfter}>
+          {(left) => (
+            <>
+              <form action={action} className="space-y-4">
+                <input type="hidden" name="intent" value="verify" />
+                <input type="hidden" name="next" value={next} />
+                <label className={labelClass}>
+                  <span>6-digit code · ኮድ</span>
+                  <input
+                    name="code"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    pattern="[0-9 ]{6,7}"
+                    maxLength={7}
+                    required
+                    autoFocus
+                    className={`${fieldClass} text-center text-2xl tracking-[0.4em]`}
+                  />
+                </label>
+                <ErrorMessage state={state} left={left} />
+                <button disabled={pending} className={primaryButtonClass}>
+                  {pending ? "Checking…" : "Sign in · ይግቡ"}
+                </button>
+              </form>
+              <form action={action} className="text-center text-sm text-muted">
+                <input type="hidden" name="email" value={state.email} />
+                <input type="hidden" name="next" value={next} />
+                <Turnstile resetKey={state} onToken={bot.onToken} />
+                Didn&apos;t get it? Check spam, or{" "}
+                <button
+                  disabled={pending || bot.waiting || left > 0}
+                  className="font-semibold text-brand hover:underline disabled:text-muted disabled:no-underline"
+                >
+                  {left > 0 ? `send a new code in ${clock(left)}` : "send a new code"}
+                </button>
+                {" · "}
+                <button name="intent" value="restart" className="font-semibold text-brand hover:underline">
+                  use another email
+                </button>
+              </form>
+            </>
+          )}
+        </Countdown>
       </div>
     );
   }
@@ -87,10 +134,22 @@ export function LoginForm({ next, googleEnabled }: { next: string; googleEnabled
             className={fieldClass}
           />
         </label>
-        {state.error && <p role="alert" className="text-sm text-danger">{state.error}</p>}
-        <button disabled={pending || bot.waiting} className={primaryButtonClass}>
-          {pending ? "Sending…" : bot.waiting ? "Checking your browser…" : "Email me a sign-in code"}
-        </button>
+        <Countdown key={resultKey} seconds={state.retryAfter}>
+          {(left) => (
+            <>
+              <ErrorMessage state={state} left={left} />
+              <button disabled={pending || bot.waiting || left > 0} className={primaryButtonClass}>
+                {pending
+                  ? "Sending…"
+                  : left > 0
+                    ? `Wait ${clock(left)}`
+                    : bot.waiting
+                      ? "Checking your browser…"
+                      : "Email me a sign-in code"}
+              </button>
+            </>
+          )}
+        </Countdown>
         <p className="text-xs text-muted">
           First time here? This code also creates your free account. We never show your email
           to other users and never ask for your phone number.

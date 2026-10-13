@@ -5,21 +5,24 @@ import { pathAfterSignIn, safeNext, siteUrl } from "@/lib/auth";
 import { createServerSupabase } from "@/lib/supabase/server";
 import type { AuthError } from "@supabase/supabase-js";
 
+// `retryAfter`: seconds until another code may be sent (the page counts it down).
 export type LoginState =
   // `email` keeps what was typed, so an error doesn't clear the box.
-  | { step: "email"; error?: string; email?: string }
-  | { step: "code"; email: string; error?: string };
+  | { step: "email"; error?: string; email?: string; retryAfter?: number }
+  | { step: "code"; email: string; error?: string; retryAfter?: number };
+
+// Supabase allows one code per address per minute.
+const resendSeconds = 60;
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // Plain-language reasons for sign-in problems, so people know what to do next.
 // Based on Supabase's error codes; anything unknown gets a gentle general message.
 function sendCodeError(error: AuthError, email: string) {
-  const waitSeconds = error.message.match(/after (\d+) seconds?/)?.[1];
   switch (error.code) {
     case "over_email_send_rate_limit":
-      return waitSeconds
-        ? `For your security, a new code can be sent once a minute. Please try again in ${waitSeconds} seconds.`
+      return waitSeconds(error)
+        ? "For your security, a new code can be sent once a minute."
         : "We've sent several codes to this address recently. Please wait a few minutes, then try again.";
     case "over_request_rate_limit":
       return "Too many attempts from this device. Please wait a few minutes, then try again.";
@@ -46,6 +49,12 @@ function sendCodeError(error: AuthError, email: string) {
     return "We couldn't reach the sign-in service. Please check your internet connection and try again.";
   }
   return "Something went wrong on our side while sending your code. Please try again in a moment.";
+}
+
+// "...you can only request this after 52 seconds" -> 52
+function waitSeconds(error: AuthError) {
+  const seconds = Number(error.message.match(/after (\d+) seconds?/)?.[1]);
+  return Number.isFinite(seconds) && seconds > 0 ? seconds : undefined;
 }
 
 function verifyCodeError(error: AuthError | null) {
@@ -90,9 +99,9 @@ export async function emailSignIn(prev: LoginState, formData: FormData): Promise
   });
   if (error) {
     const back = prev.step === "code" ? prev : { step: "email" as const, email };
-    return { ...back, error: sendCodeError(error, email) };
+    return { ...back, error: sendCodeError(error, email), retryAfter: waitSeconds(error) };
   }
-  return { step: "code", email };
+  return { step: "code", email, retryAfter: resendSeconds };
 }
 
 async function verifyCode(
@@ -102,13 +111,13 @@ async function verifyCode(
 ): Promise<LoginState> {
   const token = String(formData.get("code") ?? "").replace(/\s/g, "");
   if (!/^\d{6}$/.test(token)) {
-    return { ...prev, error: "The code is the 6 numbers in the email, for example 123456." };
+    return { ...prev, retryAfter: undefined, error: "The code is the 6 numbers in the email, for example 123456." };
   }
 
   const supabase = await createServerSupabase();
   const { data, error } = await supabase.auth.verifyOtp({ email: prev.email, token, type: "email" });
   if (error || !data.user) {
-    return { ...prev, error: verifyCodeError(error) };
+    return { ...prev, retryAfter: undefined, error: verifyCodeError(error) };
   }
   redirect(await pathAfterSignIn(supabase, data.user.id, next));
 }
