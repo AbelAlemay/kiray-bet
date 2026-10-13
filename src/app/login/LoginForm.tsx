@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect, useState, type ReactNode } from "react";
 import { fieldClass, labelClass, primaryButtonClass } from "@/components/form-styles";
-import { Turnstile, useBotCheck } from "@/components/Turnstile";
+import { BotCheckFailed, Turnstile, useBotCheck } from "@/components/Turnstile";
 import { emailSignIn, signInWithGoogle, type LoginState } from "./actions";
 
 // Seconds left of a wait, counting down live. Give the component using it a new `key`
@@ -84,7 +84,7 @@ export function LoginForm({ next, googleEnabled }: { next: string; googleEnabled
               <form action={action} className="text-center text-sm text-muted">
                 <input type="hidden" name="email" value={state.email} />
                 <input type="hidden" name="next" value={next} />
-                <Turnstile resetKey={state} onToken={bot.onToken} />
+                <Turnstile resetKey={state} onToken={bot.onToken} onError={bot.onError} onInteractive={bot.onInteractive} />
                 Didn&apos;t get it? Check spam, or{" "}
                 <button
                   disabled={pending || bot.waiting || left > 0}
@@ -121,7 +121,7 @@ export function LoginForm({ next, googleEnabled }: { next: string; googleEnabled
       )}
       <form action={action} className="space-y-4">
         <input type="hidden" name="next" value={next} />
-        <Turnstile resetKey={state} onToken={bot.onToken} />
+        <Turnstile resetKey={state} onToken={bot.onToken} onError={bot.onError} onInteractive={bot.onInteractive} />
         <label className={labelClass}>
           <span>Email · ኢሜይል</span>
           <input
@@ -138,13 +138,14 @@ export function LoginForm({ next, googleEnabled }: { next: string; googleEnabled
           {(left) => (
             <>
               <ErrorMessage state={state} left={left} />
+              {bot.failed && <BotCheckFailed />}
               <button disabled={pending || bot.waiting || left > 0} className={primaryButtonClass}>
                 {pending
                   ? "Sending…"
                   : left > 0
                     ? `Wait ${clock(left)}`
                     : bot.waiting
-                      ? "Checking your browser…"
+                      ? bot.waitingLabel
                       : "Email me a sign-in code"}
               </button>
             </>

@@ -22,20 +22,53 @@ declare global {
 
 const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
-// For forms: `waiting` is true until the bot check has produced a token.
+// For forms: `waiting` is true until the bot check has produced a token; `failed` when
+// Cloudflare couldn't run the check (blocked script, unknown site address, offline).
 export function useBotCheck() {
   const [token, setToken] = useState("");
-  return { waiting: !!siteKey && !token, onToken: setToken };
+  const [failed, setFailed] = useState(false);
+  // Cloudflare occasionally asks for a click ("Verify you are human").
+  const [needsClick, setNeedsClick] = useState(false);
+  const waiting = !!siteKey && !token;
+  return {
+    waiting,
+    failed,
+    // Button label while waiting.
+    waitingLabel: needsClick ? "Tick the box above to continue" : "Checking your browser…",
+    onToken: (value: string) => {
+      setToken(value);
+      if (value) {
+        setFailed(false);
+        setNeedsClick(false);
+      }
+    },
+    onError: () => setFailed(true),
+    onInteractive: () => setNeedsClick(true),
+  };
 }
 
-export function Turnstile({ resetKey, onToken }: { resetKey?: unknown; onToken?: (token: string) => void }) {
+export function Turnstile({
+  resetKey,
+  onToken,
+  onError,
+  onInteractive,
+}: {
+  resetKey?: unknown;
+  onToken?: (token: string) => void;
+  onError?: () => void;
+  onInteractive?: () => void;
+}) {
   const box = useRef<HTMLDivElement>(null);
   const widget = useRef<string | null>(null);
   const [ready, setReady] = useState(false);
   const [token, setTokenState] = useState("");
   const onTokenRef = useRef(onToken);
+  const onErrorRef = useRef(onError);
+  const onInteractiveRef = useRef(onInteractive);
   useEffect(() => {
     onTokenRef.current = onToken;
+    onErrorRef.current = onError;
+    onInteractiveRef.current = onInteractive;
   });
   const setToken = (value: string) => {
     setTokenState(value);
@@ -49,7 +82,11 @@ export function Turnstile({ resetKey, onToken }: { resetKey?: unknown; onToken?:
       appearance: "interaction-only",
       callback: setToken,
       "expired-callback": () => setToken(""),
-      "error-callback": () => setToken(""),
+      "before-interactive-callback": () => onInteractiveRef.current?.(),
+      "error-callback": () => {
+        setToken("");
+        onErrorRef.current?.();
+      },
     });
     return () => {
       if (widget.current) window.turnstile?.remove(widget.current);
@@ -74,5 +111,15 @@ export function Turnstile({ resetKey, onToken }: { resetKey?: unknown; onToken?:
       <div ref={box} />
       <input type="hidden" name="turnstileToken" value={token} />
     </>
+  );
+}
+
+// Shown when the bot check couldn't run, instead of "Checking your browser…" forever.
+export function BotCheckFailed() {
+  return (
+    <p role="alert" className="text-sm text-danger">
+      Our quick safety check couldn&apos;t load. Please refresh the page. If it keeps happening,
+      try another browser or turn off ad blockers for this site.
+    </p>
   );
 }

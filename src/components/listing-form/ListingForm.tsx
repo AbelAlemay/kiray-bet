@@ -3,7 +3,7 @@
 import { startTransition, useActionState, useState, type ReactNode } from "react";
 import { fieldClass, labelClass, primaryButtonClass } from "@/components/form-styles";
 import { site } from "@/lib/site";
-import { Turnstile, useBotCheck } from "@/components/Turnstile";
+import { BotCheckFailed, Turnstile, useBotCheck } from "@/components/Turnstile";
 import type { ListingFormState } from "@/app/listings/actions";
 import { PhotoPicker, type Photo } from "./PhotoPicker";
 
@@ -208,7 +208,7 @@ export function ListingForm({
           {` ${site.nameLatin}`} never handles money; don&apos;t ask renters to pay before they see the
           home and sign a lease.
         </p>
-        {!editing && <Turnstile resetKey={state} onToken={bot.onToken} />}
+        {!editing && <Turnstile resetKey={state} onToken={bot.onToken} onError={bot.onError} onInteractive={bot.onInteractive} />}
         {errors.form && (
           <p role="alert" className="text-danger">
             {errors.form}
@@ -219,13 +219,14 @@ export function ListingForm({
             Please fix the highlighted fields above.
           </p>
         )}
+        {!editing && bot.failed && <BotCheckFailed />}
         <button disabled={pending || uploading || botWaiting} className={primaryButtonClass}>
           {pending
             ? "Saving…"
             : uploading
               ? "Waiting for photos…"
               : botWaiting
-                ? "Checking your browser…"
+                ? bot.waitingLabel
               : editing
                 ? "Save changes · ለውጦችን ያስቀምጡ"
                 : "Submit for review · ለግምገማ ይላኩ"}
