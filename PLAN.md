@@ -145,8 +145,8 @@ Private (owner and admin only):
 | 3 | Accounts: sign up, log in, profile | Done (Google sign-in optional, not set up yet) |
 | 4 | Post a listing with photos + admin approval queue and notifications | Done |
 | 5 | Real search + map with approximate locations | Done |
-| 6 | In-app messaging + address requests | Next |
-| 7 | Favorites | |
+| 6 | In-app messaging + address requests | Done (email alerts for new messages: at launch) |
+| 7 | Favorites | Next |
 | 8 | Amharic | |
 | 9 | Reports, bans, Safety page, Terms, Privacy Policy | |
 | 10 | Security review, domain, launch on Vercel | |
@@ -164,6 +164,8 @@ Things set up for development that must change before real users arrive:
       update .env.local / Vercel env, and `npx supabase config push`.
 - [ ] Remove the sample listings and fake hosts from supabase/seed.sql data in the database.
 - [ ] Set NEXT_PUBLIC_SITE_URL to the real domain in Vercel.
+- [ ] Email alerts for new messages: needs the domain (Resend) and the Supabase secret key
+      as a server-only env var to look up the recipient's email.
 - [ ] Optional: Google sign-in (Google Cloud OAuth client, then NEXT_PUBLIC_GOOGLE_SIGN_IN=on).
 - [ ] Security review, Terms of Service and Privacy Policy reviewed by a lawyer.
 

@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
 import { PaymentWarning } from "@/components/PaymentWarning";
 import { requireUser } from "@/lib/auth";
 import { formatPrice } from "@/lib/format";
 import { createServerSupabase } from "@/lib/supabase/server";
+import { StartForm } from "./StartForm";
 
 export const metadata: Metadata = {
   title: "Message the host",
@@ -14,8 +15,8 @@ export const metadata: Metadata = {
 
 type Props = PageProps<"/messages/new">;
 
-// Where "Contact host" leads. Becomes the real conversation in build phase 6;
-// until then it confirms the listing and says messaging is coming.
+// Where "Contact host" leads: write the first message to the host. If this renter
+// already has a conversation about the listing, go straight to it.
 async function NewMessage({ searchParams }: { searchParams: Props["searchParams"] }) {
   const { listing: listingParam } = await searchParams;
   const id = typeof listingParam === "string" ? listingParam : "";
@@ -60,16 +61,20 @@ async function NewMessage({ searchParams }: { searchParams: Props["searchParams"
     );
   }
 
+  const { data: existing } = await supabase
+    .from("conversations")
+    .select("id")
+    .eq("listing_id", listing.id)
+    .eq("renter_id", user.id)
+    .maybeSingle();
+  if (existing) redirect(`/messages/${existing.id}`);
+
   const hostName = listing.host?.display_name ?? "the host";
   return (
     <div className="space-y-4">
       {summary}
-      <div className="rounded-2xl border border-dashed border-border p-6 text-center">
-        <p className="font-semibold">Messaging opens soon. · በቅርቡ</p>
-        <p className="mt-1 text-sm text-muted">
-          You&apos;ll be able to message {hostName} here privately, without sharing your phone number
-          or email.
-        </p>
+      <div className="rounded-2xl border border-border bg-surface p-5">
+        <StartForm listingId={listing.id} hostName={hostName} />
       </div>
       <PaymentWarning compact />
     </div>

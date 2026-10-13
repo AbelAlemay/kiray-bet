@@ -5,3 +5,14 @@ export function formatDate(iso: string, options: Intl.DateTimeFormatOptions = { 
 export function formatPrice(amount: number) {
   return `$${amount.toLocaleString("en-US")}`;
 }
+
+// "Oct 12, 3:45 PM" in Denver time (fixed time zone, so server and browser agree).
+export function formatMessageTime(iso: string) {
+  return new Date(iso).toLocaleString("en-US", {
+    timeZone: "America/Denver",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}

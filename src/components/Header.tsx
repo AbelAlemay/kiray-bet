@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { signOut } from "@/app/login/actions";
 import { getCurrentUser } from "@/lib/auth";
+import { getUnreadCount } from "@/lib/conversations";
 import { site } from "@/lib/site";
 import { Logo } from "./Logo";
 import { MobileMenu } from "./MobileMenu";
@@ -35,6 +36,7 @@ function SignInLink() {
 async function AccountLinks() {
   const user = await getCurrentUser();
   if (!user) return <SignInLink />;
+  const unread = await getUnreadCount(user.id);
   return (
     <>
       {user.role === "admin" && (
@@ -45,8 +47,11 @@ async function AccountLinks() {
       <Link href="/listings/mine" className={linkClass}>
         My listings
       </Link>
-      <Link href="/messages" className={linkClass}>
+      <Link href="/messages" className={linkClass} aria-label={unread ? `Messages, ${unread} unread` : undefined}>
         Messages
+        {unread > 0 && (
+          <span className="ml-1.5 rounded-full bg-door px-1.5 py-0.5 text-xs font-bold text-[#1c1a17]">{unread}</span>
+        )}
       </Link>
       <Link href="/account" className={`${linkClass} font-semibold`}>
         {user.name ?? "Account"}

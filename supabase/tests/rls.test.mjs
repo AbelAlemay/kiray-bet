@@ -146,6 +146,8 @@ rows = await as(SAMI, `insert into conversations (listing_id, renter_id, host_id
 const C = rows[0].id;
 await as(SAMI, `insert into messages (conversation_id, sender_id, body) values ($1, $2, 'Hi, is it still available?')`, [C, SAMI]);
 check("host reads message", (await as(DAWIT, `select body from messages`)).length === 1);
+rows = await db.query(`select last_message_at > created_at - interval '1 second' as touched from conversations where id = $1`, [C]);
+check("new message updates the conversation's last activity", rows.rows[0]?.touched === true);
 check("outsider can't read message", (await as(RUTH, `select body from messages`)).length === 0);
 check("outsider can't post into conversation", await fails(RUTH,
   `insert into messages (conversation_id, sender_id, body) values ($1, $2, 'spam')`, [C, RUTH]));
