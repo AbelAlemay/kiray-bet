@@ -3,6 +3,7 @@ import { ListingCard } from "@/components/ListingCard";
 import { PaymentWarning } from "@/components/PaymentWarning";
 import { SearchBar } from "@/components/SearchBar";
 import { ListingsMap } from "@/components/ListingsMap";
+import { ViewSwitch } from "@/components/ViewSwitch";
 import { getCityCounts, getLatestListings, getListingPins } from "@/lib/listings";
 import { site } from "@/lib/site";
 
@@ -90,36 +91,36 @@ export default async function Home() {
         </div>
       </section>
 
-      {pins.length > 0 && (
-        <section className="mx-auto max-w-6xl px-4 pt-10">
-          <div className="mb-3 flex items-end justify-between gap-4">
-            <h2 className="text-lg font-bold">
-              Homes on the map · <span className="text-muted">በካርታ</span>
-            </h2>
-            <Link href="/search?view=map" className="py-2 text-sm font-semibold text-brand hover:underline">
-              Open full map →
-            </Link>
-          </div>
-          <ListingsMap pins={pins} className="h-72 sm:h-96" />
-          <p className="mt-2 text-xs text-muted">🔒 Approximate areas only. Exact addresses are shared by the host.</p>
-        </section>
-      )}
-
       <section className="mx-auto max-w-6xl px-4 pt-10">
-        <div className="mb-5 flex items-end justify-between gap-4">
-          <div>
-            <h2 className="text-2xl font-bold">Latest homes</h2>
-            <p className="text-muted">አዳዲስ ቤቶች</p>
-          </div>
-          <Link href="/search" className="text-sm font-semibold text-brand hover:underline">
-            See all →
-          </Link>
+        <div className="mb-3">
+          <h2 className="text-2xl font-bold">Latest homes</h2>
+          <p className="text-muted">አዳዲስ ቤቶች</p>
         </div>
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {latest.map((listing) => (
-            <ListingCard key={listing.id} listing={listing} />
-          ))}
-        </div>
+        <ViewSwitch
+          label="Show homes as"
+          options={["☰ List", "🗺 Map"]}
+          actions={
+            <Link href="/search" className="py-2 text-sm font-semibold text-brand hover:underline">
+              See all →
+            </Link>
+          }
+          views={[
+            <div key="list" className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {latest.map((listing) => (
+                <ListingCard key={listing.id} listing={listing} />
+              ))}
+            </div>,
+            <div key="map" className="space-y-2">
+              <ListingsMap pins={pins} className="h-80 sm:h-[28rem]" />
+              <p className="text-xs text-muted">
+                🔒 Approximate areas only. Exact addresses are shared by the host.{" "}
+                <Link href="/search?view=map" className="font-semibold text-brand hover:underline">
+                  Open full map with filters →
+                </Link>
+              </p>
+            </div>,
+          ]}
+        />
       </section>
 
       <section className="mx-auto max-w-6xl px-4 pt-16">

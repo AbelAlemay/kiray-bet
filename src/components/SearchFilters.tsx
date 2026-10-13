@@ -9,7 +9,7 @@ const checkboxes = [
   { name: "utilities", label: "Utilities included" },
 ] as const;
 
-export function SearchFilters({ filters, view }: { filters: ListingFilters; view: "list" | "both" | "map" }) {
+export function SearchFilters({ filters, view }: { filters: ListingFilters; view: "list" | "map" }) {
   return (
     <form
       action="/search"

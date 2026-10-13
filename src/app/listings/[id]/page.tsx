@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { ListingsMap } from "@/components/ListingsMap";
+import { ViewSwitch } from "@/components/ViewSwitch";
 import { PaymentWarning } from "@/components/PaymentWarning";
 import { formatDate, formatPrice, placeLabel } from "@/lib/format";
 import { getListing } from "@/lib/listings";
@@ -74,7 +75,41 @@ async function ListingDetail({ params }: { params: Props["params"] }) {
     <>
       <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
         <div className="space-y-6">
-          <PhotoGallery photos={listing.photos} title={listing.title} />
+          {listing.approxLat != null && listing.approxLng != null ? (
+            <ViewSwitch
+              label="Show"
+              options={["📷 Photos", "🗺 Map"]}
+              views={[
+                <PhotoGallery key="photos" photos={listing.photos} title={listing.title} />,
+                <div key="map" className="space-y-2">
+                  <ListingsMap
+                    pins={[
+                      {
+                        id: listing.id,
+                        title: listing.title,
+                        price: listing.price,
+                        type: listing.type,
+                        neighborhood: listing.neighborhood,
+                        city: listing.city,
+                        crossStreets: listing.crossStreets,
+                        lat: listing.approxLat,
+                        lng: listing.approxLng,
+                      },
+                    ]}
+                    interactive={false}
+                    zoom={13}
+                    className="h-72 sm:h-96"
+                  />
+                  <p className="text-sm text-muted">
+                    🔒 Approximate area near {placeLabel(listing)}. The host shares the exact address
+                    with you after you message them.
+                  </p>
+                </div>,
+              ]}
+            />
+          ) : (
+            <PhotoGallery photos={listing.photos} title={listing.title} />
+          )}
 
           <div>
             <p className="text-sm font-semibold text-brand">
@@ -107,34 +142,6 @@ async function ListingDetail({ params }: { params: Props["params"] }) {
             <h2 className="mb-2 text-xl font-bold">About this home</h2>
             <p className="leading-relaxed">{listing.description}</p>
           </section>
-
-          {listing.approxLat != null && listing.approxLng != null && (
-            <section>
-              <h2 className="mb-2 text-xl font-bold">Where it is · አካባቢ</h2>
-              <ListingsMap
-                pins={[
-                  {
-                    id: listing.id,
-                    title: listing.title,
-                    price: listing.price,
-                    type: listing.type,
-                    neighborhood: listing.neighborhood,
-                    city: listing.city,
-                    crossStreets: listing.crossStreets,
-                    lat: listing.approxLat,
-                    lng: listing.approxLng,
-                  },
-                ]}
-                interactive={false}
-                zoom={13}
-                className="h-56 sm:h-72"
-              />
-              <p className="mt-2 text-sm text-muted">
-                🔒 Approximate area near {placeLabel(listing)}. The host shares the
-                exact address with you after you message them.
-              </p>
-            </section>
-          )}
         </div>
 
         <aside className="lg:sticky lg:top-20 lg:self-start">

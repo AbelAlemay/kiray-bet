@@ -21,11 +21,9 @@ export const metadata: Metadata = {
   title: "Browse homes for rent",
 };
 
-// List only, list with the map beside it ("both"), or the map only.
-type View = "list" | "both" | "map";
+type View = "list" | "map";
 const views: { id: View; label: string }[] = [
   { id: "list", label: "☰ List" },
-  { id: "both", label: "◫ List + Map" },
   { id: "map", label: "🗺 Map" },
 ];
 
@@ -106,12 +104,12 @@ function ListingGrid({
 async function Results({ searchParams }: { searchParams: PageProps<"/search">["searchParams"] }) {
   const params = await searchParams;
   const filters = parseFilters(params);
-  const view: View = params.view === "map" || params.view === "both" ? params.view : "list";
+  const view: View = params.view === "map" ? "map" : "list";
   const chips = activeFilterChips(filters, view);
 
   const [{ listings, total }, pins] = await Promise.all([
-    view !== "map" ? getListings(filters) : Promise.resolve({ listings: [], total: 0 }),
-    view !== "list" ? getListingPins({ ...filters, page: 1 }) : Promise.resolve([]),
+    view === "list" ? getListings(filters) : Promise.resolve({ listings: [], total: 0 }),
+    view === "map" ? getListingPins({ ...filters, page: 1 }) : Promise.resolve([]),
   ]);
   const count = view === "map" ? pins.length : total;
 
@@ -172,17 +170,6 @@ async function Results({ searchParams }: { searchParams: PageProps<"/search">["s
           <div className="space-y-2">
             <ListingsMap pins={pins} />
             <MapNote />
-          </div>
-        ) : view === "both" ? (
-          // Phones: map on top, list below. Wide screens: list left, map right (stays in view).
-          <div className="grid gap-5 lg:grid-cols-2">
-            <div className="space-y-2 lg:sticky lg:top-20 lg:order-2 lg:self-start">
-              <ListingsMap pins={pins} className="h-72 lg:h-[calc(100vh-7rem)]" />
-              <MapNote />
-            </div>
-            <div className="lg:order-1">
-              <ListingGrid listings={listings} total={total} filters={filters} view={view} columns="sm:grid-cols-2 lg:grid-cols-1 2xl:grid-cols-2" />
-            </div>
           </div>
         ) : (
           <ListingGrid listings={listings} total={total} filters={filters} view={view} columns="sm:grid-cols-2 xl:grid-cols-3" />
