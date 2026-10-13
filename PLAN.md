@@ -167,6 +167,7 @@ Things set up for development that must change before real users arrive:
 - [ ] Email alerts for new messages: needs the domain (Resend) and the Supabase secret key
       as a server-only env var to look up the recipient's email.
 - [ ] Optional: Google sign-in (Google Cloud OAuth client, then NEXT_PUBLIC_GOOGLE_SIGN_IN=on).
+- [ ] Allow search engines: set NEXT_PUBLIC_ALLOW_INDEXING=on in Vercel (off while testing).
 - [ ] Security review, Terms of Service and Privacy Policy reviewed by a lawyer.
 
 ## 11. Legal notes

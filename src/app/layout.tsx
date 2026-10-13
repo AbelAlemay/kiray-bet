@@ -27,6 +27,8 @@ export const metadata: Metadata = {
     template: `%s · ${site.nameLatin}`,
   },
   description: site.tagline,
+  // Kept out of search engines until public launch (set NEXT_PUBLIC_ALLOW_INDEXING=on).
+  robots: process.env.NEXT_PUBLIC_ALLOW_INDEXING === "on" ? undefined : { index: false, follow: false },
 };
 
 // Colors the phone's browser bar to match the (always dark) site.
