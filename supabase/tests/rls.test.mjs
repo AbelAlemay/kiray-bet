@@ -197,6 +197,19 @@ check("anon can't see saved homes", await fails(null, `select * from favorites`)
 check("can't remove someone else's save", (await as(RUTH, `delete from favorites where user_id = $1 returning listing_id`, [SAMI])).length === 0);
 check("user removes own save", (await as(SAMI, `delete from favorites where user_id = $1 and listing_id = $2 returning listing_id`, [SAMI, L1])).length === 1);
 
+// Lease templates
+const leaseBody = "x".repeat(200);
+check("host can't add a lease template", await fails(RUTH,
+  `insert into lease_templates (listing_type, version, body, created_by) values ('room', 2, $1, $2)`, [leaseBody, RUTH]));
+check("admin without two-step login can't add a lease template", await fails(ADMIN,
+  `insert into lease_templates (listing_type, version, body, created_by) values ('room', 2, $1, $2)`, [leaseBody, ADMIN], { aal: "aal1" }));
+check("admin adds a lease template version", (await as(ADMIN,
+  `insert into lease_templates (listing_type, version, body, lawyer_reviewed, created_by) values ('room', 2, $1, true, $2) returning id`, [leaseBody, ADMIN])).length === 1);
+check("hosts can read lease templates", (await as(RUTH, `select version from lease_templates where listing_type = 'room'`)).length === 1);
+check("visitors can't read lease templates", await fails(null, `select * from lease_templates`));
+check("versions can't be edited", await fails(ADMIN, `update lease_templates set body = $1`, [leaseBody]));
+check("versions can't be deleted", (await as(ADMIN, `delete from lease_templates returning id`).catch(() => [])).length === 0);
+
 // Visit stats
 const VISITOR = "d0000000-0000-4000-8000-000000000001";
 await as(null, `select public.record_visit($1)`, [VISITOR]);

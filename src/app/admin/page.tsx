@@ -7,6 +7,7 @@ import { createServerSupabase } from "@/lib/supabase/server";
 import { ActivityStats } from "./ActivityStats";
 import { AdminSearch } from "./AdminSearch";
 import { isoDaysAgo, searchTerm } from "./data";
+import { LeasesTab } from "./LeasesTab";
 import { ListingsTab, type ListingTab } from "./ListingsTab";
 import { ReviewQueue } from "./ReviewQueue";
 import { TwoStepForm } from "./TwoStepForm";
@@ -23,6 +24,7 @@ const tabs = [
   { id: "rented", label: "Rented" },
   { id: "rejected", label: "Not approved" },
   { id: "users", label: "Users" },
+  { id: "leases", label: "Leases" },
 ] as const;
 type Tab = (typeof tabs)[number]["id"];
 
@@ -78,6 +80,7 @@ async function Admin({ searchParams }: { searchParams: PageProps<"/admin">["sear
     rented: rented.count ?? 0,
     rejected: rejected.count ?? 0,
     users: users.count ?? 0,
+    leases: 4,
   };
 
   return (
@@ -121,15 +124,18 @@ async function Admin({ searchParams }: { searchParams: PageProps<"/admin">["sear
         </p>
       )}
 
-      <AdminSearch
-        tab={tab}
-        q={q}
-        placeholder={tab === "users" ? "Search name or email" : "Search title, area, city, or host name/email"}
-      />
+      {tab !== "leases" && (
+        <AdminSearch
+          tab={tab}
+          q={q}
+          placeholder={tab === "users" ? "Search name or email" : "Search title, area, city, or host name/email"}
+        />
+      )}
 
       {tab === "review" && <ReviewQueue q={q} />}
       {(tab === "live" || tab === "rented" || tab === "rejected") && <ListingsTab tab={tab as ListingTab} q={q} />}
       {tab === "users" && <UsersTab adminId={user.id} q={q} />}
+      {tab === "leases" && <LeasesTab />}
     </div>
   );
 }

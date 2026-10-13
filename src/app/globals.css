@@ -48,3 +48,14 @@ body {
     font-size: 16px;
   }
 }
+
+/* Printing a lease: plain black text on white, no site colors. */
+@media print {
+  body {
+    background: #fff;
+    color: #000;
+  }
+  @page {
+    margin: 2cm;
+  }
+}

@@ -40,6 +40,9 @@ export function ListingActions({ id, status }: { id: string; status: "pending" |
       <Link href={`/listings/${id}/edit`} className={buttonClass}>
         Edit
       </Link>
+      <Link href={`/listings/${id}/lease`} className={buttonClass}>
+        📄 Lease
+      </Link>
       {(status === "active" || status === "rented") && (
         <form action={setRented}>
           <input type="hidden" name="listingId" value={id} />

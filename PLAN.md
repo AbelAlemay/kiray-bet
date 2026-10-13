@@ -75,7 +75,16 @@ What we protect and how:
 - Promises must be concrete and true ("we never show your phone number"), never absolute
   ("your data can never be stolen").
 
-## 4. Lease agreements (proposed)
+## 4. Lease agreements (v1 built Oct 2026)
+**Built:** hosts tap 📄 Lease on My listings and get the agreement for their home type (house,
+apartment, basement, room), pre-filled from the listing, to print or save as PDF. Nothing typed is
+stored. Default drafts live in src/lib/leases/templates.ts with attorney notes ({{! … }}) that never
+print. Admin → Leases edits each agreement; every save is a new version (lease_templates table), and
+until one is marked "reviewed by a Colorado attorney" every lease shows a DRAFT warning.
+**Next:** have a Colorado landlord-tenant attorney review all four and paste their versions;
+later, e-signing and stored signed copies (proposal below).
+
+### Original proposal
 - Host fills in the terms (rent, deposit, dates, rules) from the listing; the renter fills in
   their own legal name. Both e-sign on the site, then a locked PDF is stored and both can
   download it.
@@ -166,6 +175,7 @@ Things set up for development that must change before real users arrive:
       as a server-only env var to look up the recipient's email.
 - [ ] Optional: Google sign-in (Google Cloud OAuth client, then NEXT_PUBLIC_GOOGLE_SIGN_IN=on).
 - [ ] Allow search engines: set NEXT_PUBLIC_ALLOW_INDEXING=on in Vercel (off while testing).
+- [ ] Lease agreements: Colorado attorney reviews all four (Admin → Leases), marks them reviewed.
 - [ ] Security review, Terms of Service and Privacy Policy reviewed by a lawyer.
 
 ## 11. Legal notes

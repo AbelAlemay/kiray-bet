@@ -2,7 +2,7 @@ import { site } from "@/lib/site";
 
 export function Footer() {
   return (
-    <footer className="mt-16 border-t border-border bg-surface">
+    <footer className="mt-16 print:hidden border-t border-border bg-surface">
       <div className="mx-auto max-w-6xl space-y-3 px-4 py-8 text-sm text-muted">
         <p className="font-semibold text-foreground">
           {site.name} · {site.nameLatin}

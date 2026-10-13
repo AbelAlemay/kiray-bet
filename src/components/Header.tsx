@@ -90,7 +90,7 @@ function PostLink() {
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-20 border-b border-border bg-surface/90 backdrop-blur">
+    <header className="sticky top-0 z-20 print:hidden border-b border-border bg-surface/90 backdrop-blur">
       <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
         <Link href="/" className="flex shrink-0 items-center gap-2">
           <Logo />
