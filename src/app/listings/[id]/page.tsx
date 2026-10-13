@@ -6,6 +6,7 @@ import { Suspense } from "react";
 import { ListingsMap } from "@/components/ListingsMap";
 import { ViewSwitch } from "@/components/ViewSwitch";
 import { PaymentWarning } from "@/components/PaymentWarning";
+import { SaveButton } from "@/components/SaveButton";
 import { formatDate, formatPrice, placeLabel } from "@/lib/format";
 import { getListing } from "@/lib/listings";
 import { site } from "@/lib/site";
@@ -69,7 +70,6 @@ async function ListingDetail({ params }: { params: Props["params"] }) {
   const yesNo = (v: boolean) => (v ? "Yes" : "No");
   // Signs visitors in first (requireUser), then opens the conversation page.
   const contactHref = `/messages/new?listing=${listing.id}`;
-  const saveHref = `/login?next=/listings/${listing.id}`;
 
   return (
     <>
@@ -160,13 +160,7 @@ async function ListingDetail({ params }: { params: Props["params"] }) {
             >
               Contact host · ባለቤቱን ያግኙ
             </Link>
-            {/* Saving arrives with favorites (build phase 7). */}
-            <Link
-              href={saveHref}
-              className="block rounded-xl border border-border px-4 py-3 text-center font-semibold hover:bg-brand-soft"
-            >
-              ♡ Save
-            </Link>
+            <SaveButton listingId={listing.id} variant="button" />
             {/* "Report this listing" link arrives with moderation in build step 9. */}
             <ul className="space-y-1 text-xs text-muted">
               <li>🔒 No phone numbers needed. You chat privately inside {site.nameLatin}.</li>

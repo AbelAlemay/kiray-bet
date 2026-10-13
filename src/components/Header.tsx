@@ -44,6 +44,9 @@ async function AccountLinks() {
           Admin
         </Link>
       )}
+      <Link href="/saved" className={linkClass}>
+        ♡ Saved
+      </Link>
       <Link href="/listings/mine" className={linkClass}>
         My listings
       </Link>

@@ -146,8 +146,8 @@ Private (owner and admin only):
 | 4 | Post a listing with photos + admin approval queue and notifications | Done |
 | 5 | Real search + map with approximate locations | Done |
 | 6 | In-app messaging + address requests | Done (email alerts for new messages: at launch) |
-| 7 | Favorites | Next |
-| 8 | Amharic | |
+| 7 | Favorites | Done |
+| 8 | Amharic | Next |
 | 9 | Reports, bans, Safety page, Terms, Privacy Policy | |
 | 10 | Security review, domain, launch on Vercel | |
 | 11 | Promote in community Facebook and Telegram groups, churches and restaurants | |

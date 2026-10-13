@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { Listing } from "@/lib/sample-listings";
 import { formatDate, formatPrice, placeLabel } from "@/lib/format";
 import { site } from "@/lib/site";
+import { SaveButton } from "./SaveButton";
 
 const typeColors: Record<Listing["type"], string> = {
   house: "from-emerald-700 to-emerald-500",
@@ -15,39 +16,44 @@ export function ListingCard({ listing }: { listing: Listing }) {
   const type = site.listingTypes.find((t) => t.value === listing.type)!;
 
   return (
-    <Link
-      href={`/listings/${listing.id}`}
-      className="group overflow-hidden rounded-2xl border border-border bg-surface transition hover:-translate-y-0.5 hover:shadow-lg"
-    >
-      <div className={`relative h-40 bg-gradient-to-br ${typeColors[listing.type]}`}>
-        {listing.photos[0] && (
-          <Image
-            src={listing.photos[0]}
-            alt=""
-            fill
-            sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-            className="object-cover"
-          />
-        )}
-        <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-xs font-semibold text-gray-900">
-          {type.label} · {type.labelAm}
-        </span>
-        <span className="absolute bottom-3 right-3 rounded-lg bg-black/60 px-2.5 py-1 text-sm font-bold text-white">
-          {formatPrice(listing.price)}/mo
-        </span>
+    <div className="relative transition hover:-translate-y-0.5">
+      <Link
+        href={`/listings/${listing.id}`}
+        className="group block overflow-hidden rounded-2xl border border-border bg-surface transition hover:shadow-lg"
+      >
+        <div className={`relative h-40 bg-gradient-to-br ${typeColors[listing.type]}`}>
+          {listing.photos[0] && (
+            <Image
+              src={listing.photos[0]}
+              alt=""
+              fill
+              sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+              className="object-cover"
+            />
+          )}
+          <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-xs font-semibold text-gray-900">
+            {type.label} · {type.labelAm}
+          </span>
+          <span className="absolute bottom-3 right-3 rounded-lg bg-black/60 px-2.5 py-1 text-sm font-bold text-white">
+            {formatPrice(listing.price)}/mo
+          </span>
+        </div>
+        <div className="space-y-1.5 p-4">
+          <h3 className="font-semibold group-hover:text-brand">{listing.title}</h3>
+          <p className="text-sm text-muted">
+            Near {placeLabel(listing)}
+          </p>
+          <p className="text-sm">
+            {listing.bedrooms} bd · {listing.bathrooms} ba
+            {listing.utilitiesIncluded && " · Utilities incl."}
+            {listing.parking && " · Parking"}
+          </p>
+          <p className="text-xs text-muted">Available {formatDate(listing.availableFrom)}</p>
+        </div>
+      </Link>
+      <div className="absolute right-2 top-2">
+        <SaveButton listingId={listing.id} variant="heart" />
       </div>
-      <div className="space-y-1.5 p-4">
-        <h3 className="font-semibold group-hover:text-brand">{listing.title}</h3>
-        <p className="text-sm text-muted">
-          Near {placeLabel(listing)}
-        </p>
-        <p className="text-sm">
-          {listing.bedrooms} bd · {listing.bathrooms} ba
-          {listing.utilitiesIncluded && " · Utilities incl."}
-          {listing.parking && " · Parking"}
-        </p>
-        <p className="text-xs text-muted">Available {formatDate(listing.availableFrom)}</p>
-      </div>
-    </Link>
+    </div>
   );
 }

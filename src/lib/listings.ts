@@ -220,6 +220,28 @@ export async function getListings(filters: ListingFilters): Promise<{ listings: 
   return { listings: results.slice(0, filters.page * pageSize), total: results.length };
 }
 
+// Live listings with these ids (e.g. someone's saved homes), in the given order.
+// Rented or removed listings are simply missing from the result.
+export async function getListingsByIds(ids: string[]): Promise<Listing[]> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("listings");
+
+  const valid = ids.filter((id) => uuidPattern.test(id)).slice(0, 200);
+  const supabase = createPublicClient();
+  if (!supabase) return sampleListings.filter((l) => ids.includes(l.id));
+  if (valid.length === 0) return [];
+  const { data, error } = await supabase
+    .from("listings")
+    .select(listingColumns)
+    .eq("status", "active")
+    .in("id", valid)
+    .overrideTypes<ListingRow[], { merge: false }>();
+  if (error) throw new Error(`Couldn't load listings: ${error.message}`);
+  const byId = new Map((await toListings(supabase, data)).map((l) => [l.id, l]));
+  return valid.map((id) => byId.get(id)).filter((l): l is Listing => !!l);
+}
+
 export async function getLatestListings(count: number): Promise<Listing[]> {
   return (await getListings({ sort: "newest", page: 1 })).listings.slice(0, count);
 }

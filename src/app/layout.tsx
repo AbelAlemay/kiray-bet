@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Menbere } from "next/font/google";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { SavedProvider } from "@/components/SavedProvider";
 import { VisitTracker } from "@/components/VisitTracker";
 import { Suspense } from "react";
 import { site } from "@/lib/site";
@@ -45,9 +46,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       {/* Pages with a fixed bottom bar on phones (data-bottom-bar) get room below the footer. */}
       <body className="min-h-full flex flex-col font-sans has-[[data-bottom-bar]]:pb-24 lg:has-[[data-bottom-bar]]:pb-0">
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        <SavedProvider>
+          <Header />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </SavedProvider>
         {/* Reads the current path, so it sits in its own Suspense boundary. */}
         <Suspense>
           <VisitTracker />

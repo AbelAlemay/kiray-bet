@@ -189,6 +189,14 @@ check("host reads the note", (await as(RUTH, `select review_note from listings w
 rows = await as(RUTH, `update listings set description = 'Clear new photos, quiet room near the bus line.' where id = $1 returning status`, [RL]);
 check("host edit resubmits a rejected listing", rows[0]?.status === "pending");
 
+// Favorites
+check("user saves a listing", (await as(SAMI, `insert into favorites (user_id, listing_id) values ($1, $2) returning listing_id`, [SAMI, L1])).length === 1);
+check("can't save for someone else", await fails(SAMI, `insert into favorites (user_id, listing_id) values ($1, $2)`, [RUTH, L1]));
+check("saved homes are private", (await as(RUTH, `select 1 from favorites where user_id = $1`, [SAMI])).length === 0);
+check("anon can't see saved homes", await fails(null, `select * from favorites`));
+check("can't remove someone else's save", (await as(RUTH, `delete from favorites where user_id = $1 returning listing_id`, [SAMI])).length === 0);
+check("user removes own save", (await as(SAMI, `delete from favorites where user_id = $1 and listing_id = $2 returning listing_id`, [SAMI, L1])).length === 1);
+
 // Visit stats
 const VISITOR = "d0000000-0000-4000-8000-000000000001";
 await as(null, `select public.record_visit($1)`, [VISITOR]);
