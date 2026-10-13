@@ -82,7 +82,7 @@ export function filtersToQuery(filters: Partial<ListingFilters>) {
 
 const listingColumns =
   "id, title, type, price, deposit, bedrooms, bathrooms, city, neighborhood, available_from, " +
-  "utilities_included, parking, pets_allowed, description, created_at, approx_lat, approx_lng, " +
+  "utilities_included, parking, pets_allowed, description, created_at, approx_lat, approx_lng, cross_streets, " +
   "host:profiles!listings_host_id_fkey(display_name), listing_photos(path, order)";
 
 type ListingRow = {
@@ -103,6 +103,7 @@ type ListingRow = {
   created_at: string;
   approx_lat: number | null;
   approx_lng: number | null;
+  cross_streets: string | null;
   host: { display_name: string | null } | null;
   listing_photos: { path: string; order: number }[];
 };
@@ -147,6 +148,7 @@ function toListing(row: ListingRow): Omit<Listing, "photos"> {
     postedAt: row.created_at.slice(0, 10),
     approxLat: row.approx_lat,
     approxLng: row.approx_lng,
+    crossStreets: row.cross_streets,
   };
 }
 
@@ -230,6 +232,7 @@ export type ListingPin = {
   type: ListingType;
   neighborhood: string;
   city: string;
+  crossStreets: string | null;
   lat: number;
   lng: number;
 };
@@ -243,11 +246,13 @@ export async function getListingPins(filters: ListingFilters): Promise<ListingPi
   const rows = supabase
     ? ((
         await applyFilters(
-          supabase.from("listings").select("id, title, price, type, neighborhood, city, approx_lat, approx_lng"),
+          supabase.from("listings").select("id, title, price, type, neighborhood, city, cross_streets, approx_lat, approx_lng"),
           filters,
         ).limit(500)
       ).data ?? [])
-    : sampleListings.filter((l) => matchesSample(l, filters)).map((l) => ({ ...l, approx_lat: l.approxLat, approx_lng: l.approxLng }));
+    : sampleListings
+        .filter((l) => matchesSample(l, filters))
+        .map((l) => ({ ...l, approx_lat: l.approxLat, approx_lng: l.approxLng, cross_streets: l.crossStreets }));
 
   return rows
     .filter((r) => r.approx_lat != null && r.approx_lng != null)
@@ -258,6 +263,7 @@ export async function getListingPins(filters: ListingFilters): Promise<ListingPi
       type: r.type as ListingType,
       neighborhood: r.neighborhood,
       city: r.city,
+      crossStreets: r.cross_streets,
       lat: Number(r.approx_lat),
       lng: Number(r.approx_lng),
     }));

@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { requireUser } from "@/lib/auth";
 import { getConversation, type Conversation } from "@/lib/conversations";
-import { formatPrice } from "@/lib/format";
+import { formatPrice, placeLabel } from "@/lib/format";
 import { decideAddress, requestAddress } from "../actions";
 import { Chat } from "./Chat";
 
@@ -126,7 +126,8 @@ async function ConversationView({ params }: { params: Props["params"] }) {
           <h1 className="truncate text-xl font-bold">{c.otherName}</h1>
           {c.listing ? (
             <Link href={`/listings/${c.listing.id}`} className="block truncate text-sm text-muted hover:text-foreground">
-              {c.listing.title} · {formatPrice(c.listing.price)}/mo · {c.listing.neighborhood}
+              {c.listing.title} · {formatPrice(c.listing.price)}/mo · near{" "}
+              {placeLabel({ ...c.listing, crossStreets: c.listing.cross_streets })}
             </Link>
           ) : (
             <p className="text-sm text-muted">This listing is no longer available.</p>

@@ -1,8 +1,10 @@
 "use server";
 
-import { updateTag } from "next/cache";
+import { revalidateTag, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
+import { findCrossStreets } from "@/lib/cross-streets";
 import { createServerSupabase } from "@/lib/supabase/server";
 
 // Admin actions. The database checks again that the user is an admin who confirmed
@@ -54,17 +56,42 @@ function note(formData: FormData) {
   return String(formData.get("note") ?? "").trim().slice(0, 500);
 }
 
-// Approve a pending listing, or put a rejected one live.
+// Looks up the nearest major intersection from the listing's blurred map point and
+// saves it as the public location label. Returns false if it couldn't be found.
+async function fillCrossStreets(listingId: string) {
+  const supabase = await createServerSupabase();
+  const { data } = await supabase.from("listings").select("approx_lat, approx_lng").eq("id", listingId).single();
+  if (data?.approx_lat == null || data.approx_lng == null) return false;
+  const crossStreets = await findCrossStreets(data.approx_lat, data.approx_lng);
+  if (!crossStreets) return false;
+  await supabase.from("listings").update({ cross_streets: crossStreets }).eq("id", listingId);
+  return true;
+}
+
+// Approve a pending listing, or put a rejected one live. The intersection label is
+// looked up afterwards so approving stays instant.
 export async function approveListing(formData: FormData) {
   await requireAdmin();
+  const id = String(formData.get("listingId"));
   const supabase = await createServerSupabase();
   await supabase
     .from("listings")
     .update({ status: "active", review_note: null })
-    .eq("id", String(formData.get("listingId")))
+    .eq("id", id)
     .in("status", ["pending", "rejected"]);
   updateTag("listings");
+  after(async () => {
+    if (await fillCrossStreets(id)) revalidateTag("listings", "max");
+  });
   back(formData, "approved");
+}
+
+// Retry the intersection lookup (e.g. when the map service was busy at approval).
+export async function refreshCrossStreets(formData: FormData) {
+  await requireAdmin();
+  const found = await fillCrossStreets(String(formData.get("listingId")));
+  if (found) updateTag("listings");
+  back(formData, found ? "intersection" : "intersection-failed");
 }
 
 // Reject a pending listing, or take down a live/rented one. The host sees the note.

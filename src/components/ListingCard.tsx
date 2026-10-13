@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Listing } from "@/lib/sample-listings";
-import { formatDate, formatPrice } from "@/lib/format";
+import { formatDate, formatPrice, placeLabel } from "@/lib/format";
 import { site } from "@/lib/site";
 
 const typeColors: Record<Listing["type"], string> = {
@@ -39,7 +39,7 @@ export function ListingCard({ listing }: { listing: Listing }) {
       <div className="space-y-1.5 p-4">
         <h3 className="font-semibold group-hover:text-brand">{listing.title}</h3>
         <p className="text-sm text-muted">
-          {listing.neighborhood}, {listing.city}
+          Near {placeLabel(listing)}
         </p>
         <p className="text-sm">
           {listing.bedrooms} bd · {listing.bathrooms} ba

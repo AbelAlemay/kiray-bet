@@ -23,6 +23,8 @@ export type Listing = {
   // Blurred map point (about 1 km), never the exact address.
   approxLat: number | null;
   approxLng: number | null;
+  // Nearest major intersection, e.g. "Havana & Iliff" (set when approved).
+  crossStreets: string | null;
 };
 
 export const sampleListings: Listing[] = [
@@ -47,6 +49,7 @@ export const sampleListings: Listing[] = [
     photos: [],
     approxLat: 39.71,
     approxLng: -104.86,
+    crossStreets: null,
   },
   {
     id: "2",
@@ -69,6 +72,7 @@ export const sampleListings: Listing[] = [
     photos: [],
     approxLat: 39.64,
     approxLng: -104.8,
+    crossStreets: null,
   },
   {
     id: "3",
@@ -91,6 +95,7 @@ export const sampleListings: Listing[] = [
     photos: [],
     approxLat: 39.78,
     approxLng: -104.83,
+    crossStreets: null,
   },
   {
     id: "4",
@@ -113,6 +118,7 @@ export const sampleListings: Listing[] = [
     photos: [],
     approxLat: 39.71,
     approxLng: -105.08,
+    crossStreets: null,
   },
   {
     id: "5",
@@ -135,6 +141,7 @@ export const sampleListings: Listing[] = [
     photos: [],
     approxLat: 39.59,
     approxLng: -104.88,
+    crossStreets: null,
   },
   {
     id: "6",
@@ -157,5 +164,6 @@ export const sampleListings: Listing[] = [
     photos: [],
     approxLat: 39.64,
     approxLng: -104.96,
+    crossStreets: null,
   },
 ];

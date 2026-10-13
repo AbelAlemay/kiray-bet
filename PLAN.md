@@ -14,7 +14,7 @@ every listing is reviewed by a person, and all contact happens inside the site.
 | Contact | **In-app messaging only.** Emails are never shown to other users. |
 | Phone numbers | **Never collected.** We don't ask for them at all. |
 | Listing approval | **Every listing is reviewed by the admin before it goes live.** Admin is notified of each new listing by **email and Telegram**. |
-| Address privacy | Public sees only the neighborhood and an approximate map area. The exact address is shared only after the renter asks **and the host approves**. |
+| Address privacy | Public sees only the nearest major intersection (e.g. "Near Havana & Iliff, Aurora", worked out from the blurred map point via OpenStreetMap) and an approximate map area. The exact address is shared only after the renter asks **and the host approves**. |
 | Area | Denver metro only at launch. |
 | Login | Email link + 6-digit code, and Google. Same flow signs up new users. |
 | Language | English and Amharic side by side. Amharic font: **Menbere**. |

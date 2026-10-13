@@ -4,7 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
 import { PaymentWarning } from "@/components/PaymentWarning";
 import { requireUser } from "@/lib/auth";
-import { formatPrice } from "@/lib/format";
+import { formatPrice, placeLabel } from "@/lib/format";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { StartForm } from "./StartForm";
 
@@ -26,12 +26,12 @@ async function NewMessage({ searchParams }: { searchParams: Props["searchParams"
   const { data: listing } = /^[0-9a-f-]{36}$/i.test(id)
     ? await supabase
         .from("listings")
-        .select("id, title, price, city, neighborhood, host_id, host:profiles!listings_host_id_fkey(display_name)")
+        .select("id, title, price, city, neighborhood, cross_streets, host_id, host:profiles!listings_host_id_fkey(display_name)")
         .eq("id", id)
         .eq("status", "active")
         .maybeSingle()
         .overrideTypes<
-          { id: string; title: string; price: number; city: string; neighborhood: string; host_id: string; host: { display_name: string | null } | null },
+          { id: string; title: string; price: number; city: string; neighborhood: string; cross_streets: string | null; host_id: string; host: { display_name: string | null } | null },
           { merge: false }
         >()
     : { data: null };
@@ -41,7 +41,7 @@ async function NewMessage({ searchParams }: { searchParams: Props["searchParams"
     <Link href={`/listings/${listing.id}`} className="block rounded-2xl border border-border bg-surface p-4 hover:border-brand">
       <p className="font-semibold">{listing.title}</p>
       <p className="text-sm text-muted">
-        {formatPrice(listing.price)}/mo · {listing.neighborhood}, {listing.city}
+        {formatPrice(listing.price)}/mo · near {placeLabel({ ...listing, crossStreets: listing.cross_streets })}
       </p>
     </Link>
   );

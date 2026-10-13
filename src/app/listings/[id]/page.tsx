@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { ListingsMap } from "@/components/ListingsMap";
 import { PaymentWarning } from "@/components/PaymentWarning";
-import { formatDate, formatPrice } from "@/lib/format";
+import { formatDate, formatPrice, placeLabel } from "@/lib/format";
 import { getListing } from "@/lib/listings";
 import { site } from "@/lib/site";
 
@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!listing) return { title: "Listing not found" };
   return {
     title: `${listing.title} · ${formatPrice(listing.price)}/mo`,
-    description: `${listing.neighborhood}, ${listing.city}. ${listing.description}`,
+    description: `Near ${placeLabel(listing)}. ${listing.description}`,
   };
 }
 
@@ -82,7 +82,7 @@ async function ListingDetail({ params }: { params: Props["params"] }) {
             </p>
             <h1 className="mt-1 text-3xl font-bold">{listing.title}</h1>
             <p className="mt-1 text-muted">
-              {listing.neighborhood}, {listing.city}, CO
+              Near {placeLabel(listing)}, CO
             </p>
             <p className="mt-2 text-sm text-muted">
               🔒 The exact address is private. The host shares it with you after you message them.
@@ -120,6 +120,7 @@ async function ListingDetail({ params }: { params: Props["params"] }) {
                     type: listing.type,
                     neighborhood: listing.neighborhood,
                     city: listing.city,
+                    crossStreets: listing.crossStreets,
                     lat: listing.approxLat,
                     lng: listing.approxLng,
                   },
@@ -129,7 +130,7 @@ async function ListingDetail({ params }: { params: Props["params"] }) {
                 className="h-56 sm:h-72"
               />
               <p className="mt-2 text-sm text-muted">
-                🔒 Approximate area in {listing.neighborhood}, {listing.city}. The host shares the
+                🔒 Approximate area near {placeLabel(listing)}. The host shares the
                 exact address with you after you message them.
               </p>
             </section>
@@ -176,7 +177,7 @@ async function ListingDetail({ params }: { params: Props["params"] }) {
             <span className="text-xl font-bold">{formatPrice(listing.price)}</span>
             <span className="text-sm text-muted"> /month</span>
             <span className="block text-xs text-muted">
-              {listing.neighborhood}, {listing.city}
+              Near {placeLabel(listing)}
             </span>
           </p>
           <Link

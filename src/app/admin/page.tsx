@@ -34,6 +34,8 @@ const doneMessages: Record<string, string> = {
   unbanned: "User unbanned.",
   self: "You can't ban your own account.",
   "note-missing": "Please write a short note so the host knows what to fix.",
+  intersection: "Found the nearest intersection.",
+  "intersection-failed": "Couldn't find an intersection right now (the map service may be busy). Try again later.",
 };
 
 async function Admin({ searchParams }: { searchParams: PageProps<"/admin">["searchParams"] }) {

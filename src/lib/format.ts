@@ -16,3 +16,9 @@ export function formatMessageTime(iso: string) {
     minute: "2-digit",
   });
 }
+
+// Public place label: "Havana & Iliff, Aurora", or "Del Mar, Aurora" when no nearby
+// major intersection is known yet.
+export function placeLabel(place: { crossStreets?: string | null; neighborhood: string; city: string }) {
+  return `${place.crossStreets || place.neighborhood}, ${place.city}`;
+}

@@ -31,7 +31,7 @@ const promises = [
   },
   {
     title: "Exact address only with the host's approval",
-    text: "Listings show the neighborhood and an approximate map area. The host chooses who sees the address.",
+    text: "Listings show the nearest major intersection and an approximate map area. The host chooses who sees the address.",
   },
   {
     title: "Every listing is checked by a person",

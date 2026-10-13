@@ -173,6 +173,14 @@ check("approved renter sees address", (await as(SAMI, `select 1 from listing_add
 await as(DAWIT, `update address_requests set status = 'revoked' where id = $1`, [AR]);
 check("revoked renter loses address", (await as(SAMI, `select 1 from listing_addresses where listing_id = $1`, [L1])).length === 0);
 
+// Cross streets (public location label)
+check("host can't set cross streets", await fails(RUTH, `update listings set cross_streets = 'Fake & Street' where id = $1`, [RL]));
+check("admin sets cross streets", (await as(ADMIN, `update listings set cross_streets = 'Havana & Iliff' where id = $1 returning id`, [RL])).length === 1);
+await as(RUTH, `update listing_addresses set exact_lat = 39.65 where listing_id = $1`, [RL]);
+rows = await as(RUTH, `select cross_streets, status from listings where id = $1`, [RL]);
+check("new address clears cross streets and goes to review", rows[0].cross_streets === null && rows[0].status === "pending");
+await as(ADMIN, `update listings set status = 'active' where id = $1`, [RL]);
+
 // Review notes
 check("host can't write a review note", await fails(RUTH, `update listings set review_note = 'ok' where id = $1`, [RL]));
 rows = await as(ADMIN, `update listings set status = 'rejected', review_note = 'Photos are blurry' where id = $1 returning status`, [RL]);

@@ -4,7 +4,7 @@ import "leaflet/dist/leaflet.css";
 import "./ListingsMap.css";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
-import { formatPrice } from "@/lib/format";
+import { formatPrice, placeLabel } from "@/lib/format";
 import type { ListingPin } from "@/lib/listings";
 
 // OpenStreetMap with soft circles over each listing's blurred (~1 km) area, never
@@ -74,7 +74,7 @@ export function ListingsMap({
         // A tappable badge with the number of homes in this area.
         const badge = L.marker(center, {
           icon: L.divIcon({ className: "map-badge", html: String(homes.length), iconSize: [34, 34] }),
-          title: `${homes.length} ${homes.length === 1 ? "home" : "homes"} in ${homes[0].neighborhood}`,
+          title: `${homes.length} ${homes.length === 1 ? "home" : "homes"} near ${placeLabel(homes[0])}`,
           keyboard: true,
         }).addTo(map);
 
@@ -83,7 +83,7 @@ export function ListingsMap({
         popup.className = "space-y-2";
         const heading = document.createElement("p");
         heading.className = "text-xs text-muted";
-        heading.textContent = `${homes[0].neighborhood}, ${homes[0].city} · approximate area`;
+        heading.textContent = `Near ${placeLabel(homes[0])} · approximate area`;
         popup.append(heading);
         for (const home of homes) {
           const link = document.createElement("a");

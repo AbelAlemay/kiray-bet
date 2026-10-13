@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { formatDate, formatPrice } from "@/lib/format";
 import { createServerSupabase } from "@/lib/supabase/server";
-import { approveListing, deleteListingAsAdmin, rejectListing } from "./actions";
+import { approveListing, deleteListingAsAdmin, refreshCrossStreets, rejectListing } from "./actions";
 import { ConfirmButton } from "./ConfirmButton";
 import { listingSearchFilter, signPhotos, sortedPhotos } from "./data";
 
@@ -14,6 +14,7 @@ type Row = {
   price: number;
   city: string;
   neighborhood: string;
+  cross_streets: string | null;
   review_note: string | null;
   reviewed_at: string | null;
   updated_at: string;
@@ -26,7 +27,7 @@ export async function ListingsTab({ tab, q }: { tab: ListingTab; q: string }) {
   let query = supabase
     .from("listings")
     .select(
-      "id, title, price, city, neighborhood, review_note, reviewed_at, updated_at, " +
+      "id, title, price, city, neighborhood, cross_streets, review_note, reviewed_at, updated_at, " +
         "host:profiles!listings_host_id_fkey(display_name, private_profiles(email)), listing_photos(path, order)",
     )
     .eq("status", statusFor[tab]);
@@ -60,6 +61,7 @@ export async function ListingsTab({ tab, q }: { tab: ListingTab; q: string }) {
               <p className="truncate font-semibold">{l.title}</p>
               <p className="text-sm text-muted">
                 {formatPrice(l.price)}/mo · {l.neighborhood}, {l.city}
+                {l.cross_streets ? ` · shown as "${l.cross_streets}"` : " · no intersection yet"}
               </p>
               <p className="text-xs text-muted">
                 Host: {l.host?.display_name ?? "—"} · {l.host?.private_profiles?.email} · updated{" "}
@@ -68,6 +70,15 @@ export async function ListingsTab({ tab, q }: { tab: ListingTab; q: string }) {
               {l.review_note && <p className="mt-1 text-sm text-danger">Note to host: {l.review_note}</p>}
             </div>
             <div className="flex w-full flex-wrap items-start gap-2 sm:w-auto sm:max-w-xs sm:justify-end">
+              {tab === "live" && !l.cross_streets && (
+                <form action={refreshCrossStreets}>
+                  <input type="hidden" name="listingId" value={l.id} />
+                  <input type="hidden" name="tab" value={tab} />
+                  <button className="inline-flex min-h-10 items-center rounded-lg border border-border px-3 text-sm font-semibold hover:bg-brand-soft">
+                    Find intersection
+                  </button>
+                </form>
+              )}
               {tab === "live" && (
                 <Link href={`/listings/${l.id}`} className="inline-flex min-h-10 items-center rounded-lg border border-border px-3 text-sm font-semibold hover:bg-brand-soft">
                   View
