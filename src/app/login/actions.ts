@@ -6,7 +6,8 @@ import { createServerSupabase } from "@/lib/supabase/server";
 import type { AuthError } from "@supabase/supabase-js";
 
 export type LoginState =
-  | { step: "email"; error?: string }
+  // `email` keeps what was typed, so an error doesn't clear the box.
+  | { step: "email"; error?: string; email?: string }
   | { step: "code"; email: string; error?: string };
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -73,7 +74,11 @@ export async function emailSignIn(prev: LoginState, formData: FormData): Promise
 
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   if (!emailPattern.test(email) || email.length > 254) {
-    return { step: "email", error: "That doesn't look like a complete email address. It should look like name@gmail.com." };
+    return {
+      step: "email",
+      email,
+      error: "That doesn't look like a complete email address. It should look like name@gmail.com.",
+    };
   }
 
   // Supabase checks the Turnstile token before sending any email.
@@ -84,7 +89,7 @@ export async function emailSignIn(prev: LoginState, formData: FormData): Promise
     options: { emailRedirectTo: callbackUrl(next), shouldCreateUser: true, captchaToken },
   });
   if (error) {
-    const back = prev.step === "code" ? prev : { step: "email" as const };
+    const back = prev.step === "code" ? prev : { step: "email" as const, email };
     return { ...back, error: sendCodeError(error, email) };
   }
   return { step: "code", email };

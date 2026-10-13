@@ -80,6 +80,7 @@ export function LoginForm({ next, googleEnabled }: { next: string; googleEnabled
           <input
             name="email"
             type="email"
+            defaultValue={state.email}
             autoComplete="email"
             required
             placeholder="you@example.com"
