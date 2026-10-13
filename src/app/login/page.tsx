@@ -10,8 +10,8 @@ export const metadata: Metadata = {
 };
 
 const errors: Record<string, string> = {
-  link: "That sign-in link has expired or was already used. Please request a new code.",
-  google: "Google sign-in didn't work. Please try again or use your email.",
+  link: "That sign-in link didn't work. Links last 15 minutes and work once, and asking for a new code cancels older links. Enter your email below to get a fresh one.",
+  google: "Google sign-in didn't finish. You may have closed the Google window. Please try again, or sign in with your email instead.",
 };
 
 async function Login({ searchParams }: { searchParams: PageProps<"/login">["searchParams"] }) {
