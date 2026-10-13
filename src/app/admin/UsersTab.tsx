@@ -2,6 +2,7 @@ import { formatDate } from "@/lib/format";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { setBanned } from "./actions";
 import { ConfirmButton } from "./ConfirmButton";
+import { matchingUserIds } from "./data";
 
 type Row = {
   id: string;
@@ -12,14 +13,22 @@ type Row = {
   listings: { count: number }[];
 };
 
-export async function UsersTab({ adminId }: { adminId: string }) {
+export async function UsersTab({ adminId, q }: { adminId: string; q: string }) {
   const supabase = await createServerSupabase();
-  const { data } = await supabase
+  let query = supabase
     .from("profiles")
-    .select("id, display_name, role, created_at, private_profiles(email, banned), listings(count)")
+    // Listings are linked to users both as host and through favorites; count hosted ones.
+    .select("id, display_name, role, created_at, private_profiles(email, banned), listings:listings!listings_host_id_fkey(count)");
+  if (q) {
+    const ids = await matchingUserIds(supabase, q);
+    if (ids.length === 0) return <p className="text-muted">No users match “{q}”.</p>;
+    query = query.in("id", ids);
+  }
+  const { data, error } = await query
     .order("created_at", { ascending: false })
     .limit(500)
     .overrideTypes<Row[], { merge: false }>();
+  if (error) return <p className="text-sm text-danger">Couldn&apos;t load users: {error.message}</p>;
   const users = data ?? [];
 
   return (

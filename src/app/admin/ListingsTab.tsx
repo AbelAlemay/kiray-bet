@@ -3,7 +3,7 @@ import { formatDate, formatPrice } from "@/lib/format";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { approveListing, deleteListingAsAdmin, rejectListing } from "./actions";
 import { ConfirmButton } from "./ConfirmButton";
-import { signPhotos, sortedPhotos } from "./data";
+import { listingSearchFilter, signPhotos, sortedPhotos } from "./data";
 
 export type ListingTab = "live" | "rented" | "rejected";
 const statusFor = { live: "active", rented: "rented", rejected: "rejected" } as const;
@@ -21,23 +21,26 @@ type Row = {
   listing_photos: { path: string; order: number }[];
 };
 
-export async function ListingsTab({ tab }: { tab: ListingTab }) {
+export async function ListingsTab({ tab, q }: { tab: ListingTab; q: string }) {
   const supabase = await createServerSupabase();
-  const { data } = await supabase
+  let query = supabase
     .from("listings")
     .select(
       "id, title, price, city, neighborhood, review_note, reviewed_at, updated_at, " +
         "host:profiles!listings_host_id_fkey(display_name, private_profiles(email)), listing_photos(path, order)",
     )
-    .eq("status", statusFor[tab])
+    .eq("status", statusFor[tab]);
+  if (q) query = query.or(await listingSearchFilter(supabase, q));
+  const { data, error } = await query
     .order("updated_at", { ascending: false })
     .limit(200)
     .overrideTypes<Row[], { merge: false }>();
+  if (error) return <p className="text-sm text-danger">Couldn&apos;t load listings: {error.message}</p>;
   const rows = data ?? [];
   const covers = rows.map((r) => sortedPhotos(r.listing_photos)[0]?.path).filter((p): p is string => !!p);
   const coverUrl = await signPhotos(supabase, covers);
 
-  if (rows.length === 0) return <p className="text-muted">No listings here.</p>;
+  if (rows.length === 0) return <p className="text-muted">{q ? `No listings match “${q}”.` : "No listings here."}</p>;
 
   return (
     <ul className="space-y-3">

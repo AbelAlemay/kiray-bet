@@ -6,7 +6,7 @@ import { site } from "@/lib/site";
 import { Logo } from "./Logo";
 import { MobileMenu } from "./MobileMenu";
 
-const linkClass = "rounded-lg px-3 py-2 hover:bg-brand-soft";
+const linkClass = "whitespace-nowrap rounded-lg px-3 py-2 hover:bg-brand-soft lg:px-2 xl:px-3";
 
 const mainLinks = [
   { href: "/", label: "Home" },
@@ -82,7 +82,7 @@ export function Header() {
         </Link>
 
         {/* Wide screens: everything in one row */}
-        <nav className="hidden items-center gap-1 text-sm lg:flex">
+        <nav className="hidden items-center gap-0.5 text-sm lg:flex xl:gap-1">
           <MainLinks />
           <span className="mx-1 h-5 w-px bg-border" aria-hidden />
           <Suspense fallback={<SignInLink />}>

@@ -4,7 +4,9 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { requireUser } from "@/lib/auth";
 import { createServerSupabase } from "@/lib/supabase/server";
-import { isoDaysAgo } from "./data";
+import { ActivityStats } from "./ActivityStats";
+import { AdminSearch } from "./AdminSearch";
+import { isoDaysAgo, searchTerm } from "./data";
 import { ListingsTab, type ListingTab } from "./ListingsTab";
 import { ReviewQueue } from "./ReviewQueue";
 import { TwoStepForm } from "./TwoStepForm";
@@ -54,6 +56,7 @@ async function Admin({ searchParams }: { searchParams: PageProps<"/admin">["sear
   const params = await searchParams;
   const tab: Tab = tabs.find((t) => t.id === params.tab)?.id ?? "review";
   const done = typeof params.done === "string" ? doneMessages[params.done] : undefined;
+  const q = searchTerm(params.q);
 
   // Counts for the tab labels and the summary.
   const count = (status: string) =>
@@ -77,7 +80,8 @@ async function Admin({ searchParams }: { searchParams: PageProps<"/admin">["sear
 
   return (
     <div className="space-y-6">
-      <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <h2 className="text-lg font-bold">Right now</h2>
+      <dl className="-mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
         {[
           { label: "To review", value: counts.review, highlight: counts.review > 0 },
           { label: "Live listings", value: counts.live },
@@ -91,6 +95,8 @@ async function Admin({ searchParams }: { searchParams: PageProps<"/admin">["sear
           </div>
         ))}
       </dl>
+
+      <ActivityStats />
 
       <nav className="flex gap-1 overflow-x-auto border-b border-border text-sm">
         {tabs.map((t) => (
@@ -113,9 +119,15 @@ async function Admin({ searchParams }: { searchParams: PageProps<"/admin">["sear
         </p>
       )}
 
-      {tab === "review" && <ReviewQueue />}
-      {(tab === "live" || tab === "rented" || tab === "rejected") && <ListingsTab tab={tab as ListingTab} />}
-      {tab === "users" && <UsersTab adminId={user.id} />}
+      <AdminSearch
+        tab={tab}
+        q={q}
+        placeholder={tab === "users" ? "Search name or email" : "Search title, area, city, or host name/email"}
+      />
+
+      {tab === "review" && <ReviewQueue q={q} />}
+      {(tab === "live" || tab === "rented" || tab === "rejected") && <ListingsTab tab={tab as ListingTab} q={q} />}
+      {tab === "users" && <UsersTab adminId={user.id} q={q} />}
     </div>
   );
 }

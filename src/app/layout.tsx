@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Menbere } from "next/font/google";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { VisitTracker } from "@/components/VisitTracker";
+import { Suspense } from "react";
 import { site } from "@/lib/site";
 import "./globals.css";
 
@@ -46,6 +48,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />
+        {/* Reads the current path, so it sits in its own Suspense boundary. */}
+        <Suspense>
+          <VisitTracker />
+        </Suspense>
       </body>
     </html>
   );

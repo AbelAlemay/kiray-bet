@@ -179,6 +179,22 @@ check("host reads the note", (await as(RUTH, `select review_note from listings w
 rows = await as(RUTH, `update listings set description = 'Clear new photos, quiet room near the bus line.' where id = $1 returning status`, [RL]);
 check("host edit resubmits a rejected listing", rows[0]?.status === "pending");
 
+// Visit stats
+const VISITOR = "d0000000-0000-4000-8000-000000000001";
+await as(null, `select public.record_visit($1)`, [VISITOR]);
+await as(null, `select public.record_visit($1)`, [VISITOR]);
+await as(RUTH, `select public.record_visit($1)`, ["d0000000-0000-4000-8000-000000000002"]);
+check("anyone can't read raw visit data", await fails(null, `select * from private.page_views`));
+check("signed-in users can't read raw visit data", await fails(RUTH, `select * from private.page_views`));
+check("non-admin can't read stats", await fails(RUTH, `select * from public.admin_daily_stats(7)`));
+check("anon can't read stats", await fails(null, `select * from public.admin_daily_stats(7)`));
+check("admin without two-step login can't read stats", await fails(ADMIN, `select * from public.admin_daily_stats(7)`, [], { aal: "aal1" }));
+rows = await as(ADMIN, `select * from public.admin_daily_stats(7)`);
+const todayStats = rows[rows.length - 1];
+check("admin sees 7 days of stats", rows.length === 7);
+check("unique visitors and page views counted", todayStats.visitors === 2 && todayStats.page_views === 3);
+check("sign-ups counted", todayStats.signups >= 3);
+
 // Server (admin key)
 rows = await as(SERVER, `update listings set status = 'rejected' where id = $1 returning status, reviewed_at`, [RL]);
 check("server key can review listings", rows[0]?.status === "rejected" && rows[0]?.reviewed_at);

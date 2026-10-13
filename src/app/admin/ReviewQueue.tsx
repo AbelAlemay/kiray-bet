@@ -3,7 +3,7 @@ import { formatDate, formatPrice } from "@/lib/format";
 import { site } from "@/lib/site";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { approveListing, rejectListing } from "./actions";
-import { signPhotos, sortedPhotos } from "./data";
+import { listingSearchFilter, signPhotos, sortedPhotos } from "./data";
 
 type PendingRow = {
   id: string;
@@ -29,9 +29,9 @@ type PendingRow = {
 };
 
 // Listings waiting for review, oldest first, with everything needed to decide.
-export async function ReviewQueue() {
+export async function ReviewQueue({ q }: { q: string }) {
   const supabase = await createServerSupabase();
-  const { data } = await supabase
+  let query = supabase
     .from("listings")
     .select(
       "id, title, description, type, price, deposit, bedrooms, bathrooms, city, neighborhood, available_from, " +
@@ -39,16 +39,23 @@ export async function ReviewQueue() {
         "host:profiles!listings_host_id_fkey(display_name, private_profiles(email)), " +
         "listing_addresses(street_address, unit, zip), listing_photos(path, order)",
     )
-    .eq("status", "pending")
+    .eq("status", "pending");
+  if (q) query = query.or(await listingSearchFilter(supabase, q));
+  const { data, error } = await query
     .order("updated_at", { ascending: true })
     .overrideTypes<PendingRow[], { merge: false }>();
+  if (error) return <p className="text-sm text-danger">Couldn&apos;t load listings: {error.message}</p>;
   const pending = data ?? [];
   const photoUrl = await signPhotos(supabase, pending.flatMap((l) => l.listing_photos.map((p) => p.path)));
 
   return (
     <div className="space-y-6">
       <p className="text-muted">
-        {pending.length === 0 ? "Nothing waiting for review. 🎉" : `${pending.length} waiting for review, oldest first.`}
+        {q
+          ? `${pending.length} waiting for review matching “${q}”.`
+          : pending.length === 0
+            ? "Nothing waiting for review. 🎉"
+            : `${pending.length} waiting for review, oldest first.`}
       </p>
       {pending.map((l) => {
         const type = site.listingTypes.find((t) => t.value === l.type);
