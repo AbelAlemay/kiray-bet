@@ -154,10 +154,10 @@ Private (owner and admin only):
 
 ## 10. Before launch checklist
 Things set up for development that must change before real users arrive:
-- [ ] Buy the domain (kiraybet.net or .org) and point it at Vercel.
-- [ ] Resend: verify the domain, send from e.g. hello@kiraybet.net (now: onboarding@resend.dev,
-      which only delivers to the account owner). Update the sender in Supabase SMTP settings
-      and ALERT_FROM_EMAIL.
+- [x] Buy the domain: **kiraybet.org** (Cloudflare, Oct 12, 2026).
+- [ ] Point kiraybet.org at Vercel.
+- [x] Resend: kiraybet.org verified; sign-in emails from hello@kiraybet.org (SMTP in
+      supabase/config.toml), alerts from alerts@kiraybet.org.
 - [ ] Supabase Auth: set site_url and additional_redirect_urls in supabase/config.toml to the
       real domain, then `npx supabase config push`.
 - [ ] Cloudflare Turnstile: create real keys for the domain (now: test keys that always pass),
