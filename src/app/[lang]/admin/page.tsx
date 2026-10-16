@@ -9,6 +9,7 @@ import { AdminSearch } from "./AdminSearch";
 import { isoDaysAgo, searchTerm } from "./data";
 import { LeasesTab } from "./LeasesTab";
 import { ListingsTab, type ListingTab } from "./ListingsTab";
+import { ReportsTab } from "./ReportsTab";
 import { ReviewQueue } from "./ReviewQueue";
 import { TwoStepForm } from "./TwoStepForm";
 import { UsersTab } from "./UsersTab";
@@ -21,6 +22,7 @@ export const metadata: Metadata = {
 
 const tabs = [
   { id: "review", label: "To review" },
+  { id: "reports", label: "Reports" },
   { id: "live", label: "Live" },
   { id: "rented", label: "Rented" },
   { id: "rejected", label: "Not approved" },
@@ -38,6 +40,8 @@ const doneMessages: Record<string, string> = {
   self: "You can't ban your own account.",
   "note-missing": "Please write a short note so the host knows what to fix.",
   intersection: "Found the nearest intersection.",
+  "report-resolved": "Report marked as handled.",
+  "report-dismissed": "Report dismissed.",
   "intersection-failed": "Couldn't find an intersection right now (the map service may be busy). Try again later.",
 };
 
@@ -67,16 +71,18 @@ async function Admin({ searchParams }: { searchParams: PageProps<"/[lang]/admin"
   const count = (status: string) =>
     supabase.from("listings").select("id", { count: "exact", head: true }).eq("status", status);
   const weekAgo = isoDaysAgo(7);
-  const [pending, active, rented, rejected, users, newUsers] = await Promise.all([
+  const [pending, active, rented, rejected, users, newUsers, openReports] = await Promise.all([
     count("pending"),
     count("active"),
     count("rented"),
     count("rejected"),
     supabase.from("profiles").select("id", { count: "exact", head: true }),
     supabase.from("profiles").select("id", { count: "exact", head: true }).gte("created_at", weekAgo),
+    supabase.from("reports").select("id", { count: "exact", head: true }).eq("status", "open"),
   ]);
   const counts: Record<Tab, number> = {
     review: pending.count ?? 0,
+    reports: openReports.count ?? 0,
     live: active.count ?? 0,
     rented: rented.count ?? 0,
     rejected: rejected.count ?? 0,
@@ -87,9 +93,10 @@ async function Admin({ searchParams }: { searchParams: PageProps<"/[lang]/admin"
   return (
     <div className="space-y-6">
       <h2 className="text-lg font-bold">Right now</h2>
-      <dl className="-mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <dl className="-mt-3 grid grid-cols-2 gap-3 sm:grid-cols-5">
         {[
           { label: "To review", value: counts.review, highlight: counts.review > 0 },
+          { label: "Open reports", value: counts.reports, highlight: counts.reports > 0 },
           { label: "Live listings", value: counts.live },
           { label: "Rented", value: counts.rented },
           { label: "Users", value: counts.users, extra: `+${newUsers.count ?? 0} this week` },
@@ -126,7 +133,7 @@ async function Admin({ searchParams }: { searchParams: PageProps<"/[lang]/admin"
         </p>
       )}
 
-      {tab !== "leases" && (
+      {tab !== "leases" && tab !== "reports" && (
         <AdminSearch
           tab={tab}
           q={q}
@@ -135,6 +142,7 @@ async function Admin({ searchParams }: { searchParams: PageProps<"/[lang]/admin"
       )}
 
       {tab === "review" && <ReviewQueue q={q} />}
+      {tab === "reports" && <ReportsTab showClosed={params.closed === "1"} />}
       {(tab === "live" || tab === "rented" || tab === "rejected") && <ListingsTab tab={tab as ListingTab} q={q} />}
       {tab === "users" && <UsersTab adminId={user.id} q={q} />}
       {tab === "leases" && <LeasesTab />}

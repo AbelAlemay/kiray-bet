@@ -163,6 +163,24 @@ check("sender can't mark own message read", (await as(SAMI, `update messages set
 check("recipient marks read", (await as(DAWIT, `update messages set read_at = now() returning id`)).length === 1);
 check("can't edit message body", await fails(DAWIT, `update messages set body = 'x'`));
 
+// Reports
+check("same person can't report the same thing twice while open", await fails(SAMI,
+  `insert into reports (target_type, target_id, reporter_id, reason) values ('conversation', $1, $2, 'Again please')`, [C, SAMI]));
+check("can't report someone else's conversation", await fails(RUTH,
+  `insert into reports (target_type, target_id, reporter_id, reason) values ('conversation', $1, $2, 'Not mine to report')`, [C, RUTH]));
+check("can't report a listing that isn't live", await fails(RUTH,
+  `insert into reports (target_type, target_id, reporter_id, reason) values ('listing', $1, $2, 'Hidden listing')`, ["b0000000-0000-4000-8000-00000000dead"]));
+rows = await as(RUTH, `insert into reports (target_type, target_id, reporter_id, reason, category) values ('listing', $1, $2, 'Looks copied from another site', 'fake') returning category`, [L1, RUTH]);
+check("signed-in user reports a live listing with a category", rows[0]?.category === "fake");
+check("unknown report category rejected", await fails(RUTH,
+  `insert into reports (target_type, target_id, reporter_id, reason, category) values ('listing', $1, $2, 'Something else', 'spam')`, [L1, RUTH]));
+check("can't file a report as someone else", await fails(RUTH,
+  `insert into reports (target_type, target_id, reporter_id, reason) values ('listing', $1, $2, 'Pretending')`, [L1, SAMI]));
+check("users see only their own reports", (await as(DAWIT, `select 1 from reports`)).length === 0);
+check("reporter can't close their own report", (await as(RUTH, `update reports set status = 'resolved' returning id`)).length === 0);
+check("admin sees all reports", (await as(ADMIN, `select 1 from reports`)).length === 2);
+check("admin resolves a report", (await as(ADMIN, `update reports set status = 'resolved' where reporter_id = $1 returning id`, [RUTH])).length === 1);
+
 // Address requests
 check("renter can't see address", (await as(SAMI, `select 1 from listing_addresses where listing_id = $1`, [L1])).length === 0);
 rows = await as(SAMI, `insert into address_requests (listing_id, renter_id) values ($1, $2) returning id`, [L1, SAMI]);

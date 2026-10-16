@@ -6,6 +6,7 @@ import { ListingsMap } from "@/components/ListingsMap";
 import { ViewSwitch } from "@/components/ViewSwitch";
 import { PaymentWarning } from "@/components/PaymentWarning";
 import { PhotoGallery } from "@/components/PhotoGallery";
+import { ReportButton } from "@/components/ReportButton";
 import { SaveButton } from "@/components/SaveButton";
 import { formatDate, formatPrice, nearLabel } from "@/lib/format";
 import { getListing } from "@/lib/listings";
@@ -178,7 +179,6 @@ async function ListingDetail({ params }: { params: Props["params"] }) {
               {t.both("Contact host", "ባለቤቱን ያግኙ")}
             </Link>
             <SaveButton listingId={listing.id} variant="button" />
-            {/* "Report this listing" link arrives with moderation in build step 9. */}
             <ul className="space-y-1 text-xs text-muted">
               <li>
                 ✉{" "}
@@ -197,6 +197,7 @@ async function ListingDetail({ params }: { params: Props["params"] }) {
               <li>✓ {t("This listing was reviewed before it went live.", "ይህ ማስታወቂያ ከመውጣቱ በፊት ተገምግሟል።")}</li>
             </ul>
             <PaymentWarning compact />
+            <ReportButton targetType="listing" targetId={listing.id} label={t("Report this listing", "ይህን ማስታወቂያ ሪፖርት ያድርጉ")} />
           </div>
         </aside>
       </div>

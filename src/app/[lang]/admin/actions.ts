@@ -147,3 +147,12 @@ export async function setBanned(formData: FormData) {
   }
   back(formData, banned ? "banned" : "unbanned");
 }
+
+// Close a report: "resolved" (acted on) or "dismissed" (nothing wrong).
+export async function setReportStatus(formData: FormData) {
+  await requireAdmin();
+  const status = formData.get("status") === "dismissed" ? "dismissed" : "resolved";
+  const supabase = await createServerSupabase();
+  await supabase.from("reports").update({ status }).eq("id", String(formData.get("reportId")));
+  back(formData, status === "resolved" ? "report-resolved" : "report-dismissed");
+}

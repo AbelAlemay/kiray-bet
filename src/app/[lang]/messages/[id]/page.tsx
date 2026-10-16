@@ -8,6 +8,7 @@ import { formatPrice, nearLabel } from "@/lib/format";
 import { decideAddress, requestAddress } from "../actions";
 import { Chat } from "./Chat";
 import { FormPending } from "@/components/Pending";
+import { ReportButton } from "@/components/ReportButton";
 import type { T } from "@/lib/i18n";
 import { getT } from "@/lib/i18n-server";
 
@@ -198,6 +199,14 @@ async function ConversationView({ params }: { params: Props["params"] }) {
           "ኪራይ ቤት ገንዘብ በፍጹም አይቀበልም። ቤቱን ሳያዩና ውል ሳይፈርሙ ምንም ነገር አይክፈሉ።",
         )}
       </p>
+
+      <div className="text-right">
+        <ReportButton
+          targetType="conversation"
+          targetId={c.id}
+          label={t(`Report ${c.otherName}`, `${c.otherName}ን ሪፖርት ያድርጉ`)}
+        />
+      </div>
 
       <Chat
         conversationId={c.id}
