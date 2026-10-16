@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { Listing } from "@/lib/sample-listings";
 import { formatDate, formatPrice, nearLabel, roomsLabel } from "@/lib/format";
 import { getT } from "@/lib/i18n-server";
-import { site } from "@/lib/site";
+import { featureTags, site } from "@/lib/site";
 import { SaveButton } from "./SaveButton";
 import { LinkPending } from "./Pending";
 
@@ -18,6 +18,7 @@ export async function ListingCard({ listing }: { listing: Listing }) {
   const t = await getT();
   const type = site.listingTypes.find((t) => t.value === listing.type)!;
   const available = formatDate(listing.availableFrom, undefined, t.lang);
+  const tags = featureTags(listing, t.lang);
 
   return (
     <div className="relative transition hover:-translate-y-0.5">
@@ -50,8 +51,19 @@ export async function ListingCard({ listing }: { listing: Listing }) {
           </p>
           <p className="text-sm">
             {roomsLabel(listing.bedrooms, listing.bathrooms, t.lang)}
-            {listing.parking && ` · ${t("Parking", "መኪና ማቆሚያ")}`}
           </p>
+          {tags.length > 0 && (
+            <ul className="flex flex-wrap gap-1.5" aria-label={t("Features", "ያሉት ነገሮች")}>
+              {tags.slice(0, 3).map((tag) => (
+                <li key={tag} className="rounded-full bg-brand-soft px-2 py-0.5 text-xs text-brand">
+                  {tag}
+                </li>
+              ))}
+              {tags.length > 3 && (
+                <li className="rounded-full px-1 py-0.5 text-xs text-muted">{t(`+${tags.length - 3} more`, `+${tags.length - 3} ተጨማሪ`)}</li>
+              )}
+            </ul>
+          )}
           <p className="text-xs text-muted">{t(`Available ${available}`, `ከ${available} ጀምሮ ይገኛል`)}</p>
         </div>
       </Link>

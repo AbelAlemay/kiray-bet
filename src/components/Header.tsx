@@ -14,7 +14,8 @@ import { MobileMenu } from "./MobileMenu";
 import { FormPending, LinkPending } from "./Pending";
 import { SavedLink } from "./SavedLink";
 
-const linkClass = "relative whitespace-nowrap rounded-lg px-3 py-2 hover:bg-brand-soft";
+const linkClass =
+  "relative whitespace-nowrap rounded-lg px-3 py-2 hover:bg-brand-soft";
 
 const mainLinks = (t: T) => [
   { href: "/", label: t("Home", "መነሻ") },
@@ -22,11 +23,8 @@ const mainLinks = (t: T) => [
   { href: "/contact", label: t("Contact", "ያግኙን") },
 ];
 
-// The logo already links home, so the wide header leaves "Home" out.
-function MainLinks({ t, withHome = true }: { t: T; withHome?: boolean }) {
-  return mainLinks(t)
-    .filter((l) => withHome || l.href !== "/")
-    .map((l) => (
+function MainLinks({ t }: { t: T }) {
+  return mainLinks(t).map((l) => (
     <Link key={l.href} href={l.href} className={linkClass}>
       <LinkPending />
       {l.label}
@@ -45,7 +43,13 @@ function SignInLink({ t }: { t: T }) {
 
 // The signed-in person's pages: a flat list in the phone menu, and the menu under
 // their name in the wide header. Reads the session, so it streams in behind Suspense.
-async function AccountLinks({ t, dropdown = false }: { t: T; dropdown?: boolean }) {
+async function AccountLinks({
+  t,
+  dropdown = false,
+}: {
+  t: T;
+  dropdown?: boolean;
+}) {
   const user = await getCurrentUser();
   if (!user) return <SignInLink t={t} />;
   const unread = await getUnreadCount(user.id);
@@ -66,12 +70,19 @@ async function AccountLinks({ t, dropdown = false }: { t: T; dropdown?: boolean 
       <Link
         href="/messages"
         className={linkClass}
-        aria-label={unread ? t(`Messages, ${unread} unread`, `መልዕክቶች፣ ${unread} ያልተነበቡ`) : undefined}
+        aria-label={
+          unread
+            ? t(`Messages, ${unread} unread`, `መልዕክቶች፣ ${unread} ያልተነበቡ`)
+            : undefined
+        }
       >
         <LinkPending />
         <WithCount count={unread}>{t("Messages", "መልዕክቶች")}</WithCount>
       </Link>
-      <Link href="/account" className={`${linkClass} ${dropdown ? "" : "font-semibold"}`}>
+      <Link
+        href="/account"
+        className={`${linkClass} ${dropdown ? "" : "font-semibold"}`}
+      >
         <LinkPending />
         {dropdown ? t("Account settings", "የመለያ ቅንብሮች") : name}
       </Link>
@@ -134,7 +145,14 @@ export async function Header() {
     <header className="sticky top-0 z-20 print:hidden border-b border-border bg-surface/90 backdrop-blur">
       <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
         <div className="flex shrink-0 items-center gap-2">
-          <Link href="/" aria-label={t(`${site.name} ${site.nameLatin}, home`, `${site.name}፣ መነሻ ገጽ`)} className="relative">
+          <Link
+            href="/"
+            aria-label={t(
+              `${site.name} ${site.nameLatin}, home`,
+              `${site.name}፣ መነሻ ገጽ`,
+            )}
+            className="relative"
+          >
             <LinkPending />
             <Logo />
           </Link>
@@ -151,12 +169,12 @@ export async function Header() {
 
         {/* Wide screens: one row; the signed-in person's pages sit under their name. */}
         <nav className="hidden items-center gap-1 text-sm lg:flex">
-          <MainLinks t={t} withHome={false} />
+          <MainLinks t={t} />
           <span className="mx-1 h-5 w-px bg-border" aria-hidden />
           <Suspense fallback={<SignInLink t={t} />}>
             <AccountLinks t={t} dropdown />
           </Suspense>
-          <LangSwitch compact className="ml-1" />
+          <LangSwitch className="ml-1" />
           <span className="ml-1">
             <PostLink t={t} />
           </span>
