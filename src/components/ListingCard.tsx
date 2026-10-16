@@ -46,7 +46,7 @@ export function ListingCard({ listing }: { listing: Listing }) {
             {nearLabel(listing)}
           </p>
           <p className="text-sm">
-            {listing.bedrooms} bd · {listing.bathrooms} ba
+            {listing.bedrooms === 0 ? "Studio" : `${listing.bedrooms} bd`} · {listing.bathrooms} ba
             {listing.parking && " · Parking"}
           </p>
           <p className="text-xs text-muted">Available {formatDate(listing.availableFrom)}</p>

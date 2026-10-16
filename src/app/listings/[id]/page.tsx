@@ -140,7 +140,7 @@ async function ListingDetail({ params }: { params: Props["params"] }) {
           </div>
 
           <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <Fact label="Bedrooms" labelAm="መኝታ ክፍል" value={String(listing.bedrooms)} />
+            <Fact label="Bedrooms" labelAm="መኝታ ክፍል" value={listing.bedrooms === 0 ? "Studio" : String(listing.bedrooms)} />
             <Fact label="Bathrooms" labelAm="መታጠቢያ" value={String(listing.bathrooms)} />
             <Fact label="Deposit" labelAm="ቅድመ ክፍያ" value={formatPrice(listing.deposit)} />
             <Fact
