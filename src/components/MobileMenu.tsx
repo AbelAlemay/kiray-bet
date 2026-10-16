@@ -11,9 +11,17 @@ export function MobileMenu({ children, badge }: { children: ReactNode; badge?: R
 
   return (
     <details ref={menu} className="group lg:hidden">
-      <summary className="cursor-pointer list-none whitespace-nowrap rounded-lg border border-border px-3 py-2.5 text-sm font-semibold hover:bg-brand-soft [&::-webkit-details-marker]:hidden">
-        <span className="group-open:hidden">☰ {t("Menu", "ማውጫ")}{badge}</span>
-        <span className="hidden group-open:inline">✕ {t("Close", "ዝጋ")}</span>
+      {/* Narrow phones show just the ☰ / ✕ icon so the header fits on one line. */}
+      <summary
+        className="cursor-pointer list-none whitespace-nowrap rounded-lg border border-border px-3 py-2.5 text-sm font-semibold hover:bg-brand-soft [&::-webkit-details-marker]:hidden"
+      >
+        <span className="group-open:hidden">
+          ☰<span className="max-[419px]:sr-only"> {t("Menu", "ማውጫ")}</span>
+          {badge}
+        </span>
+        <span className="hidden group-open:inline">
+          ✕<span className="max-[419px]:sr-only"> {t("Close", "ዝጋ")}</span>
+        </span>
       </summary>
       <nav
         onClick={(e) => {

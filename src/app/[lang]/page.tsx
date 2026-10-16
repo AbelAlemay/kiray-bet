@@ -92,7 +92,7 @@ async function AreaSections() {
         </div>
         <a
           href="#safety"
-          className="absolute bottom-3 right-4 text-sm font-semibold text-white/90 [text-shadow:0_1px_4px_rgb(0_0_0/0.6)] hover:underline"
+          className="absolute bottom-1 right-2 px-2 py-2.5 text-sm font-semibold text-white/90 [text-shadow:0_1px_4px_rgb(0_0_0/0.6)] hover:underline"
         >
           🔒 {t.both("Safe & private", "ደህንነቱ የተጠበቀ")}
         </a>

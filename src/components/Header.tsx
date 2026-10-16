@@ -131,7 +131,7 @@ function PostLink({ t }: { t: T }) {
   return (
     <Link
       href="/listings/new"
-      className="relative block whitespace-nowrap rounded-lg bg-brand px-3 py-2.5 font-semibold text-white hover:bg-brand-strong"
+      className="relative block whitespace-nowrap rounded-lg bg-brand px-3 py-2.5 font-semibold text-white hover:bg-brand-strong max-[359px]:px-2"
     >
       <LinkPending />
       {t("Post a home", "ቤት ያስተዋውቁ")}
@@ -143,7 +143,7 @@ export async function Header() {
   const t = await getT();
   return (
     <header className="sticky top-0 z-20 print:hidden border-b border-border bg-surface/90 backdrop-blur">
-      <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
+      <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 max-[359px]:gap-2 max-[359px]:px-3">
         <div className="flex shrink-0 items-center gap-2">
           <Link
             href="/"

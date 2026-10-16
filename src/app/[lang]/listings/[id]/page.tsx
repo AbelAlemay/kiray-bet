@@ -204,16 +204,16 @@ async function ListingDetail({ params }: { params: Props["params"] }) {
       {/* Phones: price and contact always in reach at the bottom of the screen. */}
       <div data-bottom-bar className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-surface/95 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur lg:hidden">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3">
-          <p className="leading-tight">
+          <p className="min-w-0 leading-tight">
             <span className="text-xl font-bold">{formatPrice(listing.price)}</span>
             <span className="text-sm text-muted">{perMonth}</span>
-            <span className="block text-xs text-muted">
+            <span className="block truncate text-xs text-muted">
               {near}
             </span>
           </p>
           <Link
             href={contactHref}
-            className="relative whitespace-nowrap rounded-xl bg-brand px-5 py-3 font-semibold text-white hover:bg-brand-strong"
+            className="relative shrink-0 whitespace-nowrap rounded-xl bg-brand px-4 py-3 font-semibold text-white hover:bg-brand-strong sm:px-5"
           >
             <LinkPending />
             {t("Contact host", "ባለቤቱን ያግኙ")}
