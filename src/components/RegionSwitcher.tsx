@@ -51,14 +51,14 @@ export function RegionSwitcher({ current, variant = "bar" }: { current: RegionId
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label={`Area: ${name}. Change area`}
-        className="flex min-h-12 max-w-full items-center gap-2 rounded-full bg-white py-1.5 pl-4 pr-1.5 text-left text-gray-900 shadow-lg ring-4 ring-white/15 transition hover:ring-white/30"
+        className="flex min-h-14 w-full items-center gap-3 rounded-full bg-white py-2 pl-5 pr-2 sm:min-w-[26rem] text-left text-gray-900 shadow-lg ring-4 ring-white/15 transition hover:ring-white/30"
       >
         <span aria-hidden className="text-lg">📍</span>
-        <span className="min-w-0 leading-tight">
+        <span className="min-w-0 flex-1 leading-tight">
           <span className="block text-[11px] font-semibold uppercase tracking-wide text-gray-500">Area · አካባቢ</span>
-          <span className="block truncate font-bold">{name}</span>
+          <span className="block truncate text-lg font-bold">{name}</span>
         </span>
-        <span className="ml-1 flex shrink-0 items-center gap-1.5 rounded-full bg-door px-3 py-2 text-sm font-semibold">
+        <span className="ml-1 flex shrink-0 items-center gap-1.5 rounded-full bg-door px-4 py-2.5 text-sm font-semibold">
           {switching ? <Spinner className="h-3 w-3" /> : null}
           Change <span aria-hidden>▾</span>
         </span>
@@ -82,7 +82,7 @@ export function RegionSwitcher({ current, variant = "bar" }: { current: RegionId
     );
 
   return (
-    <div ref={box} className="relative">
+    <div ref={box} className={variant === "hero" ? "relative w-full sm:w-auto" : "relative"}>
       {button}
       {open && (
         <ul

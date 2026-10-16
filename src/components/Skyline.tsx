@@ -231,7 +231,7 @@ export function Skyline({ region }: { region: RegionId }) {
       aria-hidden
       viewBox="0 0 1440 220"
       preserveAspectRatio="xMidYMax slice"
-      className="skyline pointer-events-none absolute inset-x-0 bottom-0 h-32 w-full text-black opacity-35 sm:h-48"
+      className="skyline pointer-events-none absolute inset-x-0 bottom-0 h-32 w-full text-black opacity-50 sm:h-48"
       fill="currentColor"
     >
       {skylines[region]}
