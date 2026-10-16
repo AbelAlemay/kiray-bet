@@ -6,11 +6,12 @@ import { ListingForm, type ListingFormValues } from "@/components/listing-form/L
 import { requireUser } from "@/lib/auth";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { updateListing } from "../../actions";
+import { getT } from "@/lib/i18n-server";
 
-export const metadata: Metadata = {
-  title: "Edit listing",
-  robots: { index: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return { title: t("Edit listing", "ማስተካከያ"), robots: { index: false } };
+}
 
 type Props = PageProps<"/[lang]/listings/[id]/edit">;
 
@@ -68,13 +69,14 @@ async function EditListing({ params }: { params: Props["params"] }) {
   );
 }
 
-export default function EditListingPage({ params }: Props) {
+export default async function EditListingPage({ params }: Props) {
+  const t = await getT();
   return (
     <div className="mx-auto max-w-2xl px-4 pt-8">
       <Link href="/listings/mine" className="mb-2 inline-block py-2 text-sm text-muted hover:text-foreground">
-        ← My listings
+        ← {t("My listings", "የእኔ ማስታወቂያዎች")}
       </Link>
-      <h1 className="mb-6 text-2xl font-bold sm:text-3xl">Edit listing · ማስተካከያ</h1>
+      <h1 className="mb-6 text-2xl font-bold sm:text-3xl">{t.both("Edit listing", "ማስተካከያ")}</h1>
       <Suspense fallback={<div className="h-96 animate-pulse rounded-2xl bg-border/50" />}>
         <EditListing params={params} />
       </Suspense>

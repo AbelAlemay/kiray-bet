@@ -3,11 +3,12 @@ import { Suspense } from "react";
 import { requireUser } from "@/lib/auth";
 import { ListingForm } from "@/components/listing-form/ListingForm";
 import { createListing } from "../actions";
+import { getT } from "@/lib/i18n-server";
 
-export const metadata: Metadata = {
-  title: "Post a home",
-  robots: { index: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return { title: t("Post a home", "ቤት ያስተዋውቁ"), robots: { index: false } };
+}
 
 async function NewListing() {
   const user = await requireUser("/listings/new");
@@ -17,11 +18,14 @@ async function NewListing() {
   return <ListingForm userId={user.id} listingId={listingId} today={today} saveAction={createListing} />;
 }
 
-export default function NewListingPage() {
+export default async function NewListingPage() {
+  const t = await getT();
   return (
     <div className="mx-auto max-w-2xl px-4 pt-8">
-      <h1 className="text-2xl font-bold sm:text-3xl">Post a home · ቤት ያስተዋውቁ</h1>
-      <p className="mb-6 mt-1 text-muted">Free to post. Reviewed by a person before it goes live.</p>
+      <h1 className="text-2xl font-bold sm:text-3xl">{t.both("Post a home", "ቤት ያስተዋውቁ")}</h1>
+      <p className="mb-6 mt-1 text-muted">
+        {t("Free to post. Reviewed by a person before it goes live.", "ማስተዋወቅ ነጻ ነው። ከመውጣቱ በፊት በሰው ይገመገማል።")}
+      </p>
       <Suspense fallback={<div className="h-96 animate-pulse rounded-2xl bg-border/50" />}>
         <NewListing />
       </Suspense>

@@ -1,3 +1,4 @@
+import { translator, type T } from "./i18n";
 import { stateNames } from "./regions";
 import { amenityOptions, exclusiveAmenities, site, type Amenity, type ListingType } from "./site";
 
@@ -26,17 +27,23 @@ const contactPatterns = [
   /\b(whats\s*app|telegram|wa\.me|t\.me)\b/i,
 ];
 
-export function fairHousingProblem(text: string) {
+const english = translator("en");
+
+export function fairHousingProblem(text: string, t: T = english) {
   return fairHousingPatterns.some((p) => p.test(text))
-    ? "Listings must be open to everyone. Please remove wording that limits who can rent " +
-        "(for example by background, religion, or families with children)."
+    ? t(
+        "Listings must be open to everyone. Please remove wording that limits who can rent (for example by background, religion, or families with children).",
+        "ማስታወቂያዎች ለሁሉም ክፍት መሆን አለባቸው። እባክዎ ማን መከራየት እንደሚችል የሚገድብ አነጋገር ያስወግዱ (ለምሳሌ በትውልድ፣ በሃይማኖት ወይም ልጆች ያሏቸውን ቤተሰቦች)።",
+      )
     : null;
 }
 
-export function contactInfoProblem(text: string) {
+export function contactInfoProblem(text: string, t: T = english) {
   return contactPatterns.some((p) => p.test(text))
-    ? "Please don't include phone numbers, emails, other apps or payment details. " +
-        "Renters contact you through messages on the site."
+    ? t(
+        "Please don't include phone numbers, emails, other apps or payment details. Renters contact you through messages on the site.",
+        "እባክዎ ስልክ ቁጥር፣ ኢሜይል፣ ሌሎች መተግበሪያዎችን ወይም የክፍያ መረጃ አያካትቱ። ተከራዮች የሚያገኙዎት በድረ-ገጹ መልዕክት ነው።",
+      )
     : null;
 }
 
@@ -75,7 +82,7 @@ function whole(value: string, min: number, max: number) {
 }
 
 // Validates the posting form. Limits match the database's own checks.
-export function parseListingForm(formData: FormData, hostId: string) {
+export function parseListingForm(formData: FormData, hostId: string, t: T = english) {
   const errors: ListingErrors = {};
 
   const id = text(formData, "listingId");
@@ -108,38 +115,51 @@ export function parseListingForm(formData: FormData, hostId: string) {
     });
   const addressChoice = text(formData, "addressVisibility");
 
-  if (!uuidPattern.test(id)) errors.form = "Something went wrong. Please reload the page and try again.";
-  if (title.length < 5) errors.title = "Write at least 5 characters.";
-  if (title.length > 300) errors.title = "That's a very long title. Please keep it under 300 characters.";
-  if (description.length < 20) errors.description = "Write at least 20 characters about the home.";
-  if (description.length > 20000) errors.description = "Please keep the description under 20,000 characters.";
-  if (!type) errors.type = "Choose the type of home.";
-  if (!/^[\p{L}][\p{L} .'-]{1,59}$/u.test(city)) errors.city = "Enter the city.";
-  if (!stateNames[state]) errors.state = "Choose the state.";
-  if (price === null) errors.price = "Enter the monthly rent in whole dollars.";
-  if (deposit === null) errors.deposit = "Enter the deposit in whole dollars (0 if none).";
-  if (bedrooms === null) errors.bedrooms = "Enter the number of bedrooms.";
-  if (bathrooms === null) errors.bathrooms = "Enter bathrooms (for example 1 or 1.5).";
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(availableFrom) || Number.isNaN(Date.parse(availableFrom))) {
-    errors.availableFrom = "Choose the date it's available.";
+  if (!uuidPattern.test(id)) {
+    errors.form = t("Something went wrong. Please reload the page and try again.", "ችግር ተፈጥሯል። እባክዎ ገጹን አድሰው እንደገና ይሞክሩ።");
   }
-  if (street.length < 3 || street.length > 100) errors.street = "Enter the street address.";
-  if (unit.length > 20) errors.unit = "Keep the unit short (for example Apt 4 or Basement).";
-  if (!/^\d{5}$/.test(zip)) errors.zip = "Enter a 5-digit ZIP code.";
+  if (title.length < 5) errors.title = t("Write at least 5 characters.", "ቢያንስ 5 ፊደላት ይጻፉ።");
+  if (title.length > 300) {
+    errors.title = t("That's a very long title. Please keep it under 300 characters.", "ርዕሱ በጣም ረጅም ነው። እባክዎ ከ300 ፊደላት በታች ያድርጉት።");
+  }
+  if (description.length < 20) errors.description = t("Write at least 20 characters about the home.", "ስለ ቤቱ ቢያንስ 20 ፊደላት ይጻፉ።");
+  if (description.length > 20000) {
+    errors.description = t("Please keep the description under 20,000 characters.", "እባክዎ መግለጫውን ከ20,000 ፊደላት በታች ያድርጉት።");
+  }
+  if (!type) errors.type = t("Choose the type of home.", "የቤቱን ዓይነት ይምረጡ።");
+  if (!/^[\p{L}][\p{L} .'-]{1,59}$/u.test(city)) errors.city = t("Enter the city.", "ከተማውን ያስገቡ።");
+  if (!stateNames[state]) errors.state = t("Choose the state.", "ስቴቱን ይምረጡ።");
+  if (price === null) errors.price = t("Enter the monthly rent in whole dollars.", "ወርሃዊ ኪራዩን በሙሉ ዶላር ያስገቡ።");
+  if (deposit === null) {
+    errors.deposit = t("Enter the deposit in whole dollars (0 if none).", "ቅድመ ክፍያውን በሙሉ ዶላር ያስገቡ (ከሌለ 0)።");
+  }
+  if (bedrooms === null) errors.bedrooms = t("Enter the number of bedrooms.", "የመኝታ ክፍሎችን ብዛት ያስገቡ።");
+  if (bathrooms === null) errors.bathrooms = t("Enter bathrooms (for example 1 or 1.5).", "መታጠቢያ ቤቶችን ያስገቡ (ለምሳሌ 1 ወይም 1.5)።");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(availableFrom) || Number.isNaN(Date.parse(availableFrom))) {
+    errors.availableFrom = t("Choose the date it's available.", "ቤቱ የሚገኝበትን ቀን ይምረጡ።");
+  }
+  if (street.length < 3 || street.length > 100) errors.street = t("Enter the street address.", "የመንገድ አድራሻውን ያስገቡ።");
+  if (unit.length > 20) {
+    errors.unit = t("Keep the unit short (for example Apt 4 or Basement).", "የዩኒቱን ስም አጭር ያድርጉ (ለምሳሌ Apt 4 ወይም Basement)።");
+  }
+  if (!/^\d{5}$/.test(zip)) errors.zip = t("Enter a 5-digit ZIP code.", "ባለ 5 አሃዝ ዚፕ ኮድ ያስገቡ።");
   if (addressChoice !== "private" && addressChoice !== "public") {
-    errors.addressVisibility = "Choose whether to show the exact address or keep it private.";
+    errors.addressVisibility = t(
+      "Choose whether to show the exact address or keep it private.",
+      "ትክክለኛውን አድራሻ ለማሳየት ወይም በግል ለማቆየት ይምረጡ።",
+    );
   }
 
   const writing = `${title}\n${description}`;
-  const writingProblem = fairHousingProblem(writing) ?? contactInfoProblem(writing);
+  const writingProblem = fairHousingProblem(writing, t) ?? contactInfoProblem(writing, t);
   if (writingProblem) errors.description = writingProblem;
 
   // Photos were uploaded into the host's folder for this listing; accept nothing else.
   const folder = `${hostId}/${id}/`;
-  if (photos.length === 0) errors.photos = "Add at least one photo.";
-  else if (photos.length > maxPhotos) errors.photos = `Add up to ${maxPhotos} photos.`;
+  if (photos.length === 0) errors.photos = t("Add at least one photo.", "ቢያንስ አንድ ፎቶ ያክሉ።");
+  else if (photos.length > maxPhotos) errors.photos = t(`Add up to ${maxPhotos} photos.`, `እስከ ${maxPhotos} ፎቶዎች ያክሉ።`);
   else if (photos.some((p) => !p.startsWith(folder) || !/^[\w/-]+\.jpg$/.test(p))) {
-    errors.photos = "Please re-add your photos.";
+    errors.photos = t("Please re-add your photos.", "እባክዎ ፎቶዎችዎን እንደገና ያክሉ።");
   }
 
   if (Object.keys(errors).length > 0) return { errors } as const;

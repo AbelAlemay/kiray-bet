@@ -8,6 +8,7 @@ import { BotCheckFailed, Turnstile, useBotCheck } from "@/components/Turnstile";
 import type { ListingFormState } from "@/app/[lang]/listings/actions";
 import { PhotoPicker, type Photo } from "./PhotoPicker";
 import { PendingCorner } from "@/components/Pending";
+import { useT } from "@/components/LangProvider";
 
 // What the form starts with when editing an existing listing.
 export type ListingFormValues = {
@@ -48,10 +49,11 @@ const pairClass = "grid grid-cols-2 gap-x-4";
 const pairedFieldClass = "[.grid-cols-2>&]:row-span-3 [.grid-cols-2>&]:grid [.grid-cols-2>&]:grid-rows-subgrid [.grid-cols-2>&]:space-y-0 [.grid-cols-2>&]:gap-y-1";
 
 function Section({ title, titleAm, children }: { title: string; titleAm: string; children: ReactNode }) {
+  const t = useT();
   return (
     <section className="space-y-4 rounded-2xl border border-border bg-surface p-5 sm:p-6">
       <h2 className="text-lg font-bold">
-        {title} · <span className="text-muted">{titleAm}</span>
+        {t.both(title, titleAm)}
       </h2>
       {children}
     </section>
@@ -79,6 +81,7 @@ export function ListingForm({
   const bot = useBotCheck();
   const botWaiting = !editing && bot.waiting;
   const [uploading, setUploading] = useState(false);
+  const t = useT();
   const errors = state.errors ?? {};
 
   return (
@@ -96,49 +99,54 @@ export function ListingForm({
       <input type="hidden" name="listingId" value={listingId} />
 
       <Section title="The home" titleAm="ቤቱ">
-        <Field label="Type of home" error={errors.type}>
+        <Field label={t("Type of home", "የቤቱ ዓይነት")} error={errors.type}>
           <select name="type" required defaultValue={initial?.type ?? ""} className={fieldClass}>
             <option value="" disabled>
-              Choose…
+              {t("Choose…", "ይምረጡ…")}
             </option>
-            {site.listingTypes.map((t) => (
-              <option key={t.value} value={t.value}>
-                {t.label} · {t.labelAm}
+            {site.listingTypes.map((type) => (
+              <option key={type.value} value={type.value}>
+                {t.both(type.label, type.labelAm)}
               </option>
             ))}
           </select>
         </Field>
-        <Field label="Title" error={errors.title} hint="For example: Bright 2-bed apartment near light rail">
+        <Field
+          label={t("Title", "ርዕስ")}
+          error={errors.title}
+          hint={t("For example: Bright 2-bed apartment near light rail", "ለምሳሌ፦ ለቀላል ባቡር ቅርብ የሆነ ብሩህ ባለ 2 መኝታ አፓርትመንት")}
+        >
           <input name="title" required minLength={5} maxLength={300} defaultValue={initial?.title} className={fieldClass} />
         </Field>
         <div className={pairClass}>
-          <Field label="Bedrooms · መኝታ" error={errors.bedrooms}>
+          <Field label={t.both("Bedrooms", "መኝታ")} error={errors.bedrooms}>
             <input name="bedrooms" type="number" min={0} max={20} required defaultValue={initial?.bedrooms} className={fieldClass} />
           </Field>
-          <Field label="Bathrooms · መታጠቢያ" error={errors.bathrooms}>
+          <Field label={t.both("Bathrooms", "መታጠቢያ")} error={errors.bathrooms}>
             <input name="bathrooms" type="number" min={0} max={20} step={0.5} required defaultValue={initial?.bathrooms} className={fieldClass} />
           </Field>
         </div>
         <Field
-          label="Description · መግለጫ"
+          label={t.both("Description", "መግለጫ")}
           error={errors.description}
-          hint="What's included, what's nearby, house rules. No phone numbers or payment details."
+          hint={t(
+            "What's included, what's nearby, house rules. No phone numbers or payment details.",
+            "ምን እንደተካተተ፣ በአቅራቢያ ምን እንዳለ፣ የቤቱ ደንቦች። ስልክ ቁጥር ወይም የክፍያ መረጃ አይጻፉ።",
+          )}
         >
           <textarea name="description" required minLength={20} maxLength={20000} rows={8} defaultValue={initial?.description} className={fieldClass} />
         </Field>
         <fieldset className="space-y-2">
-          <legend className="text-sm font-medium">Amenities · ምን ምን አለው?</legend>
-          <p className="text-xs text-muted">
-            Tick everything the home has.
-          </p>
+          <legend className="text-sm font-medium">{t.both("Amenities", "ምን ምን አለው?")}</legend>
+          <p className="text-xs text-muted">{t("Tick everything the home has.", "ቤቱ ያሉትን ሁሉ ምልክት ያድርጉ።")}</p>
           <div className="grid grid-cols-2 gap-x-4 gap-y-1 sm:grid-cols-3">
             <label className="flex min-h-10 items-center gap-2 text-sm">
               <input type="checkbox" name="parking" defaultChecked={initial?.parking} className="h-5 w-5 shrink-0 accent-brand" />
-              Parking
+              {t("Parking", "መኪና ማቆሚያ")}
             </label>
             <label className="flex min-h-10 items-center gap-2 text-sm">
               <input type="checkbox" name="petsAllowed" defaultChecked={initial?.petsAllowed} className="h-5 w-5 shrink-0 accent-brand" />
-              Pets allowed
+              {t("Pets allowed", "የቤት እንስሳ ይፈቀዳል")}
             </label>
             {amenityOptions.map((a) => (
               <label key={a.value} className="flex min-h-10 items-center gap-2 text-sm">
@@ -155,7 +163,7 @@ export function ListingForm({
                   }}
                   className="h-5 w-5 shrink-0 accent-brand"
                 />
-                {a.label}
+                {t(a.label, a.labelAm)}
               </label>
             ))}
           </div>
@@ -164,14 +172,14 @@ export function ListingForm({
 
       <Section title="Rent and dates" titleAm="ኪራይና ቀን">
         <div className={pairClass}>
-          <Field label="Rent ($/month)" error={errors.price}>
+          <Field label={t("Rent ($/month)", "ኪራይ ($/በወር)")} error={errors.price}>
             <input name="price" type="number" min={1} step={1} required inputMode="numeric" defaultValue={initial?.price} className={fieldClass} />
           </Field>
-          <Field label="Deposit ($)" error={errors.deposit}>
+          <Field label={t("Deposit ($)", "ቅድመ ክፍያ ($)")} error={errors.deposit}>
             <input name="deposit" type="number" min={0} step={1} defaultValue={initial?.deposit ?? 0} inputMode="numeric" className={fieldClass} />
           </Field>
         </div>
-        <Field label="Available from" error={errors.availableFrom}>
+        <Field label={t("Available from", "የሚገኝበት ቀን")} error={errors.availableFrom}>
           <input name="availableFrom" type="date" required defaultValue={initial?.availableFrom ?? today} className={fieldClass} />
         </Field>
       </Section>
@@ -188,7 +196,7 @@ export function ListingForm({
 
       <Section title="Location" titleAm="አድራሻ">
         <div className={pairClass}>
-          <Field label="City" error={errors.city}>
+          <Field label={t("City", "ከተማ")} error={errors.city}>
             <input
               name="city"
               required
@@ -204,10 +212,10 @@ export function ListingForm({
               ))}
             </datalist>
           </Field>
-          <Field label="State" error={errors.state}>
+          <Field label={t("State", "ስቴት")} error={errors.state}>
             <select name="state" required defaultValue={initial?.state ?? ""} autoComplete="address-level1" className={fieldClass}>
               <option value="" disabled>
-                Choose…
+                {t("Choose…", "ይምረጡ…")}
               </option>
               {Object.entries(stateNames).map(([code, name]) => (
                 <option key={code} value={code}>
@@ -219,33 +227,41 @@ export function ListingForm({
         </div>
         <div className="space-y-4">
           <p className="text-sm text-muted">
-            We use the address to place your home on the map and find the nearest major
-            intersection (for example &ldquo;Near Havana &amp; Iliff&rdquo;).
+            {t(
+              "We use the address to place your home on the map and find the nearest major intersection (for example “Near Havana & Iliff”).",
+              "አድራሻውን የምንጠቀመው ቤትዎን በካርታ ላይ ለማስቀመጥና በአቅራቢያ ያለውን ዋና መስቀለኛ መንገድ ለማግኘት ነው (ለምሳሌ “Havana & Iliff አካባቢ”)።",
+            )}
           </p>
-          <Field label="Street address" error={errors.street}>
+          <Field label={t("Street address", "የመንገድ አድራሻ")} error={errors.street}>
             <input name="street" required maxLength={100} autoComplete="street-address" defaultValue={initial?.street} className={fieldClass} />
           </Field>
           <div className={pairClass}>
-            <Field label="Unit (optional)" error={errors.unit}>
+            <Field label={t("Unit (optional)", "ዩኒት (ካለ)")} error={errors.unit}>
               <input name="unit" maxLength={20} placeholder="Apt 4, Basement…" defaultValue={initial?.unit} className={fieldClass} />
             </Field>
-            <Field label="ZIP code" error={errors.zip}>
+            <Field label={t("ZIP code", "ዚፕ ኮድ")} error={errors.zip}>
               <input name="zip" required inputMode="numeric" pattern="\d{5}" maxLength={5} autoComplete="postal-code" defaultValue={initial?.zip} className={fieldClass} />
             </Field>
           </div>
         </div>
         <fieldset className="space-y-2">
-          <legend className="text-sm font-medium">Who can see the exact address? · አድራሻ</legend>
+          <legend className="text-sm font-medium">{t.both("Who can see the exact address?", "ትክክለኛውን አድራሻ ማን ያያል?")}</legend>
           {[
             {
               value: "private",
-              title: "🔒 Keep it private",
-              text: "Your listing shows only the nearest major intersection and an area on the map. You share the exact address in messages with renters you choose.",
+              title: `🔒 ${t("Keep it private", "በግል ይያዝ")}`,
+              text: t(
+                "Your listing shows only the nearest major intersection and an area on the map. You share the exact address in messages with renters you choose.",
+                "ማስታወቂያዎ የሚያሳየው በአቅራቢያ ያለውን ዋና መስቀለኛ መንገድና በካርታ ላይ ያለ አካባቢን ብቻ ነው። ትክክለኛውን አድራሻ ለመረጧቸው ተከራዮች በመልዕክት ያጋራሉ።",
+              ),
             },
             {
               value: "public",
-              title: "📍 Show the exact address",
-              text: "Anyone can see the full address on your listing, so renters can drive by without asking first.",
+              title: `📍 ${t("Show the exact address", "ትክክለኛውን አድራሻ አሳይ")}`,
+              text: t(
+                "Anyone can see the full address on your listing, so renters can drive by without asking first.",
+                "ማንም ሰው ሙሉውን አድራሻ በማስታወቂያዎ ላይ ማየት ይችላል፤ ስለዚህ ተከራዮች ሳይጠይቁ ቤቱን አልፈው ማየት ይችላሉ።",
+              ),
             },
           ].map((option) => (
             <label
@@ -275,16 +291,26 @@ export function ListingForm({
 
       <div className="space-y-4 rounded-2xl border border-border bg-surface p-5 text-sm sm:p-6">
         <p>
-          <strong>Fair Housing:</strong> listings must be open to everyone. You can&apos;t limit who
-          can rent based on national origin, race, religion, sex, disability, family status or
-          source of income (such as Section 8).
+          <strong>{t("Fair Housing:", "ፍትሃዊ መኖሪያ ቤት፦")}</strong>{" "}
+          {t(
+            "listings must be open to everyone. You can't limit who can rent based on national origin, race, religion, sex, disability, family status or source of income (such as Section 8).",
+            "ማስታወቂያዎች ለሁሉም ክፍት መሆን አለባቸው። ማን መከራየት እንደሚችል በትውልድ አገር፣ በዘር፣ በሃይማኖት፣ በጾታ፣ በአካል ጉዳት፣ በቤተሰብ ሁኔታ ወይም በገቢ ምንጭ (ለምሳሌ Section 8) መገደብ አይችሉም።",
+          )}
         </p>
         <p className="text-muted">
           {editing
-            ? "Changing anything other than the available date sends the listing back for a quick review; it's hidden until approved."
-            : "Every listing is checked by a person before it appears, usually within a day."}
-          {` ${site.nameLatin}`} never handles money; don&apos;t ask renters to pay before they see the
-          home and sign a lease.
+            ? t(
+                "Changing anything other than the available date sends the listing back for a quick review; it's hidden until approved.",
+                "ከሚገኝበት ቀን ውጪ ማንኛውንም ነገር መቀየር ማስታወቂያውን ለአጭር ግምገማ ይመልሰዋል፤ እስኪጸድቅም አይታይም።",
+              )
+            : t(
+                "Every listing is checked by a person before it appears, usually within a day.",
+                "እያንዳንዱ ማስታወቂያ ከመታየቱ በፊት በሰው ይመረመራል፤ ብዙውን ጊዜ በአንድ ቀን ውስጥ።",
+              )}{" "}
+          {t(
+            `${site.nameLatin} never handles money; don't ask renters to pay before they see the home and sign a lease.`,
+            `${site.name} ገንዘብ በፍጹም አይቀበልም፤ ተከራዮች ቤቱን ሳያዩና ውል ሳይፈርሙ እንዲከፍሉ አይጠይቁ።`,
+          )}
         </p>
         {!editing && <Turnstile resetKey={state} onToken={bot.onToken} onError={bot.onError} onInteractive={bot.onInteractive} />}
         {errors.form && (
@@ -294,21 +320,21 @@ export function ListingForm({
         )}
         {Object.keys(errors).length > 0 && !errors.form && (
           <p role="alert" className="text-danger">
-            Please fix the highlighted fields above.
+            {t("Please fix the highlighted fields above.", "እባክዎ ከላይ የተመለከቱትን ቦታዎች ያስተካክሉ።")}
           </p>
         )}
         {!editing && bot.failed && <BotCheckFailed />}
         <button disabled={pending || uploading || botWaiting} className={primaryButtonClass}>
           <PendingCorner pending={pending} />
           {pending
-            ? "Saving…"
+            ? t("Saving…", "በማስቀመጥ ላይ…")
             : uploading
-              ? "Waiting for photos…"
+              ? t("Waiting for photos…", "ፎቶዎችን በመጠበቅ ላይ…")
               : botWaiting
                 ? bot.waitingLabel
               : editing
-                ? "Save changes · ለውጦችን ያስቀምጡ"
-                : "Submit for review · ለግምገማ ይላኩ"}
+                ? t.both("Save changes", "ለውጦችን ያስቀምጡ")
+                : t.both("Submit for review", "ለግምገማ ይላኩ")}
         </button>
       </div>
     </form>
