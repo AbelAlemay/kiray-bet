@@ -17,8 +17,19 @@ export async function findNeighborhood(lat: number, lng: number): Promise<string
     if (!res.ok) return null;
     const address = (await res.json()).address ?? {};
     const name: unknown = address.neighbourhood ?? address.suburb ?? address.quarter ?? address.city_district;
-    return typeof name === "string" && name.trim() ? name.trim().slice(0, 60) : null;
+    return typeof name === "string" ? tidyName(name) : null;
   } catch {
     return null;
   }
+}
+
+// "North Hollywood Neighborhood Council District" -> "North Hollywood",
+// "Hamline - Midway" -> "Hamline-Midway". Exported for the seed tools.
+export function tidyName(name: string) {
+  const tidy = name
+    .replace(/\s+(Neighborhood Council( District)?|District)$/i, "")
+    .replace(/\s+-\s+/g, "-")
+    .trim()
+    .slice(0, 60);
+  return tidy || null;
 }
