@@ -6,7 +6,8 @@ import { useT } from "./LangProvider";
 import { Spinner } from "./Pending";
 
 // "English | አማርኛ" switch. The page reloads in the chosen language at the same address.
-export function LangSwitch({ className = "" }: { className?: string }) {
+// `compact` (wide header): one small button naming the other language.
+export function LangSwitch({ className = "", compact = false }: { className?: string; compact?: boolean }) {
   const t = useT();
   const [switching, start] = useTransition();
 
@@ -16,6 +17,22 @@ export function LangSwitch({ className = "" }: { className?: string }) {
       await setLanguage(lang);
       window.location.reload();
     });
+  }
+
+  if (compact) {
+    const other = t.lang === "am" ? "en" : "am";
+    return (
+      <button
+        type="button"
+        lang={other}
+        onClick={() => choose(other)}
+        aria-label={t("Switch to Amharic (አማርኛ)", "ወደ እንግሊዝኛ ይቀይሩ (English)")}
+        className={`flex min-h-9 items-center gap-1 whitespace-nowrap rounded-full border border-border px-3 text-sm font-semibold hover:bg-brand-soft ${className}`}
+      >
+        {switching ? <Spinner className="h-3 w-3" /> : <span aria-hidden>🌐</span>}
+        {other === "am" ? "አማርኛ" : "English"}
+      </button>
+    );
   }
 
   return (

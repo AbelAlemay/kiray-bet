@@ -13,18 +13,20 @@ import { MobileMenu } from "./MobileMenu";
 import { FormPending, LinkPending } from "./Pending";
 import { SavedLink } from "./SavedLink";
 
-const linkClass =
-  "relative whitespace-nowrap rounded-lg px-3 py-2 hover:bg-brand-soft lg:px-2 xl:px-3";
+const linkClass = "relative whitespace-nowrap rounded-lg px-3 py-2 hover:bg-brand-soft xl:px-2.5";
 
 const mainLinks = (t: T) => [
   { href: "/", label: t("Home", "መነሻ") },
-  { href: "/search", label: t("Browse", "ቤቶችን ይመልከቱ") },
+  { href: "/search", label: t("Browse", "ቤቶች") },
   { href: "/about", label: t("About", "ስለ እኛ") },
   { href: "/contact", label: t("Contact", "ያግኙን") },
 ];
 
-function MainLinks({ t }: { t: T }) {
-  return mainLinks(t).map((l) => (
+// The logo already links home, so the wide header leaves "Home" out.
+function MainLinks({ t, withHome = true }: { t: T; withHome?: boolean }) {
+  return mainLinks(t)
+    .filter((l) => withHome || l.href !== "/")
+    .map((l) => (
     <Link key={l.href} href={l.href} className={linkClass}>
       <LinkPending />
       {l.label}
@@ -57,7 +59,7 @@ async function AccountLinks({ t }: { t: T }) {
       <SavedLink className={linkClass} />
       <Link href="/listings/mine" className={linkClass}>
         <LinkPending />
-        {t("My listings", "የእኔ ማስታወቂያዎች")}
+        {t("My listings", "የእኔ ቤቶች")}
       </Link>
       <Link
         href="/messages"
@@ -128,21 +130,22 @@ export async function Header() {
           </Link>
         </div>
 
-        {/* Wide screens: everything in one row */}
-        <nav className="hidden items-center gap-0.5 text-sm lg:flex xl:gap-1">
-          <MainLinks t={t} />
+        {/* Wide screens: everything in one row (Amharic labels are longer, so this
+            waits for extra-wide screens; narrower ones use the menu). */}
+        <nav className="hidden items-center gap-0.5 text-sm xl:flex">
+          <MainLinks t={t} withHome={false} />
           <span className="mx-1 h-5 w-px bg-border" aria-hidden />
           <Suspense fallback={<SignInLink t={t} />}>
             <AccountLinks t={t} />
           </Suspense>
-          <LangSwitch className="ml-1" />
+          <LangSwitch compact className="ml-1" />
           <span className="ml-1">
             <PostLink t={t} />
           </span>
         </nav>
 
         {/* Small screens: Post button plus a menu */}
-        <div className="flex items-center gap-2 lg:hidden">
+        <div className="flex items-center gap-2 xl:hidden">
           <span className="text-sm">
             <PostLink t={t} />
           </span>
