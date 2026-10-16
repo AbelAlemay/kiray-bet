@@ -66,13 +66,16 @@ async function AreaSections() {
       <section className="relative bg-forest bg-[url(/house-pattern.svg)] bg-[length:80px] text-white">
         <Skyline region={region.id} />
         <div className="relative mx-auto max-w-6xl px-4 pb-28 pt-8 sm:pb-44 sm:pt-12">
-          <div className="mb-6 flex flex-wrap items-center gap-3">
+          <div className="mb-8 flex justify-center">
             <RegionSwitcher current={region.id} variant="hero" />
-            <a href="#safety" className="rounded-full bg-white/15 px-3 py-1 text-sm transition hover:bg-white/25">
-              🔒 Safe & private · ደህንነቱ የተጠበቀ
-            </a>
           </div>
-          <h1 className="max-w-3xl text-4xl font-bold leading-tight text-door [text-shadow:0_3px_0_rgb(0_0_0/0.45),0_4px_16px_rgb(0_0_0/0.75)] sm:text-5xl">
+          <a
+            href="#safety"
+            className="mb-3 inline-block rounded-full bg-white/15 px-3 py-1 text-sm transition hover:bg-white/25"
+          >
+            🔒 Safe & private · ደህንነቱ የተጠበቀ
+          </a>
+          <h1 className="text-4xl font-bold leading-tight text-door [text-shadow:0_3px_0_rgb(0_0_0/0.45),0_4px_16px_rgb(0_0_0/0.75)] sm:text-5xl">
             {region.headlineAm}
           </h1>
           <p className="mt-3 max-w-xl text-lg text-white/85">{region.taglineEn}.</p>
@@ -160,7 +163,7 @@ function AreaSkeleton() {
     <>
       <section className="bg-forest text-white">
         <div className="mx-auto h-[30rem] max-w-6xl px-4 pt-8 sm:pt-12">
-          <div className="mb-6 h-12 w-64 animate-pulse rounded-full bg-white/20" />
+          <div className="mx-auto mb-8 h-14 w-full animate-pulse rounded-full bg-white/20 sm:w-[26rem]" />
           <div className="h-12 w-2/3 animate-pulse rounded bg-white/15" />
           <div className="mt-8 h-14 max-w-4xl animate-pulse rounded-2xl bg-white/10" />
         </div>
