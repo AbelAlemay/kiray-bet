@@ -56,9 +56,9 @@ export function RegionSwitcher({ current, variant = "bar" }: { current: RegionId
         <span aria-hidden className="text-lg">📍</span>
         <span className="min-w-0 flex-1 leading-tight">
           <span className="block text-[11px] font-semibold uppercase tracking-wide text-gray-500">Area · አካባቢ</span>
-          <span className="block truncate text-lg font-bold">{name}</span>
+          <span className="block text-base font-bold sm:text-lg">{name}</span>
         </span>
-        <span className="ml-1 flex shrink-0 items-center gap-1.5 rounded-full bg-door px-4 py-2.5 text-sm font-semibold">
+        <span className="ml-1 flex shrink-0 items-center gap-1.5 rounded-full bg-door px-3 py-2.5 text-sm font-semibold sm:px-4">
           {switching ? <Spinner className="h-3 w-3" /> : null}
           Change <span aria-hidden>▾</span>
         </span>
