@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Listing } from "@/lib/sample-listings";
-import { formatDate, formatPrice, nearLabel } from "@/lib/format";
+import { formatDate, formatPrice, nearLabel, roomsLabel } from "@/lib/format";
+import { getT } from "@/lib/i18n-server";
 import { site } from "@/lib/site";
 import { SaveButton } from "./SaveButton";
 import { LinkPending } from "./Pending";
@@ -13,8 +14,10 @@ const typeColors: Record<Listing["type"], string> = {
   room: "from-rose-700 to-rose-500",
 };
 
-export function ListingCard({ listing }: { listing: Listing }) {
+export async function ListingCard({ listing }: { listing: Listing }) {
+  const t = await getT();
   const type = site.listingTypes.find((t) => t.value === listing.type)!;
+  const available = formatDate(listing.availableFrom, undefined, t.lang);
 
   return (
     <div className="relative transition hover:-translate-y-0.5">
@@ -34,22 +37,22 @@ export function ListingCard({ listing }: { listing: Listing }) {
             />
           )}
           <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-xs font-semibold text-gray-900">
-            {type.label} · {type.labelAm}
+            {t.both(type.label, type.labelAm)}
           </span>
           <span className="absolute bottom-3 right-3 rounded-lg bg-black/60 px-2.5 py-1 text-sm font-bold text-white">
-            {formatPrice(listing.price)}/mo
+            {formatPrice(listing.price)}{t("/mo", "/በወር")}
           </span>
         </div>
         <div className="space-y-1.5 p-4">
           <h3 className="font-semibold group-hover:text-brand">{listing.title}</h3>
           <p className="text-sm text-muted">
-            {nearLabel(listing)}
+            {nearLabel(listing, t.lang)}
           </p>
           <p className="text-sm">
-            {listing.bedrooms === 0 ? "Studio" : `${listing.bedrooms} bd`} · {listing.bathrooms} ba
-            {listing.parking && " · Parking"}
+            {roomsLabel(listing.bedrooms, listing.bathrooms, t.lang)}
+            {listing.parking && ` · ${t("Parking", "መኪና ማቆሚያ")}`}
           </p>
-          <p className="text-xs text-muted">Available {formatDate(listing.availableFrom)}</p>
+          <p className="text-xs text-muted">{t(`Available ${available}`, `ከ${available} ጀምሮ ይገኛል`)}</p>
         </div>
       </Link>
       <div className="absolute right-2 top-2">

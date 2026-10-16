@@ -27,9 +27,9 @@ export type ListingFilters = {
 export const pageSize = 20;
 
 export const sortOptions = [
-  { value: "newest", label: "Newest first" },
-  { value: "price-asc", label: "Price: low to high" },
-  { value: "price-desc", label: "Price: high to low" },
+  { value: "newest", label: "Newest first", labelAm: "አዲሶቹ መጀመሪያ" },
+  { value: "price-asc", label: "Price: low to high", labelAm: "ዋጋ፦ ከዝቅተኛ ወደ ከፍተኛ" },
+  { value: "price-desc", label: "Price: high to low", labelAm: "ዋጋ፦ ከከፍተኛ ወደ ዝቅተኛ" },
 ] as const;
 
 type RawParams = { [key: string]: string | string[] | undefined };

@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "./LangProvider";
 import { useSaved } from "./SavedProvider";
 
 // ♡ Save toggle. "heart" sits on a listing card's photo; "button" is the full-width
@@ -7,7 +8,8 @@ import { useSaved } from "./SavedProvider";
 export function SaveButton({ listingId, variant }: { listingId: string; variant: "heart" | "button" }) {
   const { isSaved, toggle } = useSaved();
   const saved = isSaved(listingId);
-  const label = saved ? "Remove from saved homes" : "Save this home";
+  const t = useT();
+  const label = saved ? t("Remove from saved homes", "ከተቀመጡ ቤቶች ያስወግዱ") : t("Save this home", "ይህን ቤት ያስቀምጡ");
 
   if (variant === "heart") {
     return (
@@ -35,7 +37,7 @@ export function SaveButton({ listingId, variant }: { listingId: string; variant:
         saved ? "border-door/60 bg-door/10 text-door" : "border-border hover:bg-brand-soft"
       }`}
     >
-      {saved ? "♥ Saved · ተቀምጧል" : "♡ Save"}
+      {saved ? `♥ ${t.both("Saved", "ተቀምጧል")}` : `♡ ${t("Save", "ያስቀምጡ")}`}
     </button>
   );
 }

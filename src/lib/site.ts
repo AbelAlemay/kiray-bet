@@ -25,18 +25,18 @@ export function utilitiesIncluded(type: string) {
 
 // Amenities a host can tick (same list as the database allows).
 export const amenityOptions = [
-  { value: "wifi", label: "Wi-Fi included" },
-  { value: "furnished", label: "Furnished" },
-  { value: "washer_dryer", label: "Washer & dryer in unit" },
-  { value: "shared_laundry", label: "Shared laundry" },
-  { value: "ac", label: "Air conditioning" },
-  { value: "private_bath", label: "Private bathroom" },
-  { value: "private_entrance", label: "Private entrance" },
-  { value: "own_kitchen", label: "Own kitchen" },
-  { value: "dishwasher", label: "Dishwasher" },
-  { value: "yard", label: "Yard or patio" },
-  { value: "storage", label: "Storage space" },
-  { value: "near_transit", label: "Near bus or train" },
+  { value: "wifi", label: "Wi-Fi included", labelAm: "ዋይፋይ ተካትቷል" },
+  { value: "furnished", label: "Furnished", labelAm: "የቤት ዕቃ ያለው" },
+  { value: "washer_dryer", label: "Washer & dryer in unit", labelAm: "በቤቱ ውስጥ የልብስ ማጠቢያና ማድረቂያ" },
+  { value: "shared_laundry", label: "Shared laundry", labelAm: "የጋራ ልብስ ማጠቢያ" },
+  { value: "ac", label: "Air conditioning", labelAm: "ኤር ኮንዲሽነር (አየር ማቀዝቀዣ)" },
+  { value: "private_bath", label: "Private bathroom", labelAm: "የግል መታጠቢያ ቤት" },
+  { value: "private_entrance", label: "Private entrance", labelAm: "የግል መግቢያ በር" },
+  { value: "own_kitchen", label: "Own kitchen", labelAm: "የግል ኩሽና" },
+  { value: "dishwasher", label: "Dishwasher", labelAm: "የሳህን ማጠቢያ ማሽን" },
+  { value: "yard", label: "Yard or patio", labelAm: "ግቢ ወይም በረንዳ" },
+  { value: "storage", label: "Storage space", labelAm: "የዕቃ ማስቀመጫ ቦታ" },
+  { value: "near_transit", label: "Near bus or train", labelAm: "ለአውቶቡስ ወይም ባቡር ቅርብ" },
 ] as const;
 
 export type Amenity = (typeof amenityOptions)[number]["value"];
@@ -47,6 +47,6 @@ export const exclusiveAmenities: Partial<Record<Amenity, Amenity>> = {
   shared_laundry: "washer_dryer",
 };
 
-export function amenityLabels(amenities: readonly string[]) {
-  return amenityOptions.filter((a) => amenities.includes(a.value)).map((a) => a.label);
+export function amenityLabels(amenities: readonly string[], lang: "en" | "am" = "en") {
+  return amenityOptions.filter((a) => amenities.includes(a.value)).map((a) => (lang === "am" ? a.labelAm : a.label));
 }

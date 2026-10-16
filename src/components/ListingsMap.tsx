@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { formatPrice, nearLabel } from "@/lib/format";
 import type { ListingPin } from "@/lib/listings";
+import { useT } from "./LangProvider";
 
 // OpenStreetMap with soft circles over each listing's blurred (~1 km) area, never
 // a pin on the house. Each home has a price pin; homes that share an area fan out
@@ -41,6 +42,8 @@ export function ListingsMap({
 }) {
   const box = useRef<HTMLDivElement>(null);
   const router = useRouter();
+
+  const t = useT();
 
   useEffect(() => {
     let map: import("leaflet").Map | undefined;
@@ -129,8 +132,8 @@ export function ListingsMap({
           popup.className = "space-y-1";
           popup.append(
             homeLink(home, home.title),
-            note(`${formatPrice(home.price)}/mo · ${nearLabel(home)}`),
-            note("Approximate area, not the exact address"),
+            note(`${formatPrice(home.price)}${t("/mo", "/በወር")} · ${nearLabel(home, t.lang)}`),
+            note(t("Approximate area, not the exact address", "ግምታዊ ቦታ እንጂ ትክክለኛው አድራሻ አይደለም")),
           );
           const pin = L.marker(position, {
             icon: L.divIcon({
@@ -139,7 +142,7 @@ export function ListingsMap({
               iconSize: [72, 30],
               iconAnchor: [36, 15],
             }),
-            title: `${formatPrice(home.price)}/mo · ${home.title}`,
+            title: `${formatPrice(home.price)}${t("/mo", "/በወር")} · ${home.title}`,
             keyboard: true,
           }).bindPopup(popup, { maxWidth: 260 });
           (homes.length === 1 ? singles : spread).addLayer(pin);
@@ -148,8 +151,8 @@ export function ListingsMap({
         if (homes.length > 1) {
           const popup = document.createElement("div");
           popup.className = "space-y-2";
-          popup.append(note(`${nearLabel(homes[0])} · approximate area`));
-          for (const home of homes) popup.append(homeLink(home, `${formatPrice(home.price)}/mo · ${home.title}`));
+          popup.append(note(`${nearLabel(homes[0], t.lang)} · ${t("approximate area", "ግምታዊ ቦታ")}`));
+          for (const home of homes) popup.append(homeLink(home, `${formatPrice(home.price)}${t("/mo", "/በወር")} · ${home.title}`));
           const zoomIn = document.createElement("button");
           zoomIn.type = "button";
           zoomIn.className = "text-xs font-semibold text-accent";
@@ -159,7 +162,7 @@ export function ListingsMap({
           badges.addLayer(
             L.marker(center, {
               icon: L.divIcon({ className: "map-badge", html: String(homes.length), iconSize: [34, 34] }),
-              title: `${homes.length} homes · ${nearLabel(homes[0])}`,
+              title: `${homes.length} ${t("homes", "ቤቶች")} · ${nearLabel(homes[0], t.lang)}`,
               keyboard: true,
             }).bindPopup(popup, { maxWidth: 260 }),
           );
@@ -189,7 +192,7 @@ export function ListingsMap({
       cancelled = true;
       map?.remove();
     };
-  }, [pins, interactive, zoom, center, router]);
+  }, [pins, interactive, zoom, center, router, t]);
 
   return <div ref={box} className={`listings-map z-0 overflow-hidden rounded-2xl border border-border ${className}`} />;
 }

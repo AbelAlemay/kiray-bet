@@ -8,6 +8,7 @@ import { ViewSwitch } from "@/components/ViewSwitch";
 import { getCityCounts, getLatestListings, getListingPins } from "@/lib/listings";
 import { getChosenRegion } from "@/lib/region-server";
 import { site } from "@/lib/site";
+import { getT } from "@/lib/i18n-server";
 import { LinkPending } from "@/components/Pending";
 import { RegionSwitcher } from "@/components/RegionSwitcher";
 import { Skyline } from "@/components/Skyline";
@@ -17,16 +18,19 @@ const steps = [
     title: "Search",
     titleAm: "ይፈልጉ",
     text: "Filter by city, price and type: a whole house, apartment, basement or a single room.",
+    textAm: "በከተማ፣ በዋጋ እና በዓይነት ይምረጡ፦ ሙሉ ቤት፣ አፓርትመንት፣ ቤዝመንት ወይም አንድ ክፍል።",
   },
   {
     title: "Message the host",
     titleAm: "ባለቤቱን ያግኙ",
     text: "Chat directly in English or Amharic. No middleman, no fees for renters.",
+    textAm: "በእንግሊዝኛ ወይም በአማርኛ በቀጥታ ይነጋገሩ። ደላላ የለም፣ ለተከራዮች ምንም ክፍያ የለም።",
   },
   {
     title: "Move in",
     titleAm: "ይግቡ",
     text: "Visit the home, agree on terms with the host, and move in.",
+    textAm: "ቤቱን ይጎብኙ፣ ከባለቤቱ ጋር በውሉ ይስማሙ፣ ከዚያም ይግቡ።",
   },
 ];
 
@@ -34,24 +38,33 @@ const steps = [
 const promises = [
   {
     title: "We never ask for your phone number",
+    titleAm: "ስልክ ቁጥርዎን በፍጹም አንጠይቅም",
     text: "Hosts and renters talk through messages inside the site, and your email is never shown to anyone.",
+    textAm: "ባለቤቶችና ተከራዮች በድረ-ገጹ ውስጥ በመልዕክት ይነጋገራሉ፤ ኢሜይልዎም ለማንም አይታይም።",
   },
   {
     title: "Exact address only with the host's approval",
+    titleAm: "ትክክለኛው አድራሻ የሚሰጠው ባለቤቱ ሲፈቅድ ብቻ ነው",
     text: "Listings show the nearest major intersection and an approximate map area. The host chooses who sees the address.",
+    textAm: "ማስታወቂያዎች የሚያሳዩት በአቅራቢያ ያለውን ዋና መስቀለኛ መንገድና ግምታዊ የካርታ ቦታ ብቻ ነው። አድራሻውን ማን እንደሚያይ ባለቤቱ ይወስናል።",
   },
   {
     title: "Every listing is checked by a person",
+    titleAm: "እያንዳንዱ ማስታወቂያ በሰው ይመረመራል",
     text: "New listings are reviewed before they appear, so fake and copied listings don't go live.",
+    textAm: "አዳዲስ ማስታወቂያዎች ከመታየታቸው በፊት ይገመገማሉ፤ ስለዚህ ሐሰተኛና የተቀዱ ማስታወቂያዎች አይወጡም።",
   },
   {
     title: "Report anything suspicious",
+    titleAm: "አጠራጣሪ ነገር ካዩ ሪፖርት ያድርጉ",
     text: "One tap reports a listing or a message. Scammers are removed and banned.",
+    textAm: "በአንድ ንክኪ ማስታወቂያን ወይም መልዕክትን ሪፖርት ያድርጉ። አጭበርባሪዎች ይወገዳሉ፣ ይታገዳሉ።",
   },
 ];
 
 // Everything that depends on the chosen area: headline, cities, latest homes.
 async function AreaSections() {
+  const t = await getT();
   const region = await getChosenRegion();
   const [latest, cityCounts, pins] = await Promise.all([
     getLatestListings(6, region.id),
@@ -81,14 +94,14 @@ async function AreaSections() {
           href="#safety"
           className="absolute bottom-3 right-4 text-sm font-semibold text-white/90 [text-shadow:0_1px_4px_rgb(0_0_0/0.6)] hover:underline"
         >
-          🔒 Safe & private · ደህንነቱ የተጠበቀ
+          🔒 {t.both("Safe & private", "ደህንነቱ የተጠበቀ")}
         </a>
       </section>
 
       {citiesWithHomes.length > 0 && (
         <section className="mx-auto max-w-6xl px-4 pt-10">
           <h2 className="mb-3 text-lg font-bold">
-            Cities in {region.place} · <span className="text-muted">ከተሞች</span>
+            {t(`Cities in ${region.place}`, `ከተሞች ${region.placeAm}`)}
           </h2>
           {/* Scrolls sideways on phones; wraps on wider screens. */}
           <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-2 sm:mx-0 sm:flex-wrap sm:px-0">
@@ -110,29 +123,36 @@ async function AreaSections() {
 
       <section className="mx-auto max-w-6xl px-4 pt-10">
         <div className="mb-3">
-          <h2 className="text-2xl font-bold">Latest homes · {region.name}</h2>
-          <p className="text-muted">አዳዲስ ቤቶች</p>
+          <h2 className="text-2xl font-bold">{t(`Latest homes · ${region.name}`, `አዳዲስ ቤቶች · ${region.nameAm}`)}</h2>
+          <p className="text-muted">{t("አዳዲስ ቤቶች", "Latest homes")}</p>
         </div>
         {latest.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-border p-10 text-center">
-            <p className="font-semibold">No homes listed in {region.place} yet.</p>
-            <p className="mt-1 text-sm text-muted">Have a room or home to rent here? Be the first to post it, for free.</p>
+            <p className="font-semibold">
+              {t(`No homes listed in ${region.place} yet.`, `${region.placeAm} እስካሁን የተለጠፈ ቤት የለም።`)}
+            </p>
+            <p className="mt-1 text-sm text-muted">
+              {t(
+                "Have a room or home to rent here? Be the first to post it, for free.",
+                "እዚህ የሚከራይ ክፍል ወይም ቤት አለዎት? በነጻ ለማስተዋወቅ የመጀመሪያው ይሁኑ።",
+              )}
+            </p>
             <Link
               href="/listings/new"
               className="relative mt-4 inline-block rounded-xl bg-brand px-5 py-3 font-semibold text-white hover:bg-brand-strong"
             >
               <LinkPending />
-              Post a home
+              {t("Post a home", "ቤት ያስተዋውቁ")}
             </Link>
           </div>
         ) : (
           <ViewSwitch
-            label="Show homes as"
-            options={["☰ List", "🗺 Map"]}
+            label={t("Show homes as", "ቤቶቹን በዚህ መልክ አሳይ")}
+            options={[`☰ ${t("List", "ዝርዝር")}`, `🗺 ${t("Map", "ካርታ")}`]}
             actions={
               <Link href={searchHref()} className="relative py-2 text-sm font-semibold text-brand hover:underline">
                 <LinkPending />
-                See all →
+                {t("See all →", "ሁሉንም ይመልከቱ →")}
               </Link>
             }
             views={[
@@ -144,9 +164,9 @@ async function AreaSections() {
               <div key="map" className="space-y-2">
                 <ListingsMap pins={pins} center={region.center} zoom={region.zoom} className="h-80 sm:h-[28rem]" />
                 <p className="text-xs text-muted">
-                  🔒 Approximate areas only. Exact addresses are shared by the host.{" "}
+                  🔒 {t("Approximate areas only. Exact addresses are shared by the host.", "ግምታዊ ቦታዎች ብቻ። ትክክለኛውን አድራሻ ባለቤቱ ያጋራል።")}{" "}
                   <Link href={searchHref("&view=map")} className="font-semibold text-brand hover:underline">
-                    Open full map with filters →
+                    {t("Open full map with filters →", "ሙሉውን ካርታ በማጣሪያ ይክፈቱ →")}
                   </Link>
                 </p>
               </div>,
@@ -177,7 +197,8 @@ function AreaSkeleton() {
   );
 }
 
-export default function Home() {
+export default async function Home() {
+  const t = await getT();
   return (
     <>
       <Suspense fallback={<AreaSkeleton />}>
@@ -185,7 +206,7 @@ export default function Home() {
       </Suspense>
 
       <section className="mx-auto max-w-6xl px-4 pt-16">
-        <h2 className="mb-6 text-2xl font-bold">How it works</h2>
+        <h2 className="mb-6 text-2xl font-bold">{t("How it works", "እንዴት ይሠራል")}</h2>
         <ol className="grid gap-5 sm:grid-cols-3">
           {steps.map((step, i) => (
             <li key={step.title} className="rounded-2xl border border-border bg-surface p-5">
@@ -193,9 +214,9 @@ export default function Home() {
                 {i + 1}
               </span>
               <h3 className="mt-3 font-semibold">
-                {step.title} · <span className="text-muted">{step.titleAm}</span>
+                {t.both(step.title, step.titleAm)}
               </h3>
-              <p className="mt-1 text-sm text-muted">{step.text}</p>
+              <p className="mt-1 text-sm text-muted">{t(step.text, step.textAm)}</p>
             </li>
           ))}
         </ol>
@@ -203,11 +224,13 @@ export default function Home() {
 
       <section id="safety" className="mx-auto max-w-6xl scroll-mt-20 px-4 pt-16">
         <div className="rounded-2xl border border-border bg-surface p-6 sm:p-8">
-          <p className="text-sm font-semibold text-brand">🔒 Safe & private · ደህንነቱ የተጠበቀ</p>
-          <h2 className="mt-1 text-2xl font-bold">Your information stays private</h2>
+          <p className="text-sm font-semibold text-brand">🔒 {t.both("Safe & private", "ደህንነቱ የተጠበቀ")}</p>
+          <h2 className="mt-1 text-2xl font-bold">{t("Your information stays private", "መረጃዎ በምስጢር ይጠበቃል")}</h2>
           <p className="mt-1 max-w-2xl text-muted">
-            Rental scams are common in online groups. {site.nameLatin} is built so hosts and renters
-            can connect without giving their personal details to strangers.
+            {t(
+              `Rental scams are common in online groups. ${site.nameLatin} is built so hosts and renters can connect without giving their personal details to strangers.`,
+              `በኦንላይን ቡድኖች የኪራይ ማጭበርበር የተለመደ ነው። ${site.name} የተሠራው ባለቤቶችና ተከራዮች የግል መረጃቸውን ለማያውቁት ሰው ሳይሰጡ እንዲገናኙ ነው።`,
+            )}
           </p>
           <ul className="mt-6 grid gap-4 sm:grid-cols-2">
             {promises.map((p) => (
@@ -216,8 +239,8 @@ export default function Home() {
                   ✓
                 </span>
                 <div>
-                  <h3 className="font-semibold">{p.title}</h3>
-                  <p className="text-sm text-muted">{p.text}</p>
+                  <h3 className="font-semibold">{t(p.title, p.titleAm)}</h3>
+                  <p className="text-sm text-muted">{t(p.text, p.textAm)}</p>
                 </div>
               </li>
             ))}
@@ -231,15 +254,15 @@ export default function Home() {
       <section className="mx-auto max-w-6xl px-4 pt-16">
         <div className="flex flex-col items-start justify-between gap-4 rounded-2xl bg-brand-soft p-6 sm:flex-row sm:items-center sm:p-8">
           <div>
-            <h2 className="text-2xl font-bold">Have a room or house to rent?</h2>
-            <p className="text-muted">ቤት ወይም ክፍል አለዎት? በነጻ ያስተዋውቁ።</p>
+            <h2 className="text-2xl font-bold">{t("Have a room or house to rent?", "የሚከራይ ቤት ወይም ክፍል አለዎት?")}</h2>
+            <p className="text-muted">{t("ቤት ወይም ክፍል አለዎት? በነጻ ያስተዋውቁ።", "በነጻ ያስተዋውቁ። Post it for free.")}</p>
           </div>
           <Link
             href="/listings/new"
             className="relative rounded-xl bg-brand px-6 py-3 font-semibold text-white hover:bg-brand-strong"
           >
             <LinkPending />
-            Post for free
+            {t("Post for free", "በነጻ ያስተዋውቁ")}
           </Link>
         </div>
       </section>
