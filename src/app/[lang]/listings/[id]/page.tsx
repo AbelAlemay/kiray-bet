@@ -11,23 +11,26 @@ import { formatDate, formatPrice, nearLabel } from "@/lib/format";
 import { getListing } from "@/lib/listings";
 import { amenityLabels, site } from "@/lib/site";
 import { LinkPending } from "@/components/Pending";
+import { getT } from "@/lib/i18n-server";
 
 type Props = PageProps<"/[lang]/listings/[id]">;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const listing = await getListing((await params).id);
-  if (!listing) return { title: "Listing not found" };
+  const t = await getT();
+  if (!listing) return { title: t("Listing not found", "ማስታወቂያው አልተገኘም") };
   return {
-    title: `${listing.title} · ${formatPrice(listing.price)}/mo`,
-    description: `${nearLabel(listing)}. ${listing.description}`,
+    title: `${listing.title} · ${formatPrice(listing.price)}${t("/mo", "/በወር")}`,
+    description: `${nearLabel(listing, t.lang)}. ${listing.description}`,
   };
 }
 
-function Fact({ label, labelAm, value }: { label: string; labelAm: string; value: string }) {
+async function Fact({ label, labelAm, value }: { label: string; labelAm: string; value: string }) {
+  const t = await getT();
   return (
     <div className="rounded-xl border border-border bg-surface p-3">
       <dt className="text-xs text-muted">
-        {label} · {labelAm}
+        {t.both(label, labelAm)}
       </dt>
       <dd className="mt-0.5 font-semibold">{value}</dd>
     </div>
@@ -37,9 +40,12 @@ function Fact({ label, labelAm, value }: { label: string; labelAm: string; value
 async function ListingDetail({ params }: { params: Props["params"] }) {
   const listing = await getListing((await params).id);
   if (!listing) notFound();
+  const t = await getT();
 
-  const type = site.listingTypes.find((t) => t.value === listing.type)!;
-  const yesNo = (v: boolean) => (v ? "Yes" : "No");
+  const type = site.listingTypes.find((x) => x.value === listing.type)!;
+  const yesNo = (v: boolean) => (v ? t("Yes", "አዎ") : t("No", "የለም"));
+  const near = nearLabel(listing, t.lang);
+  const perMonth = t(" /month", " /በወር");
   // Signs visitors in first (requireUser), then opens the conversation page.
   const contactHref = `/messages/new?listing=${listing.id}`;
 
@@ -49,8 +55,8 @@ async function ListingDetail({ params }: { params: Props["params"] }) {
         <div className="space-y-6">
           {listing.approxLat != null && listing.approxLng != null ? (
             <ViewSwitch
-              label="Show"
-              options={["📷 Photos", "🗺 Map"]}
+              label={t("Show", "አሳይ")}
+              options={[`📷 ${t("Photos", "ፎቶዎች")}`, `🗺 ${t("Map", "ካርታ")}`]}
               views={[
                 <PhotoGallery key="photos" photos={listing.photos} title={listing.title} />,
                 <div key="map" className="space-y-2">
@@ -73,8 +79,11 @@ async function ListingDetail({ params }: { params: Props["params"] }) {
                     className="h-72 sm:h-96"
                   />
                   <p className="text-sm text-muted">
-                    🔒 Approximate area: {nearLabel(listing)}. The host shares the exact address
-                    with you after you message them.
+                    🔒{" "}
+                    {t(
+                      `Approximate area: ${near}. The host shares the exact address with you after you message them.`,
+                      `ግምታዊ ቦታ፦ ${near}። ባለቤቱን መልዕክት ከላኩ በኋላ ትክክለኛውን አድራሻ ያጋራዎታል።`,
+                    )}
                   </p>
                 </div>,
               ]}
@@ -85,11 +94,11 @@ async function ListingDetail({ params }: { params: Props["params"] }) {
 
           <div>
             <p className="text-sm font-semibold text-brand">
-              {type.label} · {type.labelAm}
+              {t.both(type.label, type.labelAm)}
             </p>
             <h1 className="mt-1 break-words text-3xl font-bold">{listing.title}</h1>
             <p className="mt-1 text-muted">
-              {nearLabel(listing)}, {listing.state}
+              {near}, {listing.state}
             </p>
             {listing.exactAddress ? (
               <p className="mt-2 text-sm">
@@ -100,24 +109,28 @@ async function ListingDetail({ params }: { params: Props["params"] }) {
                   rel="noreferrer"
                   className="font-semibold text-brand hover:underline"
                 >
-                  Open in Maps
+                  {t("Open in Maps", "በካርታ ይክፈቱ")}
                 </a>
               </p>
             ) : (
               <p className="mt-2 text-sm text-muted">
-                🔒 The exact address is private. The host shares it with you after you message them.
+                🔒{" "}
+                {t(
+                  "The exact address is private. The host shares it with you after you message them.",
+                  "ትክክለኛው አድራሻ የግል ነው። ባለቤቱን መልዕክት ከላኩ በኋላ ያጋራዎታል።",
+                )}
               </p>
             )}
           </div>
 
           <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <Fact label="Bedrooms" labelAm="መኝታ ክፍል" value={listing.bedrooms === 0 ? "Studio" : String(listing.bedrooms)} />
+            <Fact label="Bedrooms" labelAm="መኝታ ክፍል" value={listing.bedrooms === 0 ? t("Studio", "ስቱዲዮ") : String(listing.bedrooms)} />
             <Fact label="Bathrooms" labelAm="መታጠቢያ" value={String(listing.bathrooms)} />
             <Fact label="Deposit" labelAm="ቅድመ ክፍያ" value={formatPrice(listing.deposit)} />
             <Fact
               label="Available"
               labelAm="የሚገኝበት"
-              value={formatDate(listing.availableFrom, { month: "short", day: "numeric", year: "numeric" })}
+              value={formatDate(listing.availableFrom, { month: "short", day: "numeric", year: "numeric" }, t.lang)}
             />
             <Fact label="Parking" labelAm="መኪና ማቆሚያ" value={yesNo(listing.parking)} />
             <Fact label="Pets allowed" labelAm="የቤት እንስሳ" value={yesNo(listing.petsAllowed)} />
@@ -126,10 +139,10 @@ async function ListingDetail({ params }: { params: Props["params"] }) {
           {listing.amenities.length > 0 && (
             <section>
               <h2 className="mb-2 text-xl font-bold">
-                Amenities · <span className="text-muted">ምን ምን አለው?</span>
+                {t.both("Amenities", "ምን ምን አለው?")}
               </h2>
               <ul className="grid grid-cols-1 gap-x-6 gap-y-2 sm:grid-cols-2">
-                {amenityLabels(listing.amenities).map((label) => (
+                {amenityLabels(listing.amenities, t.lang).map((label) => (
                   <li key={label} className="flex items-center gap-2">
                     <span aria-hidden className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand-soft text-sm text-brand">
                       ✓
@@ -142,7 +155,7 @@ async function ListingDetail({ params }: { params: Props["params"] }) {
           )}
 
           <section>
-            <h2 className="mb-2 text-xl font-bold">About this home</h2>
+            <h2 className="mb-2 text-xl font-bold">{t("About this home", "ስለ ቤቱ")}</h2>
             <p className="whitespace-pre-line break-words leading-relaxed">{listing.description}</p>
           </section>
         </div>
@@ -151,25 +164,37 @@ async function ListingDetail({ params }: { params: Props["params"] }) {
           <div className="space-y-4 rounded-2xl border border-border bg-surface p-5 shadow-sm">
             <p>
               <span className="text-3xl font-bold">{formatPrice(listing.price)}</span>
-              <span className="text-muted"> /month</span>
+              <span className="text-muted">{perMonth}</span>
             </p>
             <p className="text-sm text-muted">
-              Hosted by <span className="font-semibold text-foreground">{listing.hostName}</span> · posted{" "}
-              {formatDate(listing.postedAt)}
+              {t("Hosted by", "ባለቤት፦")} <span className="font-semibold text-foreground">{listing.hostName}</span> ·{" "}
+              {t("posted", "የተለጠፈው")} {formatDate(listing.postedAt, undefined, t.lang)}
             </p>
             <Link
               href={contactHref}
               className="relative block rounded-xl bg-brand px-4 py-3 text-center font-semibold text-white hover:bg-brand-strong"
             >
               <LinkPending />
-              Contact host · ባለቤቱን ያግኙ
+              {t.both("Contact host", "ባለቤቱን ያግኙ")}
             </Link>
             <SaveButton listingId={listing.id} variant="button" />
             {/* "Report this listing" link arrives with moderation in build step 9. */}
             <ul className="space-y-1 text-xs text-muted">
-              <li>✉ No account needed in advance: just confirm your email to send a message.</li>
-              <li>🔒 No phone numbers needed. You chat privately inside {site.nameLatin}.</li>
-              <li>✓ This listing was reviewed before it went live.</li>
+              <li>
+                ✉{" "}
+                {t(
+                  "No account needed in advance: just confirm your email to send a message.",
+                  "አስቀድሞ መለያ አያስፈልግም፦ መልዕክት ለመላክ ኢሜይልዎን ብቻ ያረጋግጡ።",
+                )}
+              </li>
+              <li>
+                🔒{" "}
+                {t(
+                  `No phone numbers needed. You chat privately inside ${site.nameLatin}.`,
+                  `ስልክ ቁጥር አያስፈልግም። በ${site.name} ውስጥ በግል ይነጋገራሉ።`,
+                )}
+              </li>
+              <li>✓ {t("This listing was reviewed before it went live.", "ይህ ማስታወቂያ ከመውጣቱ በፊት ተገምግሟል።")}</li>
             </ul>
             <PaymentWarning compact />
           </div>
@@ -181,9 +206,9 @@ async function ListingDetail({ params }: { params: Props["params"] }) {
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3">
           <p className="leading-tight">
             <span className="text-xl font-bold">{formatPrice(listing.price)}</span>
-            <span className="text-sm text-muted"> /month</span>
+            <span className="text-sm text-muted">{perMonth}</span>
             <span className="block text-xs text-muted">
-              {nearLabel(listing)}
+              {near}
             </span>
           </p>
           <Link
@@ -191,7 +216,7 @@ async function ListingDetail({ params }: { params: Props["params"] }) {
             className="relative whitespace-nowrap rounded-xl bg-brand px-5 py-3 font-semibold text-white hover:bg-brand-strong"
           >
             <LinkPending />
-            Contact host
+            {t("Contact host", "ባለቤቱን ያግኙ")}
           </Link>
         </div>
       </div>
@@ -212,11 +237,12 @@ function DetailSkeleton() {
   );
 }
 
-export default function ListingPage({ params }: Props) {
+export default async function ListingPage({ params }: Props) {
+  const t = await getT();
   return (
     <div className="mx-auto max-w-6xl px-4 pt-6">
       <Link href="/search" className="mb-2 inline-block py-2 text-sm text-muted hover:text-foreground">
-        ← Back to search
+        ← {t("Back to search", "ወደ ፍለጋ ይመለሱ")}
       </Link>
       <Suspense fallback={<DetailSkeleton />}>
         <ListingDetail params={params} />

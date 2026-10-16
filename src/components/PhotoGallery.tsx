@@ -2,11 +2,13 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { useT } from "./LangProvider";
 
 // Listing photos: cover large, the rest as a grid. Tapping any photo opens a full-screen
 // viewer (arrows, swipe, keyboard, thumbnails; tap the photo to zoom in and drag around).
 export function PhotoGallery({ photos, title }: { photos: string[]; title: string }) {
   const [open, setOpen] = useState<number | null>(null);
+  const t = useT();
 
   if (photos.length === 0) {
     return (
@@ -27,12 +29,12 @@ export function PhotoGallery({ photos, title }: { photos: string[]; title: strin
               key={src}
               type="button"
               onClick={() => setOpen(i)}
-              aria-label={`Open photo ${i + 1} of ${photos.length}`}
+              aria-label={t(`Open photo ${i + 1} of ${photos.length}`, `ፎቶ ${i + 1} ከ${photos.length} ይክፈቱ`)}
               className={`group relative cursor-zoom-in bg-border/50 ${i === 0 ? "col-span-2 row-span-2 aspect-[4/3]" : "aspect-[4/3]"}`}
             >
               <Image
                 src={src}
-                alt={i === 0 ? title : `${title}, photo ${i + 1}`}
+                alt={i === 0 ? title : `${title}, ${t("photo", "ፎቶ")} ${i + 1}`}
                 fill
                 priority={i === 0}
                 sizes={i === 0 ? "(min-width: 1024px) 50vw, 100vw" : "(min-width: 640px) 25vw, 50vw"}
@@ -46,7 +48,7 @@ export function PhotoGallery({ photos, title }: { photos: string[]; title: strin
           onClick={() => setOpen(0)}
           className="absolute bottom-3 right-3 rounded-full bg-black/70 px-3 py-1.5 text-sm font-semibold text-white backdrop-blur hover:bg-black/85"
         >
-          ⤢ View {photos.length} {photos.length === 1 ? "photo" : "photos"}
+          ⤢ {t(`View ${photos.length} ${photos.length === 1 ? "photo" : "photos"}`, `${photos.length} ፎቶ${photos.length === 1 ? "" : "ዎች"} ይመልከቱ`)}
         </button>
       </div>
       {open !== null && <PhotoViewer photos={photos} title={title} start={open} onClose={() => setOpen(null)} />}
@@ -56,6 +58,7 @@ export function PhotoGallery({ photos, title }: { photos: string[]; title: strin
 
 function PhotoViewer({ photos, title, start, onClose }: { photos: string[]; title: string; start: number; onClose: () => void }) {
   const [index, setIndex] = useState(start);
+  const t = useT();
   const [zoomed, setZoomed] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
   const stage = useRef<HTMLDivElement>(null);
@@ -108,7 +111,7 @@ function PhotoViewer({ photos, title, start, onClose }: { photos: string[]; titl
     <dialog
       ref={dialog}
       onClose={onClose}
-      aria-label={`${title}: photos`}
+      aria-label={`${title}: ${t("photos", "ፎቶዎች")}`}
       className="fixed inset-0 m-0 h-dvh max-h-none w-screen max-w-none bg-black p-0 text-white backdrop:bg-black"
     >
       <div className="flex h-full flex-col">
@@ -120,7 +123,7 @@ function PhotoViewer({ photos, title, start, onClose }: { photos: string[]; titl
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close photos"
+            aria-label={t("Close photos", "ፎቶዎቹን ዝጋ")}
             className="grid h-11 w-11 place-items-center rounded-full bg-white/10 text-xl hover:bg-white/20"
           >
             ✕
@@ -166,7 +169,7 @@ function PhotoViewer({ photos, title, start, onClose }: { photos: string[]; titl
             <img
               key={photos[index]}
               src={photos[index]}
-              alt={`${title}, photo ${index + 1} of ${count}`}
+              alt={`${title}, ${t(`photo ${index + 1} of ${count}`, `ፎቶ ${index + 1} ከ${count}`)}`}
               onClick={toggleZoom}
               draggable={false}
               className={
@@ -182,7 +185,7 @@ function PhotoViewer({ photos, title, start, onClose }: { photos: string[]; titl
               <button
                 type="button"
                 onClick={() => go(-1)}
-                aria-label="Previous photo"
+                aria-label={t("Previous photo", "ያለፈው ፎቶ")}
                 className="absolute left-2 top-1/2 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full bg-white/15 text-2xl backdrop-blur hover:bg-white/30 sm:left-4"
               >
                 ‹
@@ -190,7 +193,7 @@ function PhotoViewer({ photos, title, start, onClose }: { photos: string[]; titl
               <button
                 type="button"
                 onClick={() => go(1)}
-                aria-label="Next photo"
+                aria-label={t("Next photo", "ቀጣዩ ፎቶ")}
                 className="absolute right-2 top-1/2 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full bg-white/15 text-2xl backdrop-blur hover:bg-white/30 sm:right-4"
               >
                 ›
@@ -200,8 +203,10 @@ function PhotoViewer({ photos, title, start, onClose }: { photos: string[]; titl
         </div>
 
         <p className="px-4 pt-2 text-center text-xs text-white/60">
-          {zoomed ? "Drag to look around · tap to zoom out" : "Tap the photo to zoom in"}
-          {count > 1 && !zoomed && " · swipe or use the arrows"}
+          {zoomed
+            ? t("Drag to look around · tap to zoom out", "ለማየት ይጎትቱ · ለማሳነስ ይንኩ")
+            : t("Tap the photo to zoom in", "ለማጉላት ፎቶውን ይንኩ")}
+          {count > 1 && !zoomed && t(" · swipe or use the arrows", " · ያንሸራትቱ ወይም ቀስቶቹን ይጠቀሙ")}
         </p>
         {count > 1 && (
           <div className="flex justify-center gap-2 overflow-x-auto px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2">
@@ -213,7 +218,7 @@ function PhotoViewer({ photos, title, start, onClose }: { photos: string[]; titl
                   setZoomed(false);
                   setIndex(i);
                 }}
-                aria-label={`Photo ${i + 1}`}
+                aria-label={`${t("Photo", "ፎቶ")} ${i + 1}`}
                 aria-current={i === index}
                 className={`relative h-14 w-20 shrink-0 overflow-hidden rounded-lg ${i === index ? "ring-2 ring-door" : "opacity-60 hover:opacity-100"}`}
               >
