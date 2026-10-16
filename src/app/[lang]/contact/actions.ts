@@ -3,6 +3,7 @@
 import { after } from "next/server";
 import { notifyAdmin } from "@/lib/notify";
 import { passedBotCheck } from "@/lib/turnstile";
+import { getActionT } from "@/lib/i18n-server";
 
 export type ContactState = { sent?: boolean; error?: string };
 
@@ -14,11 +15,18 @@ export async function sendContactMessage(_prev: ContactState, formData: FormData
   const email = String(formData.get("email") ?? "").trim().slice(0, 254);
   const topic = topics.find((t) => t === formData.get("topic")) ?? topics[0];
   const message = String(formData.get("message") ?? "").trim();
+  const t = await getActionT();
 
-  if (!name) return { error: "Please enter your name." };
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { error: "Please enter a valid email so we can reply." };
-  if (message.length < 10 || message.length > 3000) return { error: "Please write a message (10 to 3,000 characters)." };
-  if (!(await passedBotCheck(formData))) return { error: "We couldn't confirm you're not a bot. Please try again." };
+  if (!name) return { error: t("Please enter your name.", "እባክዎ ስምዎን ያስገቡ።") };
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return { error: t("Please enter a valid email so we can reply.", "መልስ እንድንሰጥዎ እባክዎ ትክክለኛ ኢሜይል ያስገቡ።") };
+  }
+  if (message.length < 10 || message.length > 3000) {
+    return { error: t("Please write a message (10 to 3,000 characters).", "እባክዎ መልዕክት ይጻፉ (ከ10 እስከ 3,000 ፊደላት)።") };
+  }
+  if (!(await passedBotCheck(formData))) {
+    return { error: t("We couldn't confirm you're not a bot. Please try again.", "ሮቦት አለመሆንዎን ማረጋገጥ አልቻልንም። እባክዎ እንደገና ይሞክሩ።") };
+  }
 
   after(() =>
     notifyAdmin({

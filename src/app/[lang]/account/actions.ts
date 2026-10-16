@@ -1,20 +1,24 @@
 "use server";
 
 import { refresh } from "next/cache";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { getCurrentUser, safeNext } from "@/lib/auth";
 import { createServerSupabase } from "@/lib/supabase/server";
+import { langCookie } from "@/lib/i18n";
+import { getActionT } from "@/lib/i18n-server";
 
 export type AccountState = { saved?: boolean; error?: string; name?: string; language?: "en" | "am" };
 
 export async function updateAccount(_prev: AccountState, formData: FormData): Promise<AccountState> {
   const user = await getCurrentUser();
-  if (!user) return { error: "Please sign in again." };
+  const t = await getActionT();
+  if (!user) return { error: t("Please sign in again.", "እባክዎ እንደገና ይግቡ።") };
 
   const name = String(formData.get("name") ?? "").trim().split(/\s+/)[0];
   const language = formData.get("language") === "am" ? "am" : "en";
   if (!name || name.length > 40) {
-    return { error: "Please enter your first name (up to 40 letters).", name, language };
+    return { error: t("Please enter your first name (up to 40 letters).", "እባክዎ የመጀመሪያ ስምዎን ያስገቡ (እስከ 40 ፊደላት)።"), name, language };
   }
 
   // The database only lets users change their own name and language.
@@ -24,8 +28,10 @@ export async function updateAccount(_prev: AccountState, formData: FormData): Pr
     supabase.from("private_profiles").update({ language }).eq("user_id", user.id),
   ]);
   if (profile.error || privateProfile.error) {
-    return { error: "We couldn't save your changes. Please try again.", name, language };
+    return { error: t("We couldn't save your changes. Please try again.", "ለውጦችዎን ማስቀመጥ አልቻልንም። እባክዎ እንደገና ይሞክሩ።"), name, language };
   }
+  // The site follows the chosen language from now on.
+  (await cookies()).set(langCookie, language, { path: "/", maxAge: 31536000, sameSite: "lax" });
 
   // First-time setup continues to where the user was going; later edits stay here.
   const next = formData.get("next");

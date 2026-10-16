@@ -5,16 +5,27 @@ import { fieldClass, labelClass, primaryButtonClass } from "@/components/form-st
 import { BotCheckFailed, Turnstile, useBotCheck } from "@/components/Turnstile";
 import { sendContactMessage } from "./actions";
 import { PendingCorner } from "@/components/Pending";
+import { useT } from "@/components/LangProvider";
+
+const topics = [
+  ["General question", "አጠቃላይ ጥያቄ"],
+  ["Problem with the site", "የድረ-ገጹ ችግር"],
+  ["Report a listing or user", "ማስታወቂያን ወይም ተጠቃሚን ሪፖርት ማድረግ"],
+  ["Partnership", "አጋርነት"],
+] as const;
 
 export function ContactForm() {
   const [state, action, pending] = useActionState(sendContactMessage, {});
   const bot = useBotCheck();
+  const t = useT();
 
   if (state.sent) {
     return (
       <div role="status" className="rounded-2xl bg-brand-soft p-6">
-        <p className="font-semibold">Thank you! Your message was sent. · መልዕክትዎ ተልኳል</p>
-        <p className="mt-1 text-sm">We&apos;ll reply by email, usually within a day or two.</p>
+        <p className="font-semibold">{t.both("Thank you! Your message was sent.", "እናመሰግናለን! መልዕክትዎ ተልኳል።")}</p>
+        <p className="mt-1 text-sm">
+          {t("We'll reply by email, usually within a day or two.", "ብዙውን ጊዜ በአንድ ወይም በሁለት ቀን ውስጥ በኢሜይል እንመልሳለን።")}
+        </p>
       </div>
     );
   }
@@ -23,25 +34,26 @@ export function ContactForm() {
     <form action={action} className="space-y-4 rounded-2xl border border-border bg-surface p-6 sm:p-8">
       <div className="grid gap-4 sm:grid-cols-2">
         <label className={labelClass}>
-          <span>Your name · ስም</span>
+          <span>{t.both("Your name", "ስም")}</span>
           <input name="name" required maxLength={60} autoComplete="name" className={fieldClass} />
         </label>
         <label className={labelClass}>
-          <span>Email (for our reply) · ኢሜይል</span>
+          <span>{t.both("Email (for our reply)", "ኢሜይል (ለመልሳችን)")}</span>
           <input name="email" type="email" required autoComplete="email" className={fieldClass} />
         </label>
       </div>
       <label className={labelClass}>
-        <span>Topic</span>
+        <span>{t("Topic", "ርዕስ")}</span>
         <select name="topic" className={fieldClass}>
-          <option>General question</option>
-          <option>Problem with the site</option>
-          <option>Report a listing or user</option>
-          <option>Partnership</option>
+          {topics.map(([en, am]) => (
+            <option key={en} value={en}>
+              {t(en, am)}
+            </option>
+          ))}
         </select>
       </label>
       <label className={labelClass}>
-        <span>Message · መልዕክት</span>
+        <span>{t.both("Message", "መልዕክት")}</span>
         <textarea name="message" required minLength={10} maxLength={3000} rows={6} className={fieldClass} />
       </label>
       <Turnstile resetKey={state} onToken={bot.onToken} onError={bot.onError} onInteractive={bot.onInteractive} />
@@ -53,7 +65,7 @@ export function ContactForm() {
       {bot.failed && <BotCheckFailed />}
       <button disabled={pending || bot.waiting} className={primaryButtonClass}>
         <PendingCorner pending={pending} />
-        {pending ? "Sending…" : bot.waiting ? bot.waitingLabel : "Send message · ይላኩ"}
+        {pending ? t("Sending…", "በመላክ ላይ…") : bot.waiting ? bot.waitingLabel : t.both("Send message", "ይላኩ")}
       </button>
     </form>
   );
