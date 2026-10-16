@@ -6,6 +6,7 @@ import { ListingsMap } from "@/components/ListingsMap";
 import { ViewSwitch } from "@/components/ViewSwitch";
 import { getCityCounts, getLatestListings, getListingPins } from "@/lib/listings";
 import { site } from "@/lib/site";
+import { LinkPending } from "@/components/Pending";
 
 const steps = [
   {
@@ -82,8 +83,9 @@ export default async function Home() {
             <Link
               key={city}
               href={`/search?city=${encodeURIComponent(city)}`}
-              className="flex min-h-11 shrink-0 items-center gap-2 rounded-full border border-border bg-surface px-4 font-semibold hover:border-brand"
+              className="relative flex min-h-11 shrink-0 items-center gap-2 rounded-full border border-border bg-surface px-4 font-semibold hover:border-brand"
             >
+              <LinkPending />
               {city}
               <span className="rounded-full bg-brand-soft px-2 py-0.5 text-xs text-brand">{cityCounts[city] ?? 0}</span>
             </Link>
@@ -100,7 +102,8 @@ export default async function Home() {
           label="Show homes as"
           options={["☰ List", "🗺 Map"]}
           actions={
-            <Link href="/search" className="py-2 text-sm font-semibold text-brand hover:underline">
+            <Link href="/search" className="relative py-2 text-sm font-semibold text-brand hover:underline">
+              <LinkPending />
               See all →
             </Link>
           }
@@ -175,8 +178,9 @@ export default async function Home() {
           </div>
           <Link
             href="/listings/new"
-            className="rounded-xl bg-brand px-6 py-3 font-semibold text-white hover:bg-brand-strong"
+            className="relative rounded-xl bg-brand px-6 py-3 font-semibold text-white hover:bg-brand-strong"
           >
+            <LinkPending />
             Post for free
           </Link>
         </div>

@@ -7,6 +7,7 @@ import { formatMessageTime } from "@/lib/format";
 import { messageWarning, warningText } from "@/lib/message-safety";
 import { createBrowserSupabase } from "@/lib/supabase/browser";
 import { markRead, sendMessage } from "../actions";
+import { PendingCorner } from "@/components/Pending";
 
 // The message thread. New messages and read receipts arrive live (Supabase Realtime,
 // which applies the same security rules as everything else); address decisions
@@ -163,9 +164,10 @@ export function Chat({
           />
           <button
             disabled={sending || !draft.trim()}
-            className="min-h-11 rounded-xl bg-brand px-5 font-semibold text-white hover:bg-brand-strong disabled:opacity-60"
+            className="relative min-h-11 rounded-xl bg-brand px-5 font-semibold text-white hover:bg-brand-strong disabled:opacity-60"
           >
-            {sending ? "…" : "Send"}
+            <PendingCorner pending={sending} />
+            Send
           </button>
         </div>
       </form>

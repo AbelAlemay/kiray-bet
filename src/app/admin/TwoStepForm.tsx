@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { fieldClass, labelClass, primaryButtonClass } from "@/components/form-styles";
 import { twoStep, type TwoStepState } from "./actions";
+import { PendingCorner } from "@/components/Pending";
 
 export function TwoStepForm({ initial }: { initial: TwoStepState }) {
   const [state, action, pending] = useActionState(twoStep, initial);
@@ -17,6 +18,7 @@ export function TwoStepForm({ initial }: { initial: TwoStepState }) {
         </p>
         {state.error && <p role="alert" className="text-sm text-danger">{state.error}</p>}
         <button name="intent" value="enroll" disabled={pending} className={primaryButtonClass}>
+          <PendingCorner pending={pending} />
           {pending ? "Starting…" : "Set up two-step login"}
         </button>
       </form>
@@ -53,6 +55,7 @@ export function TwoStepForm({ initial }: { initial: TwoStepState }) {
       </label>
       {state.error && <p role="alert" className="text-sm text-danger">{state.error}</p>}
       <button disabled={pending} className={primaryButtonClass}>
+        <PendingCorner pending={pending} />
         {pending ? "Checking…" : "Confirm"}
       </button>
     </form>

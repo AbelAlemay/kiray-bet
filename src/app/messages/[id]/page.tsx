@@ -7,6 +7,7 @@ import { getConversation, type Conversation } from "@/lib/conversations";
 import { formatPrice, nearLabel } from "@/lib/format";
 import { decideAddress, requestAddress } from "../actions";
 import { Chat } from "./Chat";
+import { FormPending } from "@/components/Pending";
 
 export const metadata: Metadata = {
   title: "Conversation",
@@ -15,7 +16,7 @@ export const metadata: Metadata = {
 
 type Props = PageProps<"/messages/[id]">;
 
-const smallButton = "min-h-10 rounded-lg px-3 text-sm font-semibold";
+const smallButton = "relative min-h-10 rounded-lg px-3 text-sm font-semibold";
 
 // The exact-address flow: the renter asks, the host decides (and can take it back).
 function AddressPanel({ c }: { c: Conversation }) {
@@ -82,7 +83,8 @@ function AddressPanel({ c }: { c: Conversation }) {
       <form action={requestAddress} className={`${box} flex flex-wrap items-center justify-between gap-3`}>
         {hidden()}
         <span>🔒 The exact address is private until {c.otherName} shares it.</span>
-        <button className={`${smallButton} bg-brand text-white hover:bg-brand-strong`}>Ask for the address</button>
+        <button className={`${smallButton} bg-brand text-white hover:bg-brand-strong`}>
+            <FormPending />Ask for the address</button>
       </form>
     );
   }
@@ -97,11 +99,13 @@ function AddressPanel({ c }: { c: Conversation }) {
         <div className="mt-3 flex flex-wrap gap-2">
           <form action={decideAddress}>
             {hidden("approved")}
-            <button className={`${smallButton} bg-brand text-white hover:bg-brand-strong`}>Share address</button>
+            <button className={`${smallButton} bg-brand text-white hover:bg-brand-strong`}>
+            <FormPending />Share address</button>
           </form>
           <form action={decideAddress}>
             {hidden("declined")}
-            <button className={`${smallButton} border border-border hover:bg-brand-soft`}>Not now</button>
+            <button className={`${smallButton} border border-border hover:bg-brand-soft`}>
+            <FormPending />Not now</button>
           </form>
         </div>
       </div>
@@ -112,7 +116,8 @@ function AddressPanel({ c }: { c: Conversation }) {
       <form action={decideAddress} className={`${box} flex flex-wrap items-center justify-between gap-3`}>
         {hidden("revoked")}
         <span>📍 You shared the exact address with {c.otherName}.</span>
-        <button className={`${smallButton} border border-border hover:bg-brand-soft`}>Stop sharing</button>
+        <button className={`${smallButton} border border-border hover:bg-brand-soft`}>
+            <FormPending />Stop sharing</button>
       </form>
     );
   }
@@ -120,7 +125,8 @@ function AddressPanel({ c }: { c: Conversation }) {
     <form action={decideAddress} className={`${box} flex flex-wrap items-center justify-between gap-3`}>
       {hidden("approved")}
       <span>You haven&apos;t shared the exact address with {c.otherName}.</span>
-      <button className={`${smallButton} border border-border hover:bg-brand-soft`}>Share address</button>
+      <button className={`${smallButton} border border-border hover:bg-brand-soft`}>
+            <FormPending />Share address</button>
     </form>
   );
 }

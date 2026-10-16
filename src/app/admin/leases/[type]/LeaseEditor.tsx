@@ -6,6 +6,7 @@ import { LeaseDocument } from "@/components/LeaseDocument";
 import { leaseFields } from "@/lib/leases/fields";
 import { fieldsUsed, renderLease } from "@/lib/leases/render";
 import { saveLeaseTemplate } from "../actions";
+import { PendingCorner } from "@/components/Pending";
 
 // Sample values for the preview.
 const sample = {
@@ -141,6 +142,7 @@ export function LeaseEditor({ type, body, reviewed, note }: { type: string; body
           </p>
         )}
         <button disabled={pending} className={primaryButtonClass}>
+          <PendingCorner pending={pending} />
           {pending ? "Saving…" : "Save as new version"}
         </button>
         <p className="text-xs text-muted">Earlier versions are kept. Leases already printed are not affected.</p>

@@ -4,6 +4,7 @@ import type { Listing } from "@/lib/sample-listings";
 import { formatDate, formatPrice, nearLabel } from "@/lib/format";
 import { site, utilitiesLabel } from "@/lib/site";
 import { SaveButton } from "./SaveButton";
+import { LinkPending } from "./Pending";
 
 const typeColors: Record<Listing["type"], string> = {
   house: "from-emerald-700 to-emerald-500",
@@ -22,6 +23,7 @@ export function ListingCard({ listing }: { listing: Listing }) {
         className="group block overflow-hidden rounded-2xl border border-border bg-surface transition hover:shadow-lg"
       >
         <div className={`relative h-40 bg-gradient-to-br ${typeColors[listing.type]}`}>
+          <LinkPending position="left-3 bottom-3" />
           {listing.photos[0] && (
             <Image
               src={listing.photos[0]}

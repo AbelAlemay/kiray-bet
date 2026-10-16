@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { FormPending } from "@/components/Pending";
 
 // A button that asks for confirmation inline (and optionally a note) before
 // submitting a server action.
@@ -51,7 +52,8 @@ export function ConfirmButton({
         />
       )}
       <div className="flex gap-2">
-        <button className={`min-h-10 rounded-lg px-3 font-semibold text-white ${danger ? "bg-danger" : "bg-brand"} hover:opacity-90`}>
+        <button className={`relative min-h-10 rounded-lg px-3 font-semibold text-white ${danger ? "bg-danger" : "bg-brand"} hover:opacity-90`}>
+          <FormPending />
           {confirmLabel}
         </button>
         <button type="button" onClick={() => setOpen(false)} className="min-h-10 rounded-lg border border-border px-3 font-semibold hover:bg-surface">

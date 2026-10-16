@@ -4,6 +4,7 @@ import { useActionState, useState } from "react";
 import { primaryButtonClass } from "@/components/form-styles";
 import { messageWarning, warningText } from "@/lib/message-safety";
 import { startConversation } from "../actions";
+import { PendingCorner } from "@/components/Pending";
 
 export function StartForm({ listingId, hostName }: { listingId: string; hostName: string }) {
   const [state, action, pending] = useActionState(startConversation, {});
@@ -32,6 +33,7 @@ export function StartForm({ listingId, hostName }: { listingId: string; hostName
         </p>
       )}
       <button disabled={pending || !body.trim()} className={primaryButtonClass}>
+        <PendingCorner pending={pending} />
         {pending ? "Sending…" : "Send message · ይላኩ"}
       </button>
       <p className="text-xs text-muted">

@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { requireUser, safeNext } from "@/lib/auth";
 import { signOut } from "../login/actions";
 import { AccountForm } from "./AccountForm";
+import { FormPending } from "@/components/Pending";
 
 export const metadata: Metadata = {
   title: "Your account",
@@ -41,7 +42,8 @@ async function Account({ searchParams }: { searchParams: Props["searchParams"] }
           🔒 Only you can see your email. Hosts and renters never see it.
         </p>
         <form action={signOut} className="mt-4">
-          <button className="rounded-xl border border-border px-4 py-2 font-semibold hover:bg-brand-soft">
+          <button className="relative rounded-xl border border-border px-4 py-2 font-semibold hover:bg-brand-soft">
+            <FormPending />
             Sign out · ይውጡ
           </button>
         </form>

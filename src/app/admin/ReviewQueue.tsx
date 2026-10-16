@@ -4,6 +4,7 @@ import { site, utilitiesLabel } from "@/lib/site";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { approveListing, rejectListing } from "./actions";
 import { listingSearchFilter, signPhotos, sortedPhotos } from "./data";
+import { FormPending } from "@/components/Pending";
 
 type PendingRow = {
   id: string;
@@ -123,7 +124,10 @@ export async function ReviewQueue({ q }: { q: string }) {
               <form action={approveListing}>
                 <input type="hidden" name="listingId" value={l.id} />
                 <input type="hidden" name="tab" value="review" />
-                <button className={primaryButtonClass}>✓ Approve</button>
+                <button className={primaryButtonClass}>
+                  ✓ Approve
+                  <FormPending />
+                </button>
               </form>
               <form action={rejectListing} className="flex gap-2">
                 <input type="hidden" name="listingId" value={l.id} />
@@ -135,7 +139,8 @@ export async function ReviewQueue({ q }: { q: string }) {
                   placeholder="Reason, shown to the host (e.g. photos too dark)"
                   className={fieldClass}
                 />
-                <button className="shrink-0 rounded-xl border border-danger/50 px-4 font-semibold text-danger hover:bg-danger/10">
+                <button className="relative shrink-0 rounded-xl border border-danger/50 px-4 font-semibold text-danger hover:bg-danger/10">
+                  <FormPending />
                   Reject
                 </button>
               </form>

@@ -7,9 +7,11 @@ import { site } from "@/lib/site";
 import { Logo } from "./Logo";
 import { WithCount } from "./CountBadge";
 import { MobileMenu } from "./MobileMenu";
+import { FormPending, LinkPending } from "./Pending";
 import { SavedLink } from "./SavedLink";
 
-const linkClass = "whitespace-nowrap rounded-lg px-3 py-2 hover:bg-brand-soft lg:px-2 xl:px-3";
+const linkClass =
+  "relative whitespace-nowrap rounded-lg px-3 py-2 hover:bg-brand-soft lg:px-2 xl:px-3";
 
 const mainLinks = [
   { href: "/", label: "Home" },
@@ -21,6 +23,7 @@ const mainLinks = [
 function MainLinks() {
   return mainLinks.map((l) => (
     <Link key={l.href} href={l.href} className={linkClass}>
+      <LinkPending />
       {l.label}
     </Link>
   ));
@@ -29,6 +32,7 @@ function MainLinks() {
 function SignInLink() {
   return (
     <Link href="/login" className={linkClass}>
+      <LinkPending />
       Sign in / Join
     </Link>
   );
@@ -43,21 +47,32 @@ async function AccountLinks() {
     <>
       {user.role === "admin" && (
         <Link href="/admin" className={linkClass}>
+          <LinkPending />
           Admin
         </Link>
       )}
       <SavedLink className={linkClass} />
       <Link href="/listings/mine" className={linkClass}>
+        <LinkPending />
         My listings
       </Link>
-      <Link href="/messages" className={linkClass} aria-label={unread ? `Messages, ${unread} unread` : undefined}>
+      <Link
+        href="/messages"
+        className={linkClass}
+        aria-label={unread ? `Messages, ${unread} unread` : undefined}
+      >
+        <LinkPending />
         <WithCount count={unread}>Messages</WithCount>
       </Link>
       <Link href="/account" className={`${linkClass} font-semibold`}>
+        <LinkPending />
         {user.name ?? "Account"}
       </Link>
       <form action={signOut} className="contents">
-        <button className={`${linkClass} text-left text-muted`}>Sign out</button>
+        <button className={`${linkClass} text-left text-muted`}>
+          <FormPending />
+          Sign out
+        </button>
       </form>
     </>
   );
@@ -81,8 +96,9 @@ function PostLink() {
   return (
     <Link
       href="/listings/new"
-      className="block whitespace-nowrap rounded-lg bg-brand px-3 py-2.5 font-semibold text-white hover:bg-brand-strong"
+      className="relative block whitespace-nowrap rounded-lg bg-brand px-3 py-2.5 font-semibold text-white hover:bg-brand-strong"
     >
+      <LinkPending />
       Post a home
     </Link>
   );
@@ -93,10 +109,13 @@ export function Header() {
     <header className="sticky top-0 z-20 print:hidden border-b border-border bg-surface/90 backdrop-blur">
       <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
         <Link href="/" className="flex shrink-0 items-center gap-2">
+          <LinkPending />
           <Logo />
           <span className="leading-tight">
             <span className="block text-lg font-bold">{site.name}</span>
-            <span className="block text-xs text-muted">{site.nameLatin} · Denver</span>
+            <span className="block text-xs text-muted">
+              {site.nameLatin} · Denver
+            </span>
           </span>
         </Link>
 

@@ -10,6 +10,7 @@ import { SaveButton } from "@/components/SaveButton";
 import { formatDate, formatPrice, nearLabel } from "@/lib/format";
 import { getListing } from "@/lib/listings";
 import { site, utilitiesLabel } from "@/lib/site";
+import { LinkPending } from "@/components/Pending";
 
 type Props = PageProps<"/listings/[id]">;
 
@@ -170,8 +171,9 @@ async function ListingDetail({ params }: { params: Props["params"] }) {
             </p>
             <Link
               href={contactHref}
-              className="block rounded-xl bg-brand px-4 py-3 text-center font-semibold text-white hover:bg-brand-strong"
+              className="relative block rounded-xl bg-brand px-4 py-3 text-center font-semibold text-white hover:bg-brand-strong"
             >
+              <LinkPending />
               Contact host · ባለቤቱን ያግኙ
             </Link>
             <SaveButton listingId={listing.id} variant="button" />
@@ -198,8 +200,9 @@ async function ListingDetail({ params }: { params: Props["params"] }) {
           </p>
           <Link
             href={contactHref}
-            className="whitespace-nowrap rounded-xl bg-brand px-5 py-3 font-semibold text-white hover:bg-brand-strong"
+            className="relative whitespace-nowrap rounded-xl bg-brand px-5 py-3 font-semibold text-white hover:bg-brand-strong"
           >
+            <LinkPending />
             Contact host
           </Link>
         </div>

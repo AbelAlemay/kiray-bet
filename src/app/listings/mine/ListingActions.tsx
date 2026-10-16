@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useState } from "react";
 import { deleteListing, setRented } from "../actions";
+import { FormPending, LinkPending } from "@/components/Pending";
 
-const buttonClass = "inline-flex min-h-10 items-center rounded-lg border border-border px-3 text-sm font-semibold hover:bg-brand-soft";
+const buttonClass = "relative inline-flex min-h-10 items-center rounded-lg border border-border px-3 text-sm font-semibold hover:bg-brand-soft";
 
 export function ListingActions({ id, status }: { id: string; status: "pending" | "active" | "rejected" | "rented" }) {
   const [confirming, setConfirming] = useState(false);
@@ -18,7 +19,8 @@ export function ListingActions({ id, status }: { id: string; status: "pending" |
         <div className="flex gap-2">
           <form action={deleteListing}>
             <input type="hidden" name="listingId" value={id} />
-            <button className="min-h-10 rounded-lg bg-danger px-3 font-semibold text-white hover:opacity-90">
+            <button className="relative min-h-10 rounded-lg bg-danger px-3 font-semibold text-white hover:opacity-90">
+              <FormPending />
               Yes, delete
             </button>
           </form>
@@ -34,20 +36,26 @@ export function ListingActions({ id, status }: { id: string; status: "pending" |
     <div className="flex flex-wrap gap-2">
       {status === "active" && (
         <Link href={`/listings/${id}`} className={buttonClass}>
+          <LinkPending />
           View
         </Link>
       )}
       <Link href={`/listings/${id}/edit`} className={buttonClass}>
+        <LinkPending />
         Edit
       </Link>
       <Link href={`/listings/${id}/lease`} className={buttonClass}>
+        <LinkPending />
         📄 Lease
       </Link>
       {(status === "active" || status === "rented") && (
         <form action={setRented}>
           <input type="hidden" name="listingId" value={id} />
           <input type="hidden" name="rented" value={String(status === "active")} />
-          <button className={buttonClass}>{status === "active" ? "Mark rented" : "Available again"}</button>
+          <button className={buttonClass}>
+            <FormPending />
+            {status === "active" ? "Mark rented" : "Available again"}
+          </button>
         </form>
       )}
       <button type="button" onClick={() => setConfirming(true)} className={`${buttonClass} text-danger`}>

@@ -5,6 +5,7 @@ import { requireUser } from "@/lib/auth";
 import { formatPrice, placeLabel } from "@/lib/format";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { ListingActions } from "./ListingActions";
+import { LinkPending } from "@/components/Pending";
 
 export const metadata: Metadata = {
   title: "My listings",
@@ -129,7 +130,8 @@ export default function MyListingsPage({ searchParams }: PageProps<"/listings/mi
     <div className="mx-auto max-w-3xl px-4 pt-8">
       <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <h1 className="text-2xl font-bold sm:text-3xl">My listings · የእኔ ቤቶች</h1>
-        <Link href="/listings/new" className="whitespace-nowrap rounded-xl bg-brand px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-strong">
+        <Link href="/listings/new" className="relative whitespace-nowrap rounded-xl bg-brand px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-strong">
+          <LinkPending />
           + Post a home
         </Link>
       </div>

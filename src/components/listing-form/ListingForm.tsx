@@ -6,6 +6,7 @@ import { site, utilityOptions } from "@/lib/site";
 import { BotCheckFailed, Turnstile, useBotCheck } from "@/components/Turnstile";
 import type { ListingFormState } from "@/app/listings/actions";
 import { PhotoPicker, type Photo } from "./PhotoPicker";
+import { PendingCorner } from "@/components/Pending";
 
 // What the form starts with when editing an existing listing.
 export type ListingFormValues = {
@@ -269,6 +270,7 @@ export function ListingForm({
         )}
         {!editing && bot.failed && <BotCheckFailed />}
         <button disabled={pending || uploading || botWaiting} className={primaryButtonClass}>
+          <PendingCorner pending={pending} />
           {pending
             ? "Saving…"
             : uploading

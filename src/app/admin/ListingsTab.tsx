@@ -4,6 +4,7 @@ import { createServerSupabase } from "@/lib/supabase/server";
 import { approveListing, deleteListingAsAdmin, refreshCrossStreets, rejectListing } from "./actions";
 import { ConfirmButton } from "./ConfirmButton";
 import { listingSearchFilter, signPhotos, sortedPhotos } from "./data";
+import { FormPending } from "@/components/Pending";
 
 export type ListingTab = "live" | "rented" | "rejected";
 const statusFor = { live: "active", rented: "rented", rejected: "rejected" } as const;
@@ -74,7 +75,8 @@ export async function ListingsTab({ tab, q }: { tab: ListingTab; q: string }) {
                 <form action={refreshCrossStreets}>
                   <input type="hidden" name="listingId" value={l.id} />
                   <input type="hidden" name="tab" value={tab} />
-                  <button className="inline-flex min-h-10 items-center rounded-lg border border-border px-3 text-sm font-semibold hover:bg-brand-soft">
+                  <button className="relative inline-flex min-h-10 items-center rounded-lg border border-border px-3 text-sm font-semibold hover:bg-brand-soft">
+                    <FormPending />
                     Find intersection
                   </button>
                 </form>
@@ -88,7 +90,8 @@ export async function ListingsTab({ tab, q }: { tab: ListingTab; q: string }) {
                 <form action={approveListing}>
                   <input type="hidden" name="listingId" value={l.id} />
                   <input type="hidden" name="tab" value={tab} />
-                  <button className="inline-flex min-h-10 items-center rounded-lg border border-border px-3 text-sm font-semibold hover:bg-brand-soft">
+                  <button className="relative inline-flex min-h-10 items-center rounded-lg border border-border px-3 text-sm font-semibold hover:bg-brand-soft">
+                    <FormPending />
                     Approve
                   </button>
                 </form>

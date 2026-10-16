@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { requireUser } from "@/lib/auth";
 import { getInbox } from "@/lib/conversations";
 import { formatMessageTime } from "@/lib/format";
+import { LinkPending } from "@/components/Pending";
 
 export const metadata: Metadata = {
   title: "Messages",
@@ -32,7 +33,8 @@ async function Inbox() {
     <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface">
       {conversations.map((c) => (
         <li key={c.id}>
-          <Link href={`/messages/${c.id}`} className="flex gap-3 p-4 hover:bg-brand-soft">
+          <Link href={`/messages/${c.id}`} className="relative flex gap-3 p-4 hover:bg-brand-soft">
+            <LinkPending position="right-3 top-3" />
             <span
               aria-hidden
               className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-brand-soft text-lg font-bold text-brand"

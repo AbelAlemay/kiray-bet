@@ -4,6 +4,7 @@ import { useActionState, useEffect, useState, type ReactNode } from "react";
 import { fieldClass, labelClass, primaryButtonClass } from "@/components/form-styles";
 import { BotCheckFailed, Turnstile, useBotCheck } from "@/components/Turnstile";
 import { emailSignIn, signInWithGoogle, type LoginState } from "./actions";
+import { PendingCorner } from "@/components/Pending";
 
 // Seconds left of a wait, counting down live. Give the component using it a new `key`
 // for each result so it starts again from the new number.
@@ -78,6 +79,7 @@ export function LoginForm({ next, googleEnabled }: { next: string; googleEnabled
                 </label>
                 <ErrorMessage state={state} left={left} />
                 <button disabled={pending} className={primaryButtonClass}>
+                  <PendingCorner pending={pending} />
                   {pending ? "Checking…" : "Sign in · ይግቡ"}
                 </button>
               </form>
@@ -140,6 +142,7 @@ export function LoginForm({ next, googleEnabled }: { next: string; googleEnabled
               <ErrorMessage state={state} left={left} />
               {bot.failed && <BotCheckFailed />}
               <button disabled={pending || bot.waiting || left > 0} className={primaryButtonClass}>
+                <PendingCorner pending={pending} />
                 {pending
                   ? "Sending…"
                   : left > 0

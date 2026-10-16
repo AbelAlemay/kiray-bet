@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import { fieldClass, labelClass, primaryButtonClass } from "@/components/form-styles";
 import { BotCheckFailed, Turnstile, useBotCheck } from "@/components/Turnstile";
 import { sendContactMessage } from "./actions";
+import { PendingCorner } from "@/components/Pending";
 
 export function ContactForm() {
   const [state, action, pending] = useActionState(sendContactMessage, {});
@@ -51,6 +52,7 @@ export function ContactForm() {
       )}
       {bot.failed && <BotCheckFailed />}
       <button disabled={pending || bot.waiting} className={primaryButtonClass}>
+        <PendingCorner pending={pending} />
         {pending ? "Sending…" : bot.waiting ? bot.waitingLabel : "Send message · ይላኩ"}
       </button>
     </form>

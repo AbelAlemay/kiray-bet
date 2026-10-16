@@ -12,6 +12,7 @@ import { ListingsTab, type ListingTab } from "./ListingsTab";
 import { ReviewQueue } from "./ReviewQueue";
 import { TwoStepForm } from "./TwoStepForm";
 import { UsersTab } from "./UsersTab";
+import { LinkPending } from "@/components/Pending";
 
 export const metadata: Metadata = {
   title: "Admin",
@@ -109,10 +110,11 @@ async function Admin({ searchParams }: { searchParams: PageProps<"/admin">["sear
             key={t.id}
             href={`/admin?tab=${t.id}`}
             aria-current={t.id === tab ? "page" : undefined}
-            className={`whitespace-nowrap border-b-2 px-3 py-2 font-semibold ${
+            className={`relative whitespace-nowrap border-b-2 px-3 py-2 font-semibold ${
               t.id === tab ? "border-brand text-brand" : "border-transparent text-muted hover:text-foreground"
             }`}
           >
+            <LinkPending position="-right-1 top-0" />
             {t.label} <span className="font-normal">({counts[t.id]})</span>
           </Link>
         ))}

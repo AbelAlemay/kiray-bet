@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import { fieldClass, labelClass, primaryButtonClass } from "@/components/form-styles";
 import type { CurrentUser } from "@/lib/auth";
 import { updateAccount } from "./actions";
+import { PendingCorner } from "@/components/Pending";
 
 // `next` is set during first-time setup: saving then continues there.
 export function AccountForm({ user, next }: { user: CurrentUser; next?: string }) {
@@ -37,6 +38,7 @@ export function AccountForm({ user, next }: { user: CurrentUser; next?: string }
       {state.error && <p role="alert" className="text-sm text-danger">{state.error}</p>}
       {state.saved && <p role="status" className="text-sm text-brand">Saved · ተቀምጧል</p>}
       <button disabled={pending} className={primaryButtonClass}>
+        <PendingCorner pending={pending} />
         {pending ? "Saving…" : next ? "Continue · ይቀጥሉ" : "Save"}
       </button>
     </form>

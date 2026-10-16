@@ -2,6 +2,7 @@ import Link from "next/link";
 import { leaseTitles } from "@/lib/leases/fields";
 import { getLeaseTemplate } from "@/lib/leases/templates-server";
 import { site } from "@/lib/site";
+import { LinkPending } from "@/components/Pending";
 
 // Admin overview of the four lease agreements and whether a lawyer has approved them.
 export async function LeasesTab() {
@@ -26,7 +27,8 @@ export async function LeasesTab() {
                     : `Version ${t.version} · not marked as reviewed`}
               </p>
             </div>
-            <Link href={`/admin/leases/${t.type}`} className="inline-flex min-h-10 items-center rounded-lg border border-border px-4 text-sm font-semibold hover:bg-brand-soft">
+            <Link href={`/admin/leases/${t.type}`} className="relative inline-flex min-h-10 items-center rounded-lg border border-border px-4 text-sm font-semibold hover:bg-brand-soft">
+              <LinkPending />
               Open / edit
             </Link>
           </li>

@@ -16,6 +16,7 @@ import {
 } from "@/lib/listings";
 import type { Listing } from "@/lib/sample-listings";
 import { site } from "@/lib/site";
+import { LinkPending } from "@/components/Pending";
 
 export const metadata: Metadata = {
   title: "Browse homes for rent",
@@ -54,7 +55,7 @@ function activeFilterChips(filters: ListingFilters, view: View) {
   }));
 }
 
-const toggleClass = "flex-1 whitespace-nowrap rounded-lg px-3 py-2 text-center text-sm font-semibold sm:flex-none";
+const toggleClass = "relative flex-1 whitespace-nowrap rounded-lg px-3 py-2 text-center text-sm font-semibold sm:flex-none";
 
 function MapNote() {
   return (
@@ -91,8 +92,9 @@ function ListingGrid({
           <Link
             href={searchHref({ ...filters, page: filters.page + 1 }, view)}
             scroll={false}
-            className="inline-flex min-h-11 items-center rounded-xl border border-border bg-surface px-6 font-semibold hover:bg-brand-soft"
+            className="relative inline-flex min-h-11 items-center rounded-xl border border-border bg-surface px-6 font-semibold hover:bg-brand-soft"
           >
+            <LinkPending />
             Show more ({Math.min(pageSize, total - listings.length)} of {total - listings.length} more)
           </Link>
         </div>
@@ -134,6 +136,7 @@ async function Results({ searchParams }: { searchParams: PageProps<"/search">["s
                 aria-current={v.id === view ? "page" : undefined}
                 className={`${toggleClass} ${v.id === view ? "bg-brand text-white" : "text-muted hover:text-foreground"}`}
               >
+                <LinkPending />
                 {v.label}
               </Link>
             ))}
@@ -147,15 +150,17 @@ async function Results({ searchParams }: { searchParams: PageProps<"/search">["s
                 key={chip.key}
                 href={chip.href}
                 aria-label={`Remove filter: ${chip.label}`}
-                className="inline-flex min-h-10 items-center gap-2 rounded-full border border-border bg-surface px-4 text-sm font-semibold hover:border-brand"
+                className="relative inline-flex min-h-10 items-center gap-2 rounded-full border border-border bg-surface px-4 text-sm font-semibold hover:border-brand"
               >
+                <LinkPending />
                 {chip.label} <span aria-hidden className="text-muted">✕</span>
               </Link>
             ))}
             <Link
               href={searchHref({}, view)}
-              className="inline-flex min-h-10 items-center rounded-full px-3 text-sm font-semibold text-brand hover:underline"
+              className="relative inline-flex min-h-10 items-center rounded-full px-3 text-sm font-semibold text-brand hover:underline"
             >
+              <LinkPending />
               Clear all
             </Link>
           </div>
