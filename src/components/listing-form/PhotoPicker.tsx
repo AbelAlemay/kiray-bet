@@ -134,10 +134,19 @@ export function PhotoPicker({
           />
         </label>
       )}
-      <p className="text-xs text-muted">
-        🔒 We remove hidden location data from your photos before uploading. Avoid photos that
-        show your house number or street sign.
-      </p>
+      <details open className="rounded-xl bg-brand-soft p-3 text-sm">
+        <summary className="cursor-pointer font-semibold">📸 Tips for great photos · የፎቶ ምክሮች</summary>
+        <ul className="mt-2 list-disc space-y-1 pl-5 text-muted">
+          <li>Take photos in daylight with lights on and curtains open.</li>
+          <li>Hold the phone sideways (landscape) at chest height, standing in a corner to show the whole room.</li>
+          <li>Tidy up first, and include every room: bedroom, kitchen, bathroom, living area and the entrance.</li>
+          <li>Add the outside and parking, but not the house number or street signs.</li>
+          <li>Leave people, family photos and mail out of the picture.</li>
+        </ul>
+        <p className="mt-2 text-xs text-muted">
+          🔒 We remove hidden location data from your photos before uploading.
+        </p>
+      </details>
       {(problem || error) && (
         <p role="alert" className="text-sm text-danger">
           {problem ?? error}

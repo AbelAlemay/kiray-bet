@@ -9,9 +9,15 @@ export type Listing = {
   bedrooms: number;
   bathrooms: number;
   city: string;
-  neighborhood: string;
+  // Filled in from the map when approved; may be empty.
+  neighborhood: string | null;
   availableFrom: string;
   utilitiesIncluded: boolean;
+  // Included utilities, e.g. ["water", "trash"].
+  utilities: string[];
+  // The host chose to show the exact address publicly (then exactAddress is set).
+  showExactAddress: boolean;
+  exactAddress: string | null;
   parking: boolean;
   deposit: number;
   petsAllowed: boolean;
@@ -39,6 +45,9 @@ export const sampleListings: Listing[] = [
     neighborhood: "Del Mar",
     availableFrom: "2026-11-01",
     utilitiesIncluded: false,
+    utilities: [],
+    showExactAddress: false,
+    exactAddress: null,
     parking: true,
     deposit: 2450,
     petsAllowed: false,
@@ -62,6 +71,9 @@ export const sampleListings: Listing[] = [
     neighborhood: "Mission Viejo",
     availableFrom: "2026-10-20",
     utilitiesIncluded: true,
+    utilities: ["electricity", "gas", "water", "sewer", "trash"],
+    showExactAddress: false,
+    exactAddress: null,
     parking: true,
     deposit: 800,
     petsAllowed: false,
@@ -85,6 +97,9 @@ export const sampleListings: Listing[] = [
     neighborhood: "Montbello",
     availableFrom: "2026-10-15",
     utilitiesIncluded: true,
+    utilities: ["electricity", "gas", "water", "sewer", "trash"],
+    showExactAddress: false,
+    exactAddress: null,
     parking: false,
     deposit: 400,
     petsAllowed: false,
@@ -108,6 +123,9 @@ export const sampleListings: Listing[] = [
     neighborhood: "Belmar",
     availableFrom: "2026-12-01",
     utilitiesIncluded: false,
+    utilities: [],
+    showExactAddress: false,
+    exactAddress: null,
     parking: true,
     deposit: 1750,
     petsAllowed: true,
@@ -131,6 +149,9 @@ export const sampleListings: Listing[] = [
     neighborhood: "Willow Creek",
     availableFrom: "2026-11-15",
     utilitiesIncluded: false,
+    utilities: [],
+    showExactAddress: false,
+    exactAddress: null,
     parking: true,
     deposit: 2900,
     petsAllowed: true,
@@ -154,6 +175,9 @@ export const sampleListings: Listing[] = [
     neighborhood: "Cherry Hills",
     availableFrom: "2026-10-25",
     utilitiesIncluded: true,
+    utilities: ["electricity", "gas", "water", "sewer", "trash"],
+    showExactAddress: false,
+    exactAddress: null,
     parking: false,
     deposit: 600,
     petsAllowed: false,

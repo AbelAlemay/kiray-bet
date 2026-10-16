@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { requireUser } from "@/lib/auth";
 import { getConversation, type Conversation } from "@/lib/conversations";
-import { formatPrice, placeLabel } from "@/lib/format";
+import { formatPrice, nearLabel } from "@/lib/format";
 import { decideAddress, requestAddress } from "../actions";
 import { Chat } from "./Chat";
 
@@ -29,6 +29,24 @@ function AddressPanel({ c }: { c: Conversation }) {
     </>
   );
   const box = "rounded-2xl border border-border bg-surface p-4 text-sm";
+
+  // The host made the address public: no request needed.
+  if (c.listing?.show_exact_address && c.address) {
+    const full = `${c.address.street_address}${c.address.unit ? `, ${c.address.unit}` : ""}, ${c.listing.city}, CO ${c.address.zip}`;
+    return (
+      <p className={box}>
+        📍 {full} ·{" "}
+        <a
+          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(full)}`}
+          target="_blank"
+          rel="noreferrer"
+          className="font-semibold text-brand hover:underline"
+        >
+          Open in Maps
+        </a>
+      </p>
+    );
+  }
 
   if (c.role === "renter") {
     if (request?.status === "approved" && c.address) {
@@ -126,8 +144,7 @@ async function ConversationView({ params }: { params: Props["params"] }) {
           <h1 className="truncate text-xl font-bold">{c.otherName}</h1>
           {c.listing ? (
             <Link href={`/listings/${c.listing.id}`} className="block truncate text-sm text-muted hover:text-foreground">
-              {c.listing.title} · {formatPrice(c.listing.price)}/mo · near{" "}
-              {placeLabel({ ...c.listing, crossStreets: c.listing.cross_streets })}
+              {c.listing.title} · {formatPrice(c.listing.price)}/mo · {nearLabel({ ...c.listing, crossStreets: c.listing.cross_streets })}
             </Link>
           ) : (
             <p className="text-sm text-muted">This listing is no longer available.</p>

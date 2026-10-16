@@ -4,6 +4,7 @@ import { revalidateTag, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { after } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
+import { findNeighborhood } from "@/lib/area-name";
 import { findCrossStreets } from "@/lib/cross-streets";
 import { createServerSupabase } from "@/lib/supabase/server";
 
@@ -56,16 +57,24 @@ function note(formData: FormData) {
   return String(formData.get("note") ?? "").trim().slice(0, 500);
 }
 
-// Looks up the nearest major intersection from the listing's blurred map point and
-// saves it as the public location label. Returns false if it couldn't be found.
+// Looks up the nearest major intersection (and, if missing, the neighborhood name) from
+// the listing's blurred map point and saves them for the public location label.
+// Returns false if no intersection could be found.
 async function fillCrossStreets(listingId: string) {
   const supabase = await createServerSupabase();
-  const { data } = await supabase.from("listings").select("approx_lat, approx_lng").eq("id", listingId).single();
+  const { data } = await supabase
+    .from("listings")
+    .select("approx_lat, approx_lng, neighborhood")
+    .eq("id", listingId)
+    .single();
   if (data?.approx_lat == null || data.approx_lng == null) return false;
-  const crossStreets = await findCrossStreets(data.approx_lat, data.approx_lng);
-  if (!crossStreets) return false;
-  await supabase.from("listings").update({ cross_streets: crossStreets }).eq("id", listingId);
-  return true;
+  const [crossStreets, neighborhood] = await Promise.all([
+    findCrossStreets(data.approx_lat, data.approx_lng),
+    data.neighborhood ? Promise.resolve(null) : findNeighborhood(data.approx_lat, data.approx_lng),
+  ]);
+  const changes = { ...(crossStreets && { cross_streets: crossStreets }), ...(neighborhood && { neighborhood }) };
+  if (Object.keys(changes).length) await supabase.from("listings").update(changes).eq("id", listingId);
+  return !!crossStreets;
 }
 
 // Approve a pending listing, or put a rejected one live. The intersection label is

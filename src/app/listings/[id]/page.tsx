@@ -7,9 +7,9 @@ import { ListingsMap } from "@/components/ListingsMap";
 import { ViewSwitch } from "@/components/ViewSwitch";
 import { PaymentWarning } from "@/components/PaymentWarning";
 import { SaveButton } from "@/components/SaveButton";
-import { formatDate, formatPrice, placeLabel } from "@/lib/format";
+import { formatDate, formatPrice, nearLabel } from "@/lib/format";
 import { getListing } from "@/lib/listings";
-import { site } from "@/lib/site";
+import { site, utilitiesLabel } from "@/lib/site";
 
 type Props = PageProps<"/listings/[id]">;
 
@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!listing) return { title: "Listing not found" };
   return {
     title: `${listing.title} · ${formatPrice(listing.price)}/mo`,
-    description: `Near ${placeLabel(listing)}. ${listing.description}`,
+    description: `${nearLabel(listing)}. ${listing.description}`,
   };
 }
 
@@ -101,7 +101,7 @@ async function ListingDetail({ params }: { params: Props["params"] }) {
                     className="h-72 sm:h-96"
                   />
                   <p className="text-sm text-muted">
-                    🔒 Approximate area near {placeLabel(listing)}. The host shares the exact address
+                    🔒 Approximate area: {nearLabel(listing)}. The host shares the exact address
                     with you after you message them.
                   </p>
                 </div>,
@@ -115,13 +115,27 @@ async function ListingDetail({ params }: { params: Props["params"] }) {
             <p className="text-sm font-semibold text-brand">
               {type.label} · {type.labelAm}
             </p>
-            <h1 className="mt-1 text-3xl font-bold">{listing.title}</h1>
+            <h1 className="mt-1 break-words text-3xl font-bold">{listing.title}</h1>
             <p className="mt-1 text-muted">
-              Near {placeLabel(listing)}, CO
+              {nearLabel(listing)}, CO
             </p>
-            <p className="mt-2 text-sm text-muted">
-              🔒 The exact address is private. The host shares it with you after you message them.
-            </p>
+            {listing.exactAddress ? (
+              <p className="mt-2 text-sm">
+                📍 <strong>{listing.exactAddress}, {listing.city}, CO</strong>{" "}
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${listing.exactAddress}, ${listing.city}, CO`)}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-semibold text-brand hover:underline"
+                >
+                  Open in Maps
+                </a>
+              </p>
+            ) : (
+              <p className="mt-2 text-sm text-muted">
+                🔒 The exact address is private. The host shares it with you after you message them.
+              </p>
+            )}
           </div>
 
           <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -133,14 +147,14 @@ async function ListingDetail({ params }: { params: Props["params"] }) {
               labelAm="የሚገኝበት"
               value={formatDate(listing.availableFrom, { month: "short", day: "numeric", year: "numeric" })}
             />
-            <Fact label="Utilities incl." labelAm="መብራት/ውሃ" value={yesNo(listing.utilitiesIncluded)} />
+            <Fact label="Utilities incl." labelAm="የተካተቱ" value={utilitiesLabel(listing.utilities) || "None"} />
             <Fact label="Parking" labelAm="መኪና ማቆሚያ" value={yesNo(listing.parking)} />
             <Fact label="Pets allowed" labelAm="የቤት እንስሳ" value={yesNo(listing.petsAllowed)} />
           </dl>
 
           <section>
             <h2 className="mb-2 text-xl font-bold">About this home</h2>
-            <p className="leading-relaxed">{listing.description}</p>
+            <p className="whitespace-pre-line break-words leading-relaxed">{listing.description}</p>
           </section>
         </div>
 
@@ -179,7 +193,7 @@ async function ListingDetail({ params }: { params: Props["params"] }) {
             <span className="text-xl font-bold">{formatPrice(listing.price)}</span>
             <span className="text-sm text-muted"> /month</span>
             <span className="block text-xs text-muted">
-              Near {placeLabel(listing)}
+              {nearLabel(listing)}
             </span>
           </p>
           <Link

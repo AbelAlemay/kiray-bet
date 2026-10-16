@@ -17,8 +17,14 @@ export function formatMessageTime(iso: string) {
   });
 }
 
-// Public place label: "Havana & Iliff, Aurora", or "Del Mar, Aurora" when no nearby
-// major intersection is known yet.
-export function placeLabel(place: { crossStreets?: string | null; neighborhood: string; city: string }) {
-  return `${place.crossStreets || place.neighborhood}, ${place.city}`;
+// Public place label: "Havana & Iliff, Aurora", "Del Mar, Aurora" when no nearby major
+// intersection is known yet, or just "Aurora".
+export function placeLabel(place: { crossStreets?: string | null; neighborhood?: string | null; city: string }) {
+  const near = place.crossStreets || place.neighborhood;
+  return near ? `${near}, ${place.city}` : place.city;
+}
+
+// "Near Havana & Iliff, Aurora", or just "Aurora" when nothing more precise is known.
+export function nearLabel(place: Parameters<typeof placeLabel>[0]) {
+  return place.crossStreets || place.neighborhood ? `Near ${placeLabel(place)}` : place.city;
 }

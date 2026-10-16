@@ -4,7 +4,7 @@ import "leaflet/dist/leaflet.css";
 import "./ListingsMap.css";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
-import { formatPrice, placeLabel } from "@/lib/format";
+import { formatPrice, nearLabel } from "@/lib/format";
 import type { ListingPin } from "@/lib/listings";
 
 // OpenStreetMap with soft circles over each listing's blurred (~1 km) area, never
@@ -126,7 +126,7 @@ export function ListingsMap({
           popup.className = "space-y-1";
           popup.append(
             homeLink(home, home.title),
-            note(`${formatPrice(home.price)}/mo · near ${placeLabel(home)}`),
+            note(`${formatPrice(home.price)}/mo · ${nearLabel(home)}`),
             note("Approximate area, not the exact address"),
           );
           const pin = L.marker(position, {
@@ -145,7 +145,7 @@ export function ListingsMap({
         if (homes.length > 1) {
           const popup = document.createElement("div");
           popup.className = "space-y-2";
-          popup.append(note(`Near ${placeLabel(homes[0])} · approximate area`));
+          popup.append(note(`${nearLabel(homes[0])} · approximate area`));
           for (const home of homes) popup.append(homeLink(home, `${formatPrice(home.price)}/mo · ${home.title}`));
           const zoomIn = document.createElement("button");
           zoomIn.type = "button";
@@ -156,7 +156,7 @@ export function ListingsMap({
           badges.addLayer(
             L.marker(center, {
               icon: L.divIcon({ className: "map-badge", html: String(homes.length), iconSize: [34, 34] }),
-              title: `${homes.length} homes near ${placeLabel(homes[0])}`,
+              title: `${homes.length} homes · ${nearLabel(homes[0])}`,
               keyboard: true,
             }).bindPopup(popup, { maxWidth: 260 }),
           );

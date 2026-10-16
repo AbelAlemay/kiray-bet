@@ -82,7 +82,7 @@ export function filtersToQuery(filters: Partial<ListingFilters>) {
 
 const listingColumns =
   "id, title, type, price, deposit, bedrooms, bathrooms, city, neighborhood, available_from, " +
-  "utilities_included, parking, pets_allowed, description, created_at, approx_lat, approx_lng, cross_streets, " +
+  "utilities_included, utilities, show_exact_address, parking, pets_allowed, description, created_at, approx_lat, approx_lng, cross_streets, " +
   "host:profiles!listings_host_id_fkey(display_name), listing_photos(path, order)";
 
 type ListingRow = {
@@ -94,9 +94,11 @@ type ListingRow = {
   bedrooms: number;
   bathrooms: number;
   city: string;
-  neighborhood: string;
+  neighborhood: string | null;
   available_from: string;
   utilities_included: boolean;
+  utilities: string[];
+  show_exact_address: boolean;
   parking: boolean;
   pets_allowed: boolean;
   description: string;
@@ -119,8 +121,18 @@ async function toListings(supabase: PublicClient, rows: ListingRow[]): Promise<L
     : { data: [] };
   const urls = new Map((signed ?? []).map((s) => [s.path, s.signedUrl]));
 
+  // Exact addresses the hosts chose to make public (the database only returns those).
+  const publicIds = rows.filter((r) => r.show_exact_address).map((r) => r.id);
+  const { data: addresses } = publicIds.length
+    ? await supabase.from("listing_addresses").select("listing_id, street_address, unit, zip").in("listing_id", publicIds)
+    : { data: [] };
+  const addressFor = new Map(
+    (addresses ?? []).map((a) => [a.listing_id, `${a.street_address}${a.unit ? `, ${a.unit}` : ""}`]),
+  );
+
   return rows.map((row) => ({
     ...toListing(row),
+    exactAddress: addressFor.get(row.id) ?? null,
     photos: [...row.listing_photos]
       .sort((a, b) => a.order - b.order)
       .map((p) => urls.get(p.path))
@@ -141,6 +153,9 @@ function toListing(row: ListingRow): Omit<Listing, "photos"> {
     neighborhood: row.neighborhood,
     availableFrom: row.available_from,
     utilitiesIncluded: row.utilities_included,
+    utilities: row.utilities ?? [],
+    showExactAddress: row.show_exact_address,
+    exactAddress: null,
     parking: row.parking,
     petsAllowed: row.pets_allowed,
     description: row.description,
@@ -252,7 +267,7 @@ export type ListingPin = {
   title: string;
   price: number;
   type: ListingType;
-  neighborhood: string;
+  neighborhood: string | null;
   city: string;
   crossStreets: string | null;
   lat: number;

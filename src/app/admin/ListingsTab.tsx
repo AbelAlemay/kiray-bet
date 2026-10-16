@@ -13,7 +13,7 @@ type Row = {
   title: string;
   price: number;
   city: string;
-  neighborhood: string;
+  neighborhood: string | null;
   cross_streets: string | null;
   review_note: string | null;
   reviewed_at: string | null;
@@ -60,7 +60,7 @@ export async function ListingsTab({ tab, q }: { tab: ListingTab; q: string }) {
             <div className="min-w-0 flex-1">
               <p className="truncate font-semibold">{l.title}</p>
               <p className="text-sm text-muted">
-                {formatPrice(l.price)}/mo · {l.neighborhood}, {l.city}
+                {formatPrice(l.price)}/mo · {l.neighborhood ? `${l.neighborhood}, ` : ""}{l.city}
                 {l.cross_streets ? ` · shown as "${l.cross_streets}"` : " · no intersection yet"}
               </p>
               <p className="text-xs text-muted">

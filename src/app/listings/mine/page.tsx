@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { requireUser } from "@/lib/auth";
-import { formatPrice } from "@/lib/format";
+import { formatPrice, placeLabel } from "@/lib/format";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { ListingActions } from "./ListingActions";
 
@@ -24,7 +24,8 @@ type Row = {
   status: keyof typeof statusLabels;
   price: number;
   city: string;
-  neighborhood: string;
+  neighborhood: string | null;
+  cross_streets: string | null;
   review_note: string | null;
   listing_photos: { path: string; order: number }[];
 };
@@ -45,7 +46,7 @@ async function MyListings({ searchParams }: { searchParams: PageProps<"/listings
   const supabase = await createServerSupabase();
   const { data } = await supabase
     .from("listings")
-    .select("id, title, status, price, city, neighborhood, review_note, listing_photos(path, order)")
+    .select("id, title, status, price, city, neighborhood, cross_streets, review_note, listing_photos(path, order)")
     .eq("host_id", user.id)
     .order("created_at", { ascending: false })
     .overrideTypes<Row[], { merge: false }>();
@@ -103,7 +104,7 @@ async function MyListings({ searchParams }: { searchParams: PageProps<"/listings
                   </span>
                   <p className="mt-1 truncate font-semibold">{l.title}</p>
                   <p className="text-sm text-muted">
-                    {formatPrice(l.price)}/mo · {l.neighborhood}, {l.city}
+                    {formatPrice(l.price)}/mo · {placeLabel({ ...l, crossStreets: l.cross_streets })}
                   </p>
                   {l.status === "rejected" && l.review_note && (
                     <p className="mt-1 text-sm text-danger">

@@ -97,6 +97,7 @@ export type Conversation = {
     city: string;
     neighborhood: string;
     cross_streets: string | null;
+    show_exact_address: boolean;
     status: string;
   } | null;
   listingId: string;
@@ -121,7 +122,7 @@ export async function getConversation(id: string, userId: string): Promise<Conve
   const supabase = await createServerSupabase();
   const { data: c } = await supabase
     .from("conversations")
-    .select(`id, listing_id, renter_id, host_id, listing:listings(id, title, price, city, neighborhood, cross_streets, status), ${people}`)
+    .select(`id, listing_id, renter_id, host_id, listing:listings(id, title, price, city, neighborhood, cross_streets, show_exact_address, status), ${people}`)
     .eq("id", id)
     .maybeSingle()
     .overrideTypes<ConversationRow, { merge: false }>();
@@ -143,9 +144,10 @@ export async function getConversation(id: string, userId: string): Promise<Conve
       .maybeSingle(),
   ]);
 
-  // The database only returns the address to the renter once it's been shared.
+  // The database only returns the address to the renter once it's been shared, or to
+  // anyone when the host chose to show it publicly.
   let address: Conversation["address"] = null;
-  if (role === "renter" && request?.status === "approved") {
+  if ((role === "renter" && request?.status === "approved") || c.listing?.show_exact_address) {
     const { data } = await supabase
       .from("listing_addresses")
       .select("street_address, unit, zip")

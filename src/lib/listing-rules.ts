@@ -1,4 +1,4 @@
-import { site, type ListingType } from "./site";
+import { site, utilityOptions, type ListingType, type Utility } from "./site";
 
 // Rules for what hosts may write in a listing. Shared by the posting form (instant
 // feedback) and the server (the real check).
@@ -49,11 +49,12 @@ export type ListingInput = {
   bedrooms: number;
   bathrooms: number;
   city: string;
-  neighborhood: string;
   available_from: string;
-  utilities_included: boolean;
+  utilities: Utility[];
   parking: boolean;
   pets_allowed: boolean;
+  // true = the exact address is shown on the public listing.
+  show_exact_address: boolean;
 };
 
 export type AddressInput = { street_address: string; unit: string | null; zip: string };
@@ -80,7 +81,6 @@ export function parseListingForm(formData: FormData, hostId: string) {
   const description = text(formData, "description");
   const type = site.listingTypes.find((t) => t.value === text(formData, "type"))?.value;
   const city = site.cities.find((c) => c === text(formData, "city"));
-  const neighborhood = text(formData, "neighborhood");
   const price = whole(text(formData, "price"), 1, 100000);
   const deposit = whole(text(formData, "deposit") || "0", 0, 100000);
   const bedrooms = whole(text(formData, "bedrooms"), 0, 20);
@@ -94,13 +94,16 @@ export function parseListingForm(formData: FormData, hostId: string) {
   const unit = text(formData, "unit");
   const zip = text(formData, "zip");
   const photos = formData.getAll("photos").map(String);
+  const utilities = utilityOptions.map((u) => u.value).filter((u) => formData.getAll("utilities").includes(u));
+  const addressChoice = text(formData, "addressVisibility");
 
   if (!uuidPattern.test(id)) errors.form = "Something went wrong. Please reload the page and try again.";
-  if (title.length < 5 || title.length > 100) errors.title = "Use 5 to 100 characters.";
-  if (description.length < 20 || description.length > 4000) errors.description = "Use 20 to 4,000 characters.";
+  if (title.length < 5) errors.title = "Write at least 5 characters.";
+  if (title.length > 300) errors.title = "That's a very long title. Please keep it under 300 characters.";
+  if (description.length < 20) errors.description = "Write at least 20 characters about the home.";
+  if (description.length > 20000) errors.description = "Please keep the description under 20,000 characters.";
   if (!type) errors.type = "Choose the type of home.";
   if (!city) errors.city = "Choose a city.";
-  if (neighborhood.length < 2 || neighborhood.length > 60) errors.neighborhood = "Enter the neighborhood.";
   if (price === null) errors.price = "Enter the monthly rent in whole dollars.";
   if (deposit === null) errors.deposit = "Enter the deposit in whole dollars (0 if none).";
   if (bedrooms === null) errors.bedrooms = "Enter the number of bedrooms.";
@@ -111,6 +114,9 @@ export function parseListingForm(formData: FormData, hostId: string) {
   if (street.length < 3 || street.length > 100) errors.street = "Enter the street address.";
   if (unit.length > 20) errors.unit = "Keep the unit short (for example Apt 4 or Basement).";
   if (!/^\d{5}$/.test(zip)) errors.zip = "Enter a 5-digit ZIP code.";
+  if (addressChoice !== "private" && addressChoice !== "public") {
+    errors.addressVisibility = "Choose whether to show the exact address or keep it private.";
+  }
 
   const writing = `${title}\n${description}`;
   const writingProblem = fairHousingProblem(writing) ?? contactInfoProblem(writing);
@@ -136,9 +142,9 @@ export function parseListingForm(formData: FormData, hostId: string) {
     bedrooms: bedrooms!,
     bathrooms: bathrooms!,
     city: city!,
-    neighborhood,
     available_from: availableFrom,
-    utilities_included: formData.get("utilitiesIncluded") === "on",
+    utilities,
+    show_exact_address: addressChoice === "public",
     parking: formData.get("parking") === "on",
     pets_allowed: formData.get("petsAllowed") === "on",
   };

@@ -1,6 +1,6 @@
 import { fieldClass, primaryButtonClass } from "@/components/form-styles";
 import { formatDate, formatPrice } from "@/lib/format";
-import { site } from "@/lib/site";
+import { site, utilitiesLabel } from "@/lib/site";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { approveListing, rejectListing } from "./actions";
 import { listingSearchFilter, signPhotos, sortedPhotos } from "./data";
@@ -15,9 +15,10 @@ type PendingRow = {
   bedrooms: number;
   bathrooms: number;
   city: string;
-  neighborhood: string;
+  neighborhood: string | null;
   available_from: string;
-  utilities_included: boolean;
+  utilities: string[];
+  show_exact_address: boolean;
   parking: boolean;
   pets_allowed: boolean;
   reviewed_at: string | null;
@@ -35,7 +36,7 @@ export async function ReviewQueue({ q }: { q: string }) {
     .from("listings")
     .select(
       "id, title, description, type, price, deposit, bedrooms, bathrooms, city, neighborhood, available_from, " +
-        "utilities_included, parking, pets_allowed, reviewed_at, created_at, updated_at, " +
+        "utilities, show_exact_address, parking, pets_allowed, reviewed_at, created_at, updated_at, " +
         "host:profiles!listings_host_id_fkey(display_name, private_profiles(email)), " +
         "listing_addresses(street_address, unit, zip), listing_photos(path, order)",
     )
@@ -71,7 +72,7 @@ export async function ReviewQueue({ q }: { q: string }) {
                 </p>
                 <h2 className="text-xl font-bold">{l.title}</h2>
                 <p className="text-sm text-muted">
-                  {l.neighborhood}, {l.city} · {formatPrice(l.price)}/mo · deposit {formatPrice(l.deposit)} ·{" "}
+                  {l.city} · {formatPrice(l.price)}/mo · deposit {formatPrice(l.deposit)} ·{" "}
                   {l.bedrooms} bd / {l.bathrooms} ba · from {formatDate(l.available_from)}
                 </p>
               </div>
@@ -98,14 +99,15 @@ export async function ReviewQueue({ q }: { q: string }) {
 
             <p className="whitespace-pre-line text-sm">{l.description}</p>
             <p className="text-sm text-muted">
-              {[l.utilities_included && "Utilities incl.", l.parking && "Parking", l.pets_allowed && "Pets OK"]
+              {[l.utilities.length > 0 && `${utilitiesLabel(l.utilities)} incl.`, l.parking && "Parking", l.pets_allowed && "Pets OK"]
                 .filter(Boolean)
                 .join(" · ") || "No extras"}
             </p>
 
             {fullAddress && (
               <p className="rounded-xl bg-brand-soft p-3 text-sm">
-                🔒 {fullAddress} ·{" "}
+                {l.show_exact_address ? "📍 Shown publicly: " : "🔒 Private: "}
+                {fullAddress} ·{" "}
                 <a
                   href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`}
                   target="_blank"

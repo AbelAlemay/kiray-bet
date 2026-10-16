@@ -76,7 +76,7 @@ await db.query(`update public.profiles set role = 'admin' where id = $1`, [ADMIN
 let rows = await as(null, `select id, status, approx_lat, approx_lng from listings`);
 check("anon sees 6 active seed listings", rows.length === 6 && rows.every((r) => r.status === "active"));
 check("seed listing has blurred location", rows.find((r) => r.id === L1)?.approx_lat === 39.71);
-check("anon can't read addresses", await fails(null, `select * from listing_addresses`));
+check("anon can't read private addresses", (await as(null, `select * from listing_addresses`)).length === 0);
 check("anon can't read emails", await fails(null, `select * from private_profiles`));
 rows = await as(null, `select display_name from profiles`);
 check("anon sees only host first names", rows.length === 6 && rows.every((r) => !r.display_name.includes(" ")));
@@ -196,6 +196,20 @@ check("saved homes are private", (await as(RUTH, `select 1 from favorites where 
 check("anon can't see saved homes", await fails(null, `select * from favorites`));
 check("can't remove someone else's save", (await as(RUTH, `delete from favorites where user_id = $1 returning listing_id`, [SAMI])).length === 0);
 check("user removes own save", (await as(SAMI, `delete from favorites where user_id = $1 and listing_id = $2 returning listing_id`, [SAMI, L1])).length === 1);
+
+// Exact address shown by choice
+check("private address hidden from visitors", (await as(null, `select 1 from listing_addresses where listing_id = $1`, [L1])).length === 0);
+await db.query(`update listings set show_exact_address = true where id = $1`, [L1]);
+check("public address visible to visitors", (await as(null, `select street_address from listing_addresses where listing_id = $1`, [L1])).length === 1);
+await db.query(`update listings set status = 'rented' where id = $1`, [L1]);
+check("public address hidden once not live", (await as(null, `select 1 from listing_addresses where listing_id = $1`, [L1])).length === 0);
+await db.query(`update listings set status = 'active', show_exact_address = false where id = $1`, [L1]);
+check("hiding it again works", (await as(null, `select 1 from listing_addresses where listing_id = $1`, [L1])).length === 0);
+rows = await db.query(`update listings set utilities = '{water,trash}' where id = $1 returning utilities_included`, [L1]);
+check("utilities checklist sets utilities_included", rows.rows[0].utilities_included === true);
+check("unknown utility rejected", await fails(SERVER, `update listings set utilities = '{cable}' where id = $1`, [L1]));
+check("long description allowed", (await db.query(`update listings set description = $2 where id = $1 returning id`, [L1, "x".repeat(15000)])).rows.length === 1);
+check("listing without a neighborhood allowed", (await db.query(`update listings set neighborhood = null where id = $1 returning id`, [L1])).rows.length === 1);
 
 // Lease templates
 const leaseBody = "x".repeat(200);

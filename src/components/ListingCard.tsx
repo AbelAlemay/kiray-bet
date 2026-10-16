@@ -1,8 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Listing } from "@/lib/sample-listings";
-import { formatDate, formatPrice, placeLabel } from "@/lib/format";
-import { site } from "@/lib/site";
+import { formatDate, formatPrice, nearLabel } from "@/lib/format";
+import { site, utilitiesLabel } from "@/lib/site";
 import { SaveButton } from "./SaveButton";
 
 const typeColors: Record<Listing["type"], string> = {
@@ -41,11 +41,11 @@ export function ListingCard({ listing }: { listing: Listing }) {
         <div className="space-y-1.5 p-4">
           <h3 className="font-semibold group-hover:text-brand">{listing.title}</h3>
           <p className="text-sm text-muted">
-            Near {placeLabel(listing)}
+            {nearLabel(listing)}
           </p>
           <p className="text-sm">
             {listing.bedrooms} bd · {listing.bathrooms} ba
-            {listing.utilitiesIncluded && " · Utilities incl."}
+            {listing.utilities.length > 0 && ` · ${utilitiesLabel(listing.utilities)} incl.`}
             {listing.parking && " · Parking"}
           </p>
           <p className="text-xs text-muted">Available {formatDate(listing.availableFrom)}</p>
