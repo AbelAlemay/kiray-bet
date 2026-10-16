@@ -12,7 +12,7 @@ import { getListing } from "@/lib/listings";
 import { amenityLabels, site } from "@/lib/site";
 import { LinkPending } from "@/components/Pending";
 
-type Props = PageProps<"/listings/[id]">;
+type Props = PageProps<"/[lang]/listings/[id]">;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const listing = await getListing((await params).id);

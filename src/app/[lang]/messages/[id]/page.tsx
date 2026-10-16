@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-type Props = PageProps<"/messages/[id]">;
+type Props = PageProps<"/[lang]/messages/[id]">;
 
 const smallButton = "relative min-h-10 rounded-lg px-3 text-sm font-semibold";
 

@@ -41,7 +41,7 @@ const doneMessages: Record<string, string> = {
   "intersection-failed": "Couldn't find an intersection right now (the map service may be busy). Try again later.",
 };
 
-async function Admin({ searchParams }: { searchParams: PageProps<"/admin">["searchParams"] }) {
+async function Admin({ searchParams }: { searchParams: PageProps<"/[lang]/admin">["searchParams"] }) {
   const user = await requireUser("/admin");
   if (user.role !== "admin") notFound();
 
@@ -142,7 +142,7 @@ async function Admin({ searchParams }: { searchParams: PageProps<"/admin">["sear
   );
 }
 
-export default function AdminPage({ searchParams }: PageProps<"/admin">) {
+export default function AdminPage({ searchParams }: PageProps<"/[lang]/admin">) {
   return (
     <div className="mx-auto max-w-5xl px-4 pt-8">
       <h1 className="mb-6 text-3xl font-bold">Admin</h1>

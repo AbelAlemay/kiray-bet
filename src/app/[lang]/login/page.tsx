@@ -29,7 +29,7 @@ const errors: Record<string, string> = {
   google: "Google sign-in didn't finish. You may have closed the Google window. Please try again, or sign in with your email instead.",
 };
 
-async function Login({ searchParams }: { searchParams: PageProps<"/login">["searchParams"] }) {
+async function Login({ searchParams }: { searchParams: PageProps<"/[lang]/login">["searchParams"] }) {
   const params = await searchParams;
   const next = safeNext(params.next);
   if (await getCurrentUser()) redirect(next);
@@ -49,7 +49,7 @@ async function Login({ searchParams }: { searchParams: PageProps<"/login">["sear
   );
 }
 
-export default function LoginPage({ searchParams }: PageProps<"/login">) {
+export default function LoginPage({ searchParams }: PageProps<"/[lang]/login">) {
   return (
     <div className="mx-auto max-w-md px-4 pt-10">
       <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm sm:p-8">

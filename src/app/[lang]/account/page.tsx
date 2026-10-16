@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-type Props = PageProps<"/account">;
+type Props = PageProps<"/[lang]/account">;
 
 async function Account({ searchParams }: { searchParams: Props["searchParams"] }) {
   const user = await requireUser("/account");

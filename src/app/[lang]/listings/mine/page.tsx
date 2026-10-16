@@ -33,7 +33,7 @@ type Row = {
   listing_photos: { path: string; order: number }[];
 };
 
-async function MyListings({ searchParams }: { searchParams: PageProps<"/listings/mine">["searchParams"] }) {
+async function MyListings({ searchParams }: { searchParams: PageProps<"/[lang]/listings/mine">["searchParams"] }) {
   const user = await requireUser("/listings/mine");
   const { posted, updated, deleted } = await searchParams;
   const notice =
@@ -127,7 +127,7 @@ async function MyListings({ searchParams }: { searchParams: PageProps<"/listings
   );
 }
 
-export default function MyListingsPage({ searchParams }: PageProps<"/listings/mine">) {
+export default function MyListingsPage({ searchParams }: PageProps<"/[lang]/listings/mine">) {
   return (
     <div className="mx-auto max-w-3xl px-4 pt-8">
       <div className="mb-6 flex flex-wrap items-end justify-between gap-3">

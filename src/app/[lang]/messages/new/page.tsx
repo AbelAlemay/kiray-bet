@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-type Props = PageProps<"/messages/new">;
+type Props = PageProps<"/[lang]/messages/new">;
 
 // Where "Contact host" leads: write the first message to the host. If this renter
 // already has a conversation about the listing, go straight to it.

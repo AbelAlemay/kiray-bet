@@ -105,7 +105,7 @@ function ListingGrid({
   );
 }
 
-async function Results({ searchParams }: { searchParams: PageProps<"/search">["searchParams"] }) {
+async function Results({ searchParams }: { searchParams: PageProps<"/[lang]/search">["searchParams"] }) {
   const params = await searchParams;
   const region = await getChosenRegion(params.region);
   const filters = parseFilters(params, region.id);
@@ -205,7 +205,7 @@ function ResultsSkeleton() {
   );
 }
 
-export default function SearchPage({ searchParams }: PageProps<"/search">) {
+export default function SearchPage({ searchParams }: PageProps<"/[lang]/search">) {
   return (
     <div className="mx-auto max-w-6xl px-4 pt-6 sm:pt-8">
       <h1 className="text-2xl font-bold sm:text-3xl">Homes for rent</h1>

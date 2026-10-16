@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-type Props = PageProps<"/admin/leases/[type]">;
+type Props = PageProps<"/[lang]/admin/leases/[type]">;
 
 async function Editor({ params, searchParams }: { params: Props["params"]; searchParams: Props["searchParams"] }) {
   const user = await requireUser("/admin");

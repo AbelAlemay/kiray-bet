@@ -5,7 +5,7 @@ import { fieldClass, labelClass, primaryButtonClass } from "@/components/form-st
 import { regions, stateNames } from "@/lib/regions";
 import { amenityOptions, exclusiveAmenities, site } from "@/lib/site";
 import { BotCheckFailed, Turnstile, useBotCheck } from "@/components/Turnstile";
-import type { ListingFormState } from "@/app/listings/actions";
+import type { ListingFormState } from "@/app/[lang]/listings/actions";
 import { PhotoPicker, type Photo } from "./PhotoPicker";
 import { PendingCorner } from "@/components/Pending";
 

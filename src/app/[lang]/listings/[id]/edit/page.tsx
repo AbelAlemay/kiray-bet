@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-type Props = PageProps<"/listings/[id]/edit">;
+type Props = PageProps<"/[lang]/listings/[id]/edit">;
 
 async function EditListing({ params }: { params: Props["params"] }) {
   const { id } = await params;

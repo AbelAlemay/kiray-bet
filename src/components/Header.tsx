@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import { signOut } from "@/app/login/actions";
+import { signOut } from "@/app/[lang]/login/actions";
 import { getCurrentUser } from "@/lib/auth";
 import { getUnreadCount } from "@/lib/conversations";
 import { site } from "@/lib/site";

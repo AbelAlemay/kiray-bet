@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { createContext, use, useEffect, useState, type ReactNode } from "react";
-import { getSavedIds, setSaved } from "@/app/saved/actions";
+import { getSavedIds, setSaved } from "@/app/[lang]/saved/actions";
 
 // Which homes the visitor has saved, loaded once in the browser so public pages can
 // stay cached for everyone. Toggling updates at once and is undone if saving fails.

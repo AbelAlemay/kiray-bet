@@ -5,6 +5,9 @@ import { Footer } from "@/components/Footer";
 import { SavedProvider } from "@/components/SavedProvider";
 import { VisitTracker } from "@/components/VisitTracker";
 import { Suspense } from "react";
+import { LangProvider } from "@/components/LangProvider";
+import { langs } from "@/lib/i18n";
+import { getT } from "@/lib/i18n-server";
 import { site } from "@/lib/site";
 import "./globals.css";
 
@@ -47,20 +50,28 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+// Every page is built in English and Amharic.
+export function generateStaticParams() {
+  return langs.map((lang) => ({ lang }));
+}
+
+export default async function RootLayout({ children }: LayoutProps<"/[lang]">) {
+  const t = await getT();
   return (
     <html
-      lang="en"
+      lang={t.lang}
       data-scroll-behavior="smooth"
       className={`${geistSans.variable} ${ethiopic.variable} h-full antialiased motion-safe:scroll-smooth`}
     >
       {/* Pages with a fixed bottom bar on phones (data-bottom-bar) get room below the footer. */}
       <body className="min-h-full flex flex-col font-sans has-[[data-bottom-bar]]:pb-24 lg:has-[[data-bottom-bar]]:pb-0">
-        <SavedProvider>
-          <Header />
-          <main className="flex-1">{children}</main>
-          <Footer />
-        </SavedProvider>
+        <LangProvider lang={t.lang}>
+          <SavedProvider>
+            <Header />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </SavedProvider>
+        </LangProvider>
         {/* Reads the current path, so it sits in its own Suspense boundary. */}
         <Suspense>
           <VisitTracker />

@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-type Props = PageProps<"/listings/[id]/lease">;
+type Props = PageProps<"/[lang]/listings/[id]/lease">;
 
 // One year from the start date, minus a day: "2026-11-01" -> "2027-10-31".
 function oneYearLater(iso: string) {
