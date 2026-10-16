@@ -1,5 +1,5 @@
 import { stateNames } from "./regions";
-import { amenityOptions, site, type Amenity, type ListingType } from "./site";
+import { amenityOptions, exclusiveAmenities, site, type Amenity, type ListingType } from "./site";
 
 // Rules for what hosts may write in a listing. Shared by the posting form (instant
 // feedback) and the server (the real check).
@@ -97,7 +97,15 @@ export function parseListingForm(formData: FormData, hostId: string) {
   const unit = text(formData, "unit");
   const zip = text(formData, "zip");
   const photos = formData.getAll("photos").map(String);
-  const amenities = amenityOptions.map((a) => a.value).filter((a) => formData.getAll("amenities").includes(a));
+  const ticked = formData.getAll("amenities");
+  // Of two amenities that can't both be true, keep the first in the list.
+  const amenities = amenityOptions
+    .map((a) => a.value)
+    .filter((a) => ticked.includes(a))
+    .filter((a, i, kept) => {
+      const other = exclusiveAmenities[a];
+      return !other || !kept.slice(0, i).includes(other);
+    });
   const addressChoice = text(formData, "addressVisibility");
 
   if (!uuidPattern.test(id)) errors.form = "Something went wrong. Please reload the page and try again.";

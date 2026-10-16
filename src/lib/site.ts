@@ -41,6 +41,12 @@ export const amenityOptions = [
 
 export type Amenity = (typeof amenityOptions)[number]["value"];
 
+// Amenities that can't both be true: ticking one unticks the other.
+export const exclusiveAmenities: Partial<Record<Amenity, Amenity>> = {
+  washer_dryer: "shared_laundry",
+  shared_laundry: "washer_dryer",
+};
+
 export function amenityLabels(amenities: readonly string[]) {
   return amenityOptions.filter((a) => amenities.includes(a.value)).map((a) => a.label);
 }

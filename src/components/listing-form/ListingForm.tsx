@@ -3,7 +3,7 @@
 import { startTransition, useActionState, useState, type ReactNode } from "react";
 import { fieldClass, labelClass, primaryButtonClass } from "@/components/form-styles";
 import { regions, stateNames } from "@/lib/regions";
-import { amenityOptions, site } from "@/lib/site";
+import { amenityOptions, exclusiveAmenities, site } from "@/lib/site";
 import { BotCheckFailed, Turnstile, useBotCheck } from "@/components/Turnstile";
 import type { ListingFormState } from "@/app/listings/actions";
 import { PhotoPicker, type Photo } from "./PhotoPicker";
@@ -147,6 +147,12 @@ export function ListingForm({
                   name="amenities"
                   value={a.value}
                   defaultChecked={initial?.amenities.includes(a.value)}
+                  onChange={(e) => {
+                    const other = exclusiveAmenities[a.value];
+                    if (!e.target.checked || !other) return;
+                    const box = e.target.form?.querySelector<HTMLInputElement>(`input[name="amenities"][value="${other}"]`);
+                    if (box) box.checked = false;
+                  }}
                   className="h-5 w-5 shrink-0 accent-brand"
                 />
                 {a.label}
