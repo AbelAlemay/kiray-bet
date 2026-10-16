@@ -7,17 +7,18 @@ import { leaseStates } from "@/lib/regions";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { ListingActions } from "./ListingActions";
 import { LinkPending } from "@/components/Pending";
+import { getT } from "@/lib/i18n-server";
 
-export const metadata: Metadata = {
-  title: "My listings",
-  robots: { index: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return { title: t("My listings", "የእኔ ማስታወቂያዎች"), robots: { index: false } };
+}
 
 const statusLabels = {
-  pending: { label: "Waiting for review · በግምገማ ላይ", className: "bg-accent/20 text-foreground" },
-  active: { label: "Live · ታትሟል", className: "bg-brand-soft text-brand" },
-  rejected: { label: "Not approved", className: "bg-danger/10 text-danger" },
-  rented: { label: "Rented · ተከራይቷል", className: "bg-border text-muted" },
+  pending: { label: "Waiting for review", labelAm: "በግምገማ ላይ", className: "bg-accent/20 text-foreground" },
+  active: { label: "Live", labelAm: "ታትሟል", className: "bg-brand-soft text-brand" },
+  rejected: { label: "Not approved", labelAm: "አልጸደቀም", className: "bg-danger/10 text-danger" },
+  rented: { label: "Rented", labelAm: "ተከራይቷል", className: "bg-border text-muted" },
 } as const;
 
 type Row = {
@@ -36,13 +37,17 @@ type Row = {
 async function MyListings({ searchParams }: { searchParams: PageProps<"/[lang]/listings/mine">["searchParams"] }) {
   const user = await requireUser("/listings/mine");
   const { posted, updated, deleted } = await searchParams;
+  const t = await getT();
   const notice =
     updated === "review"
-      ? "Saved. Your changes are waiting for a quick review; the listing is hidden until they're approved."
+      ? t(
+          "Saved. Your changes are waiting for a quick review; the listing is hidden until they're approved.",
+          "ተቀምጧል። ለውጦችዎ አጭር ግምገማ እየጠበቁ ነው፤ እስኪጸድቁ ድረስ ማስታወቂያው አይታይም።",
+        )
       : updated
-        ? "Saved. · ተቀምጧል"
+        ? t.both("Saved.", "ተቀምጧል።")
         : deleted
-          ? "Listing deleted."
+          ? t("Listing deleted.", "ማስታወቂያው ተሰርዟል።")
           : null;
 
   // The host's own client: the database returns only this host's listings (any status).
@@ -68,10 +73,14 @@ async function MyListings({ searchParams }: { searchParams: PageProps<"/[lang]/l
     <div className="space-y-4">
       {posted && (
         <div role="status" className="rounded-2xl bg-brand-soft p-5">
-          <p className="font-semibold">Thanks! Your listing was sent for review. · ለግምገማ ተልኳል</p>
+          <p className="font-semibold">
+            {t.both("Thanks! Your listing was sent for review.", "እናመሰግናለን! ማስታወቂያዎ ለግምገማ ተልኳል።")}
+          </p>
           <p className="mt-1 text-sm">
-            A person checks every listing before it appears, usually within a day. It will show
-            as &ldquo;Live&rdquo; here once it&apos;s approved.
+            {t(
+              "A person checks every listing before it appears, usually within a day. It will show as “Live” here once it's approved.",
+              "እያንዳንዱ ማስታወቂያ ከመታየቱ በፊት በሰው ይመረመራል፤ ብዙውን ጊዜ በአንድ ቀን ውስጥ። ሲጸድቅ እዚህ “ታትሟል” ተብሎ ይታያል።",
+            )}
           </p>
         </div>
       )}
@@ -82,9 +91,9 @@ async function MyListings({ searchParams }: { searchParams: PageProps<"/[lang]/l
       )}
       {listings.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-border p-10 text-center">
-          <p className="font-semibold">You haven&apos;t posted any homes yet.</p>
+          <p className="font-semibold">{t("You haven't posted any homes yet.", "እስካሁን ምንም ቤት አላስተዋወቁም።")}</p>
           <Link href="/listings/new" className="mt-3 inline-block font-semibold text-brand hover:underline">
-            Post a home →
+            {t("Post a home →", "ቤት ያስተዋውቁ →")}
           </Link>
         </div>
       ) : (
@@ -103,15 +112,19 @@ async function MyListings({ searchParams }: { searchParams: PageProps<"/[lang]/l
                 )}
                 <div className="min-w-0 flex-1">
                   <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold ${status.className}`}>
-                    {status.label}
+                    {t.both(status.label, status.labelAm)}
                   </span>
                   <p className="mt-1 truncate font-semibold">{l.title}</p>
                   <p className="text-sm text-muted">
-                    {formatPrice(l.price)}/mo · {placeLabel({ ...l, crossStreets: l.cross_streets })}
+                    {formatPrice(l.price)}
+                    {t("/mo", "/በወር")} · {placeLabel({ ...l, crossStreets: l.cross_streets })}
                   </p>
                   {l.status === "rejected" && l.review_note && (
                     <p className="mt-1 text-sm text-danger">
-                      Reviewer&apos;s note: {l.review_note}. Edit the listing to fix it and resubmit.
+                      {t(
+                        `Reviewer's note: ${l.review_note}. Edit the listing to fix it and resubmit.`,
+                        `የገምጋሚው ማስታወሻ፦ ${l.review_note}። ለማስተካከል ማስታወቂያውን አርመው እንደገና ይላኩ።`,
+                      )}
                     </p>
                   )}
                 </div>
@@ -127,14 +140,15 @@ async function MyListings({ searchParams }: { searchParams: PageProps<"/[lang]/l
   );
 }
 
-export default function MyListingsPage({ searchParams }: PageProps<"/[lang]/listings/mine">) {
+export default async function MyListingsPage({ searchParams }: PageProps<"/[lang]/listings/mine">) {
+  const t = await getT();
   return (
     <div className="mx-auto max-w-3xl px-4 pt-8">
       <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
-        <h1 className="text-2xl font-bold sm:text-3xl">My listings · የእኔ ቤቶች</h1>
+        <h1 className="text-2xl font-bold sm:text-3xl">{t.both("My listings", "የእኔ ቤቶች")}</h1>
         <Link href="/listings/new" className="relative whitespace-nowrap rounded-xl bg-brand px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-strong">
           <LinkPending />
-          + Post a home
+          + {t("Post a home", "ቤት ያስተዋውቁ")}
         </Link>
       </div>
       <Suspense fallback={<div className="h-40 animate-pulse rounded-2xl bg-border/50" />}>
