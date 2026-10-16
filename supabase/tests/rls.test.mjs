@@ -282,6 +282,8 @@ check("server key can review listings", rows[0]?.status === "rejected" && rows[0
 // Bans
 check("user can't ban someone else", (await as(RUTH, `update private_profiles set banned = true where user_id = $1 returning user_id`, [SAMI])).length === 0);
 check("user can't ban/unban themselves", await fails(SAMI, `update private_profiles set banned = true where user_id = $1`, [SAMI]));
+check("user can turn off their own message emails", (await as(RUTH, `update private_profiles set message_emails = false where user_id = $1 returning user_id`, [RUTH])).length === 1);
+check("user can't change someone else's message emails", (await as(RUTH, `update private_profiles set message_emails = false where user_id = $1 returning user_id`, [DAWIT])).length === 0);
 check("user can still change own language", (await as(SAMI, `update private_profiles set language = 'am' where user_id = $1 returning user_id`, [SAMI])).length === 1);
 check("admin without two-step login can't ban", (await as(ADMIN, `update private_profiles set banned = true where user_id = $1 returning user_id`, [SAMI], { aal: "aal1" })).length === 0);
 check("admin bans a user", (await as(ADMIN, `update private_profiles set banned = true where user_id = $1 returning user_id`, [SAMI])).length === 1);

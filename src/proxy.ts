@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { defaultLang, isLang, langCookie } from "@/lib/i18n";
 
 // Paths that aren't pages: served as they are, in no particular language.
-const notPages = /^\/(?:en|am)(?:\/|$)|^\/(?:auth|app-icons|apple-icon|manifest\.webmanifest|icon\.svg)/;
+const notPages = /^\/(?:en|am)(?:\/|$)|^\/(?:auth|app-icons|apple-icon|manifest\.webmanifest|icon\.svg|robots\.txt|sitemap\.xml)/;
 
 // Serves each page in the visitor's language (src/app/[lang]) at the same address.
 // A link with ?lang=am (or en) switches language and is remembered.

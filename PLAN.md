@@ -178,10 +178,14 @@ Things set up for development that must change before real users arrive:
       delete from auth.users where id::text like 'c1000000-%';` then delete the matching
       c1000000-… folders in the listing-photos storage bucket.
 - [x] Set NEXT_PUBLIC_SITE_URL to the real domain in Vercel.
-- [ ] Email alerts for new messages: needs the domain (Resend) and the Supabase secret key
-      as a server-only env var to look up the recipient's email.
+- [x] Email alerts for new messages (Oct 15, 2026): sent by the database every 5 minutes
+      (pg_cron job "message-alerts", private.send_message_alerts) for messages unread 5+ minutes,
+      at most one per conversation per hour, never with the message text; Resend key in Supabase
+      Vault as resend_api_key; people can turn them off on the account page.
 - [ ] Optional: Google sign-in (Google Cloud OAuth client, then NEXT_PUBLIC_GOOGLE_SIGN_IN=on).
 - [ ] Allow search engines: set NEXT_PUBLIC_ALLOW_INDEXING=on in Vercel (off while testing).
+      robots.txt and sitemap.xml are ready and follow the same switch; then add the site in
+      Google Search Console.
 - [ ] Lease agreements: Colorado attorney reviews all four (Admin → Leases), marks them reviewed.
 - [ ] Lease agreements for the other states (DC, MD, VA, WA, TX, MN, OR, GA, CA). Until then the
       Lease button is hidden outside Colorado (leaseStates in src/lib/regions.ts).

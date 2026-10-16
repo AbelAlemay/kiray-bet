@@ -64,12 +64,13 @@ export default async function PrivacyPage() {
           title: "4. Services we use",
           paras: ["These companies process some information for us, only to run the site:"],
           bullets: [
-            "Supabase: stores accounts, listings, photos and messages, and sends sign-in emails.",
+            "Supabase: stores accounts, listings, photos and messages.",
             "Vercel: hosts the website.",
             "Cloudflare Turnstile: checks that forms are filled in by a person, not a bot.",
             "U.S. Census Bureau geocoder: turns a listing's address into a map point when a host posts it.",
             "OpenStreetMap: shows map tiles, and finds the nearest intersection and neighborhood name from the approximate map point (never the exact address).",
-            "Resend (email) and Telegram: send alerts to our administrator about new listings, reports and contact messages. Listing alerts contain no address or email.",
+            "Resend (email): sends sign-in codes, new-message notices (which never include the message itself; you can turn them off on your account page), and alerts to our administrator.",
+            "Telegram: sends alerts to our administrator about new listings, reports and contact messages. Listing alerts contain no address or email.",
           ],
         },
         {

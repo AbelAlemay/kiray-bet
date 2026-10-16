@@ -17,6 +17,7 @@ export async function updateAccount(_prev: AccountState, formData: FormData): Pr
 
   const name = String(formData.get("name") ?? "").trim().split(/\s+/)[0];
   const language = formData.get("language") === "am" ? "am" : "en";
+  const messageEmails = formData.get("messageEmails") === "on";
   if (!name || name.length > 40) {
     return { error: t("Please enter your first name (up to 40 letters).", "እባክዎ የመጀመሪያ ስምዎን ያስገቡ (እስከ 40 ፊደላት)።"), name, language };
   }
@@ -25,7 +26,7 @@ export async function updateAccount(_prev: AccountState, formData: FormData): Pr
   const supabase = await createServerSupabase();
   const [profile, privateProfile] = await Promise.all([
     supabase.from("profiles").update({ display_name: name }).eq("id", user.id),
-    supabase.from("private_profiles").update({ language }).eq("user_id", user.id),
+    supabase.from("private_profiles").update({ language, message_emails: messageEmails }).eq("user_id", user.id),
   ]);
   if (profile.error || privateProfile.error) {
     return { error: t("We couldn't save your changes. Please try again.", "ለውጦችዎን ማስቀመጥ አልቻልንም። እባክዎ እንደገና ይሞክሩ።"), name, language };

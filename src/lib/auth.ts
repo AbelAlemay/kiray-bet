@@ -13,6 +13,7 @@ export type CurrentUser = {
   name: string | null;
   role: "renter" | "host" | "admin";
   language: "en" | "am";
+  messageEmails: boolean;
   // "aal2" once this session was confirmed with an authenticator app code.
   twoStepVerified: boolean;
 };
@@ -34,7 +35,7 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
 
   const [{ data: profile }, { data: privateProfile }] = await Promise.all([
     supabase.from("profiles").select("display_name, role").eq("id", userId).single(),
-    supabase.from("private_profiles").select("email, language").eq("user_id", userId).single(),
+    supabase.from("private_profiles").select("email, language, message_emails").eq("user_id", userId).single(),
   ]);
   if (!profile || !privateProfile) return null;
 
@@ -44,6 +45,7 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
     name: profile.display_name,
     role: profile.role,
     language: privateProfile.language,
+    messageEmails: privateProfile.message_emails ?? true,
     twoStepVerified,
   };
 });
