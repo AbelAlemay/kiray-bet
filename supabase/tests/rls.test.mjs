@@ -197,6 +197,19 @@ check("anon can't see saved homes", await fails(null, `select * from favorites`)
 check("can't remove someone else's save", (await as(RUTH, `delete from favorites where user_id = $1 returning listing_id`, [SAMI])).length === 0);
 check("user removes own save", (await as(SAMI, `delete from favorites where user_id = $1 and listing_id = $2 returning listing_id`, [SAMI, L1])).length === 1);
 
+// Areas
+rows = await as(null, `select region, state from listings where id = $1`, [L1]);
+check("existing listings are in Denver, CO", rows[0].region === "denver" && rows[0].state === "CO");
+await as(RUTH, `update listing_addresses set exact_lat = 47.61, exact_lng = -122.33 where listing_id = $1`, [RL]);
+rows = await db.query(`select region from listings where id = $1`, [RL]);
+check("address in Seattle puts the listing in Seattle", rows.rows[0].region === "seattle");
+check("address outside all areas is refused", await fails(RUTH, `update listing_addresses set exact_lat = 41.88, exact_lng = -87.63 where listing_id = $1`, [RL]));
+check("host can't set the area by hand", await fails(RUTH, `update listings set region = 'denver' where id = $1`, [RL]));
+await as(RUTH, `update listing_addresses set exact_lat = 39.7, exact_lng = -104.8 where listing_id = $1`, [RL]);
+rows = await db.query(`select region from listings where id = $1`, [RL]);
+check("moving the address back moves the area", rows.rows[0].region === "denver");
+await as(ADMIN, `update listings set status = 'active' where id = $1`, [RL]);
+
 // Exact address shown by choice
 check("private address hidden from visitors", (await as(null, `select 1 from listing_addresses where listing_id = $1`, [L1])).length === 0);
 await db.query(`update listings set show_exact_address = true where id = $1`, [L1]);

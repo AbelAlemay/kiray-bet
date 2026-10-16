@@ -4,7 +4,8 @@ import { updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { after } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
-import { geocodeAddress, inDenverMetro } from "@/lib/geocode";
+import { geocodeAddress } from "@/lib/geocode";
+import { regionFor, regions } from "@/lib/regions";
 import { listingAlert, notifyAdmin } from "@/lib/notify";
 import { parseListingForm, type AddressInput, type ListingErrors } from "@/lib/listing-rules";
 import { createServerSupabase } from "@/lib/supabase/server";
@@ -18,10 +19,14 @@ export type ListingFormState = { errors?: ListingErrors };
 const bucket = "listing-photos";
 const saveFailed = "We couldn't save your listing. Please try again.";
 
-async function locate(address: AddressInput, city: string) {
-  const point = await geocodeAddress(address.street_address, city, address.zip);
-  if (!point) return { error: "We couldn't find this address. Check the street, city and ZIP code." };
-  if (!inDenverMetro(point)) return { error: "For now we only list homes in the Denver metro area." };
+async function locate(address: AddressInput, city: string, state: string) {
+  const point = await geocodeAddress(address.street_address, city, state, address.zip);
+  if (!point) return { error: "We couldn't find this address. Check the street, city, state and ZIP code." };
+  if (!regionFor(point.lat, point.lng)) {
+    return {
+      error: `KirayBet isn't in that area yet. For now we list homes in: ${regions.map((r) => r.name).join(", ")}.`,
+    };
+  }
   return { point };
 }
 
@@ -38,8 +43,9 @@ export async function createListing(_prev: ListingFormState, formData: FormData)
     return { errors: { form: "We couldn't confirm you're not a bot. Please try again." } };
   }
 
-  const located = await locate(address, listing.city);
+  const located = await locate(address, listing.city, listing.state);
   if ("error" in located) return { errors: { street: located.error } };
+  if (located.point.city) listing.city = located.point.city;
 
   const supabase = await createServerSupabase();
   const { error: listingError } = await supabase.from("listings").insert({ ...listing, host_id: user.id });
@@ -81,7 +87,7 @@ export async function updateListing(_prev: ListingFormState, formData: FormData)
 
   const supabase = await createServerSupabase();
   const [{ data: current }, { data: currentAddress }, { data: currentPhotos }] = await Promise.all([
-    supabase.from("listings").select("host_id, status").eq("id", id).maybeSingle(),
+    supabase.from("listings").select("host_id, status, city, state").eq("id", id).maybeSingle(),
     supabase.from("listing_addresses").select("street_address, unit, zip").eq("listing_id", id).maybeSingle(),
     supabase.from("listing_photos").select("path").eq("listing_id", id).order("order"),
   ]);
@@ -92,12 +98,15 @@ export async function updateListing(_prev: ListingFormState, formData: FormData)
     !currentAddress ||
     currentAddress.street_address !== address.street_address ||
     currentAddress.unit !== address.unit ||
-    currentAddress.zip !== address.zip;
-  let point: { lat: number; lng: number } | undefined;
+    currentAddress.zip !== address.zip ||
+    current.city.toLowerCase() !== listing.city.toLowerCase() ||
+    current.state !== listing.state;
+  let point: { lat: number; lng: number; city: string | null } | undefined;
   if (addressChanged) {
-    const located = await locate(address, listing.city);
+    const located = await locate(address, listing.city, listing.state);
     if ("error" in located) return { errors: { street: located.error } };
     point = located.point;
+    if (point.city) fields.city = point.city;
   }
 
   const { error: listingError } = await supabase.from("listings").update(fields).eq("id", id);

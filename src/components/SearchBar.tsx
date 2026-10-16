@@ -1,17 +1,20 @@
 import { site } from "@/lib/site";
+import type { RegionId } from "@/lib/regions";
 
 const fieldClass =
   "w-full rounded-xl border border-border bg-surface px-3 py-3 text-foreground outline-none focus:border-brand";
 
-export function SearchBar() {
+// Quick search on the home page, for the chosen area.
+export function SearchBar({ region, cities }: { region: RegionId; cities: string[] }) {
   return (
     <form
       action="/search"
       className="grid gap-2 rounded-2xl bg-surface p-3 shadow-xl sm:grid-cols-[1fr_1fr_1fr_auto]"
     >
+      <input type="hidden" name="region" value={region} />
       <select name="city" className={fieldClass} defaultValue="" aria-label="City">
         <option value="">All cities</option>
-        {site.cities.map((city) => (
+        {cities.map((city) => (
           <option key={city}>{city}</option>
         ))}
       </select>

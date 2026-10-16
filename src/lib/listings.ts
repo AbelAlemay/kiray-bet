@@ -1,5 +1,6 @@
 import { cacheLife, cacheTag } from "next/cache";
 import { sampleListings, type Listing } from "./sample-listings";
+import { defaultRegionId, isRegionId, type RegionId } from "./regions";
 import { site, type ListingType } from "./site";
 import { createPublicClient } from "./supabase/public";
 
@@ -9,6 +10,7 @@ import { createPublicClient } from "./supabase/public";
 // is approved, edited or removed.
 
 export type ListingFilters = {
+  region: RegionId;
   city?: string;
   type?: ListingType;
   maxPrice?: number;
@@ -42,8 +44,9 @@ function positiveNumber(value: string | undefined) {
   return value && Number.isFinite(n) && n > 0 ? n : undefined;
 }
 
-// Turns untrusted URL search params into validated filters.
-export function parseFilters(params: RawParams): ListingFilters {
+// Turns untrusted URL search params into validated filters. `region` is the area to use
+// when the link doesn't name one (the visitor's chosen area).
+export function parseFilters(params: RawParams, region: RegionId = defaultRegionId): ListingFilters {
   const city = first(params.city);
   const type = first(params.type);
   const sort = first(params.sort);
@@ -51,8 +54,11 @@ export function parseFilters(params: RawParams): ListingFilters {
   const availableBy = first(params.availableBy);
   const page = Math.floor(positiveNumber(first(params.page)) ?? 1);
 
+  const regionParam = first(params.region);
   return {
-    city: site.cities.find((c) => c === city),
+    region: isRegionId(regionParam) ? regionParam : region,
+    // Any city name (cities come from the listings themselves).
+    city: city && /^[\p{L}][\p{L} .'-]{0,59}$/u.test(city.trim()) ? city.trim() : undefined,
     type: site.listingTypes.find((t) => t.value === type)?.value,
     maxPrice: positiveNumber(first(params.maxPrice)),
     minBedrooms: positiveNumber(first(params.minBedrooms)),
@@ -82,7 +88,7 @@ export function filtersToQuery(filters: Partial<ListingFilters>) {
 
 const listingColumns =
   "id, title, type, price, deposit, bedrooms, bathrooms, city, neighborhood, available_from, " +
-  "utilities_included, utilities, show_exact_address, parking, pets_allowed, description, created_at, approx_lat, approx_lng, cross_streets, " +
+  "utilities_included, utilities, show_exact_address, parking, pets_allowed, description, created_at, approx_lat, approx_lng, cross_streets, region, state, " +
   "host:profiles!listings_host_id_fkey(display_name), listing_photos(path, order)";
 
 type ListingRow = {
@@ -106,6 +112,8 @@ type ListingRow = {
   approx_lat: number | null;
   approx_lng: number | null;
   cross_streets: string | null;
+  region: string;
+  state: string;
   host: { display_name: string | null } | null;
   listing_photos: { path: string; order: number }[];
 };
@@ -164,6 +172,8 @@ function toListing(row: ListingRow): Omit<Listing, "photos"> {
     approxLat: row.approx_lat,
     approxLng: row.approx_lng,
     crossStreets: row.cross_streets,
+    region: row.region,
+    state: row.state,
   };
 }
 
@@ -178,7 +188,7 @@ type Filterable = {
 
 // Applies the search filters to any listings query, keeping its type.
 function applyFilters<Q>(query: Q, filters: ListingFilters): Q {
-  let q = (query as Filterable).eq("status", "active");
+  let q = (query as Filterable).eq("status", "active").eq("region", filters.region);
   if (filters.city) q = q.eq("city", filters.city);
   if (filters.type) q = q.eq("type", filters.type);
   if (filters.maxPrice) q = q.lte("price", filters.maxPrice);
@@ -192,6 +202,7 @@ function applyFilters<Q>(query: Q, filters: ListingFilters): Q {
 
 function matchesSample(l: Listing, filters: ListingFilters) {
   return (
+    l.region === filters.region &&
     (!filters.city || l.city === filters.city) &&
     (!filters.type || l.type === filters.type) &&
     (!filters.maxPrice || l.price <= filters.maxPrice) &&
@@ -257,8 +268,8 @@ export async function getListingsByIds(ids: string[]): Promise<Listing[]> {
   return valid.map((id) => byId.get(id)).filter((l): l is Listing => !!l);
 }
 
-export async function getLatestListings(count: number): Promise<Listing[]> {
-  return (await getListings({ sort: "newest", page: 1 })).listings.slice(0, count);
+export async function getLatestListings(count: number, region: RegionId): Promise<Listing[]> {
+  return (await getListings({ region, sort: "newest", page: 1 })).listings.slice(0, count);
 }
 
 // Everything the map needs for all matching listings (no photos, no paging).
@@ -306,16 +317,19 @@ export async function getListingPins(filters: ListingFilters): Promise<ListingPi
     }));
 }
 
-// How many live listings each city has, for the home page.
-export async function getCityCounts(): Promise<Record<string, number>> {
+// How many live listings each city in an area has (most first), for the home page and
+// the search filter.
+export async function getCityCounts(region: RegionId): Promise<Record<string, number>> {
   "use cache";
   cacheLife("minutes");
   cacheTag("listings");
 
   const supabase = createPublicClient();
   const cities = supabase
-    ? ((await supabase.from("listings").select("city").eq("status", "active").limit(5000)).data ?? []).map((r) => r.city)
-    : sampleListings.map((l) => l.city);
+    ? (
+        (await supabase.from("listings").select("city").eq("status", "active").eq("region", region).limit(5000)).data ?? []
+      ).map((r) => r.city)
+    : sampleListings.filter((l) => l.region === region).map((l) => l.city);
   const counts: Record<string, number> = {};
   for (const city of cities) counts[city] = (counts[city] ?? 0) + 1;
   return counts;

@@ -1,7 +1,7 @@
 # ኪራይ ቤት · KirayBet — Project Plan
 
-A rental marketplace for the Habesha (Ethiopian & Eritrean) community in the Denver metro
-area. Hosts can list houses, apartments, basements and rooms. Renters can search and
+A rental marketplace for the Habesha (Ethiopian & Eritrean) community in 11 U.S. metro
+areas (Denver first; see the Area row). Hosts can list houses, apartments, basements and rooms. Renters can search and
 message them, in English or Amharic.
 
 **Our core promise: safe and private.** Personal information is never shown publicly,
@@ -15,7 +15,7 @@ every listing is reviewed by a person, and all contact happens inside the site.
 | Phone numbers | **Never collected.** We don't ask for them at all. |
 | Listing approval | **Every listing is reviewed by the admin before it goes live.** Admin is notified of each new listing by **email and Telegram**. |
 | Address privacy | Public sees only the nearest major intersection (e.g. "Near Havana & Iliff, Aurora", worked out from the blurred map point via OpenStreetMap) and an approximate map area. The exact address is shared only after the renter asks **and the host approves**. |
-| Area | Denver metro only at launch. |
+| Area | Denver at launch; since Oct 15, 2026 also DC/MD/VA, Seattle, Dallas–Fort Worth, Austin, Houston, Minneapolis–Saint Paul, Portland, Atlanta, SF Bay Area and Southern California. Areas are defined in src/lib/regions.ts and must match `private.region_for()` in the database; a listing's area is set by the database from its address. Visitors pick an area in the top-left switcher (remembered in a cookie, `?region=` in links). |
 | Login | Email link + 6-digit code, and Google. Same flow signs up new users. |
 | Language | English and Amharic side by side. Amharic font: **Menbere**. |
 | Accounts | **Only hosts create full accounts.** Renters browse with no account and just confirm their email (email link or Google) when they tap "Contact host". No password, no profile. |
@@ -131,7 +131,7 @@ later, e-signing and stored signed copies (proposal below).
 ## 8. Data model
 Public (readable by anyone, only approved listings):
 - **listings**: id, host_id, title, description, type, price, deposit, bedrooms, bathrooms,
-  city, neighborhood, approx_lat, approx_lng, available_from, utilities_included, parking,
+  city, state, region (set from the address), neighborhood (filled by admin lookup), approx_lat, approx_lng, available_from, utilities (checklist), show_exact_address, parking,
   pets_allowed, status (pending/active/rejected/rented), reviewed_at, created_at
 - **listing_photos**: id, listing_id, path, order
 - **profiles**: id, display_name (first name only), role (renter/host/admin), created_at
@@ -176,6 +176,8 @@ Things set up for development that must change before real users arrive:
 - [ ] Optional: Google sign-in (Google Cloud OAuth client, then NEXT_PUBLIC_GOOGLE_SIGN_IN=on).
 - [ ] Allow search engines: set NEXT_PUBLIC_ALLOW_INDEXING=on in Vercel (off while testing).
 - [ ] Lease agreements: Colorado attorney reviews all four (Admin → Leases), marks them reviewed.
+- [ ] Lease agreements for the other states (DC, MD, VA, WA, TX, MN, OR, GA, CA). Until then the
+      Lease button is hidden outside Colorado (leaseStates in src/lib/regions.ts).
 - [ ] Security review, Terms of Service and Privacy Policy reviewed by a lawyer.
 
 ## 11. Legal notes

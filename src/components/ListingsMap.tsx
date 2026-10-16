@@ -29,11 +29,14 @@ export function ListingsMap({
   pins,
   interactive = true,
   zoom,
+  center = denver,
   className = "h-[60vh] min-h-80",
 }: {
   pins: ListingPin[];
   interactive?: boolean;
   zoom?: number;
+  // Where to start when there are no pins (the chosen area).
+  center?: [number, number];
   className?: string;
 }) {
   const box = useRef<HTMLDivElement>(null);
@@ -46,7 +49,7 @@ export function ListingsMap({
     import("leaflet").then((L) => {
       if (cancelled || !box.current) return;
       map = L.map(box.current, {
-        center: denver,
+        center,
         zoom: zoom ?? 10,
         maxZoom: 15,
         scrollWheelZoom: false,
@@ -186,7 +189,7 @@ export function ListingsMap({
       cancelled = true;
       map?.remove();
     };
-  }, [pins, interactive, zoom, router]);
+  }, [pins, interactive, zoom, center, router]);
 
   return <div ref={box} className={`listings-map z-0 overflow-hidden rounded-2xl border border-border ${className}`} />;
 }

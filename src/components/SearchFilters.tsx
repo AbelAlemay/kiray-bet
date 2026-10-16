@@ -9,7 +9,15 @@ const checkboxes = [
   { name: "utilities", label: "Utilities included" },
 ] as const;
 
-export function SearchFilters({ filters, view }: { filters: ListingFilters; view: "list" | "map" }) {
+export function SearchFilters({
+  filters,
+  view,
+  cities,
+}: {
+  filters: ListingFilters;
+  view: "list" | "map";
+  cities: string[];
+}) {
   return (
     <form
       action="/search"
@@ -17,6 +25,7 @@ export function SearchFilters({ filters, view }: { filters: ListingFilters; view
       key={JSON.stringify(filters)}
       className="space-y-4 rounded-2xl border border-border bg-surface p-4"
     >
+      <input type="hidden" name="region" value={filters.region} />
       {view !== "list" && <input type="hidden" name="view" value={view} />}
       <h2 className="font-semibold">
         Filters · <span className="text-muted">ማጣሪያ</span>
@@ -25,7 +34,7 @@ export function SearchFilters({ filters, view }: { filters: ListingFilters; view
         <span>City</span>
         <select name="city" defaultValue={filters.city ?? ""} className={fieldClass}>
           <option value="">All cities</option>
-          {site.cities.map((city) => (
+          {cities.map((city) => (
             <option key={city}>{city}</option>
           ))}
         </select>

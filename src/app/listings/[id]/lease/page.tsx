@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { requireUser } from "@/lib/auth";
 import { leaseTitles } from "@/lib/leases/fields";
 import { getLeaseTemplate } from "@/lib/leases/templates-server";
+import { leaseStates, stateNames } from "@/lib/regions";
 import { utilityOptions, type ListingType } from "@/lib/site";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { LeaseBuilder } from "./LeaseBuilder";
@@ -34,13 +35,24 @@ async function Lease({ params }: { params: Props["params"] }) {
   const [{ data: listing }, { data: address }] = await Promise.all([
     supabase
       .from("listings")
-      .select("id, title, type, price, deposit, city, available_from, utilities, parking, pets_allowed")
+      .select("id, title, type, price, deposit, city, state, available_from, utilities, parking, pets_allowed")
       .eq("id", id)
       .eq("host_id", user.id)
       .maybeSingle(),
     supabase.from("listing_addresses").select("street_address, unit, zip").eq("listing_id", id).maybeSingle(),
   ]);
   if (!listing) notFound();
+  if (!leaseStates.includes(listing.state)) {
+    return (
+      <div className="rounded-2xl border border-dashed border-border p-8 text-center">
+        <p className="font-semibold">Lease forms for {stateNames[listing.state] ?? listing.state} are coming soon.</p>
+        <p className="mt-1 text-sm text-muted">
+          Our lease agreements are written for Colorado law. We&apos;re preparing attorney-reviewed
+          forms for other states.
+        </p>
+      </div>
+    );
+  }
 
   const type = listing.type as ListingType;
   const template = await getLeaseTemplate(type);

@@ -33,7 +33,7 @@ function AddressPanel({ c }: { c: Conversation }) {
 
   // The host made the address public: no request needed.
   if (c.listing?.show_exact_address && c.address) {
-    const full = `${c.address.street_address}${c.address.unit ? `, ${c.address.unit}` : ""}, ${c.listing.city}, CO ${c.address.zip}`;
+    const full = `${c.address.street_address}${c.address.unit ? `, ${c.address.unit}` : ""}, ${c.listing.city}, ${c.listing.state} ${c.address.zip}`;
     return (
       <p className={box}>
         📍 {full} ·{" "}
@@ -51,7 +51,7 @@ function AddressPanel({ c }: { c: Conversation }) {
 
   if (c.role === "renter") {
     if (request?.status === "approved" && c.address) {
-      const full = `${c.address.street_address}${c.address.unit ? `, ${c.address.unit}` : ""}, ${c.listing?.city ?? ""}, CO ${c.address.zip}`;
+      const full = `${c.address.street_address}${c.address.unit ? `, ${c.address.unit}` : ""}, ${c.listing?.city ?? ""}, ${c.listing?.state ?? ""} ${c.address.zip}`;
       return (
         <div className={`${box} border-brand/50 bg-brand-soft`}>
           <p className="font-semibold">📍 {c.otherName} shared the exact address</p>

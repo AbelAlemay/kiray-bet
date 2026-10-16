@@ -6,8 +6,10 @@ import { ListingCard } from "@/components/ListingCard";
 import { ListingsMap } from "@/components/ListingsMap";
 import { SearchFilters } from "@/components/SearchFilters";
 import { formatDate, formatPrice } from "@/lib/format";
+import { getChosenRegion } from "@/lib/region-server";
 import {
   filtersToQuery,
+  getCityCounts,
   getListingPins,
   getListings,
   pageSize,
@@ -105,28 +107,31 @@ function ListingGrid({
 
 async function Results({ searchParams }: { searchParams: PageProps<"/search">["searchParams"] }) {
   const params = await searchParams;
-  const filters = parseFilters(params);
+  const region = await getChosenRegion(params.region);
+  const filters = parseFilters(params, region.id);
   const view: View = params.view === "map" ? "map" : "list";
   const chips = activeFilterChips(filters, view);
 
-  const [{ listings, total }, pins] = await Promise.all([
+  const [{ listings, total }, pins, cityCounts] = await Promise.all([
     view === "list" ? getListings(filters) : Promise.resolve({ listings: [], total: 0 }),
     view === "map" ? getListingPins({ ...filters, page: 1 }) : Promise.resolve([]),
+    getCityCounts(filters.region),
   ]);
+  // Cities with homes first, then the area's other main cities.
+  const cities = [...new Set([...Object.keys(cityCounts), ...region.cities])];
   const count = view === "map" ? pins.length : total;
 
   return (
     <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
       <aside className="lg:sticky lg:top-20 lg:self-start">
         <FiltersPanel activeCount={chips.length}>
-          <SearchFilters filters={filters} view={view} />
+          <SearchFilters filters={filters} view={view} cities={cities} />
         </FiltersPanel>
       </aside>
       <div className="min-w-0">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm text-muted" aria-live="polite">
-            {count} {count === 1 ? "home" : "homes"} found
-            {filters.city && ` in ${filters.city}`}
+            {count} {count === 1 ? "home" : "homes"} found in {filters.city ?? region.name}
           </p>
           <nav aria-label="View" className="flex w-full gap-1 rounded-xl border border-border bg-surface p-1 sm:w-auto">
             {views.map((v) => (
@@ -157,7 +162,7 @@ async function Results({ searchParams }: { searchParams: PageProps<"/search">["s
               </Link>
             ))}
             <Link
-              href={searchHref({}, view)}
+              href={searchHref({ region: filters.region }, view)}
               className="relative inline-flex min-h-10 items-center rounded-full px-3 text-sm font-semibold text-brand hover:underline"
             >
               <LinkPending />
@@ -173,7 +178,7 @@ async function Results({ searchParams }: { searchParams: PageProps<"/search">["s
           </div>
         ) : view === "map" ? (
           <div className="space-y-2">
-            <ListingsMap pins={pins} />
+            <ListingsMap pins={pins} center={region.center} zoom={region.zoom} />
             <MapNote />
           </div>
         ) : (
@@ -201,7 +206,7 @@ export default function SearchPage({ searchParams }: PageProps<"/search">) {
   return (
     <div className="mx-auto max-w-6xl px-4 pt-6 sm:pt-8">
       <h1 className="text-2xl font-bold sm:text-3xl">Homes for rent</h1>
-      <p className="mb-4 text-muted sm:mb-6">ለኪራይ የሚሆኑ ቤቶች · Denver metro</p>
+      <p className="mb-4 text-muted sm:mb-6">ለኪራይ የሚሆኑ ቤቶች</p>
       <Suspense fallback={<ResultsSkeleton />}>
         <Results searchParams={searchParams} />
       </Suspense>

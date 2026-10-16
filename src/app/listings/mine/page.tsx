@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { requireUser } from "@/lib/auth";
 import { formatPrice, placeLabel } from "@/lib/format";
+import { leaseStates } from "@/lib/regions";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { ListingActions } from "./ListingActions";
 import { LinkPending } from "@/components/Pending";
@@ -27,6 +28,7 @@ type Row = {
   city: string;
   neighborhood: string | null;
   cross_streets: string | null;
+  state: string;
   review_note: string | null;
   listing_photos: { path: string; order: number }[];
 };
@@ -47,7 +49,7 @@ async function MyListings({ searchParams }: { searchParams: PageProps<"/listings
   const supabase = await createServerSupabase();
   const { data } = await supabase
     .from("listings")
-    .select("id, title, status, price, city, neighborhood, cross_streets, review_note, listing_photos(path, order)")
+    .select("id, title, status, price, city, state, neighborhood, cross_streets, review_note, listing_photos(path, order)")
     .eq("host_id", user.id)
     .order("created_at", { ascending: false })
     .overrideTypes<Row[], { merge: false }>();
@@ -114,7 +116,7 @@ async function MyListings({ searchParams }: { searchParams: PageProps<"/listings
                   )}
                 </div>
                 <div className="self-center">
-                  <ListingActions id={l.id} status={l.status} />
+                  <ListingActions id={l.id} status={l.status} leaseAvailable={leaseStates.includes(l.state)} />
                 </div>
               </li>
             );

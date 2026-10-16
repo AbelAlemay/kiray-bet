@@ -2,6 +2,7 @@
 
 import { startTransition, useActionState, useState, type ReactNode } from "react";
 import { fieldClass, labelClass, primaryButtonClass } from "@/components/form-styles";
+import { regions, stateNames } from "@/lib/regions";
 import { site, utilityOptions } from "@/lib/site";
 import { BotCheckFailed, Turnstile, useBotCheck } from "@/components/Turnstile";
 import type { ListingFormState } from "@/app/listings/actions";
@@ -18,7 +19,7 @@ export type ListingFormValues = {
   bedrooms: number;
   bathrooms: number;
   city: string;
-
+  state: string;
   availableFrom: string;
   utilities: string[];
   addressVisibility: "private" | "public";
@@ -178,16 +179,36 @@ export function ListingForm({
       </Section>
 
       <Section title="Location" titleAm="አድራሻ">
-        <Field label="City" error={errors.city}>
-          <select name="city" required defaultValue={initial?.city ?? ""} className={fieldClass}>
-            <option value="" disabled>
-              Choose…
-            </option>
-            {site.cities.map((c) => (
-              <option key={c}>{c}</option>
-            ))}
-          </select>
-        </Field>
+        <div className={pairClass}>
+          <Field label="City" error={errors.city}>
+            <input
+              name="city"
+              required
+              maxLength={60}
+              list="kiraybet-cities"
+              autoComplete="address-level2"
+              defaultValue={initial?.city}
+              className={fieldClass}
+            />
+            <datalist id="kiraybet-cities">
+              {[...new Set(regions.flatMap((r) => r.cities))].sort().map((c) => (
+                <option key={c} value={c} />
+              ))}
+            </datalist>
+          </Field>
+          <Field label="State" error={errors.state}>
+            <select name="state" required defaultValue={initial?.state ?? ""} autoComplete="address-level1" className={fieldClass}>
+              <option value="" disabled>
+                Choose…
+              </option>
+              {Object.entries(stateNames).map(([code, name]) => (
+                <option key={code} value={code}>
+                  {name}
+                </option>
+              ))}
+            </select>
+          </Field>
+        </div>
         <div className="space-y-4">
           <p className="text-sm text-muted">
             We use the address to place your home on the map and find the nearest major

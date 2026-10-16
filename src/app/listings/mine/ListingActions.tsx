@@ -7,7 +7,16 @@ import { FormPending, LinkPending } from "@/components/Pending";
 
 const buttonClass = "relative inline-flex min-h-10 items-center rounded-lg border border-border px-3 text-sm font-semibold hover:bg-brand-soft";
 
-export function ListingActions({ id, status }: { id: string; status: "pending" | "active" | "rejected" | "rented" }) {
+export function ListingActions({
+  id,
+  status,
+  leaseAvailable,
+}: {
+  id: string;
+  status: "pending" | "active" | "rejected" | "rented";
+  // Lease forms exist only for some states so far (Colorado).
+  leaseAvailable: boolean;
+}) {
   const [confirming, setConfirming] = useState(false);
 
   // Delete asks for confirmation right here in the row.
@@ -44,10 +53,12 @@ export function ListingActions({ id, status }: { id: string; status: "pending" |
         <LinkPending />
         Edit
       </Link>
-      <Link href={`/listings/${id}/lease`} className={buttonClass}>
-        <LinkPending />
-        📄 Lease
-      </Link>
+      {leaseAvailable && (
+        <Link href={`/listings/${id}/lease`} className={buttonClass}>
+          <LinkPending />
+          📄 Lease
+        </Link>
+      )}
       {(status === "active" || status === "rented") && (
         <form action={setRented}>
           <input type="hidden" name="listingId" value={id} />

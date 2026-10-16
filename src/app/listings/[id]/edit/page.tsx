@@ -41,6 +41,7 @@ async function EditListing({ params }: { params: Props["params"] }) {
     bedrooms: listing.bedrooms,
     bathrooms: Number(listing.bathrooms),
     city: listing.city,
+    state: listing.state,
     availableFrom: listing.available_from,
     utilities: listing.utilities ?? [],
     addressVisibility: listing.show_exact_address ? "public" : "private",

@@ -98,6 +98,7 @@ export type Conversation = {
     neighborhood: string;
     cross_streets: string | null;
     show_exact_address: boolean;
+    state: string;
     status: string;
   } | null;
   listingId: string;
@@ -122,7 +123,7 @@ export async function getConversation(id: string, userId: string): Promise<Conve
   const supabase = await createServerSupabase();
   const { data: c } = await supabase
     .from("conversations")
-    .select(`id, listing_id, renter_id, host_id, listing:listings(id, title, price, city, neighborhood, cross_streets, show_exact_address, status), ${people}`)
+    .select(`id, listing_id, renter_id, host_id, listing:listings(id, title, price, city, neighborhood, cross_streets, show_exact_address, state, status), ${people}`)
     .eq("id", id)
     .maybeSingle()
     .overrideTypes<ConversationRow, { merge: false }>();

@@ -54,14 +54,14 @@ export async function notifyAdmin(alert: Alert) {
 
 export function listingAlert(
   kind: "new" | "edited",
-  listing: { title: string; city: string; price: number },
+  listing: { title: string; city: string; state?: string; price: number },
   hostName: string | null,
 ): Alert {
   return {
     subject: kind === "new" ? "New listing to review" : "Edited listing to review",
     lines: [
       listing.title,
-      `${listing.city} · $${listing.price.toLocaleString("en-US")}/mo`,
+      `${listing.city}${listing.state ? `, ${listing.state}` : ""} · $${listing.price.toLocaleString("en-US")}/mo`,
       `Host: ${hostName ?? "(no name yet)"}`,
     ],
   };

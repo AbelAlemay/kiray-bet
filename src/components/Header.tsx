@@ -6,7 +6,9 @@ import { getUnreadCount } from "@/lib/conversations";
 import { site } from "@/lib/site";
 import { Logo } from "./Logo";
 import { WithCount } from "./CountBadge";
+import { getChosenRegion } from "@/lib/region-server";
 import { MobileMenu } from "./MobileMenu";
+import { RegionSwitcher } from "./RegionSwitcher";
 import { FormPending, LinkPending } from "./Pending";
 import { SavedLink } from "./SavedLink";
 
@@ -92,6 +94,12 @@ async function MenuBadge() {
   ) : null;
 }
 
+// Reads the remembered area (a cookie), so it streams in behind a Suspense boundary.
+async function CurrentRegion() {
+  const region = await getChosenRegion();
+  return <RegionSwitcher current={region.id} />;
+}
+
 function PostLink() {
   return (
     <Link
@@ -108,16 +116,20 @@ export function Header() {
   return (
     <header className="sticky top-0 z-20 print:hidden border-b border-border bg-surface/90 backdrop-blur">
       <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
-        <Link href="/" className="flex shrink-0 items-center gap-2">
-          <LinkPending />
-          <Logo />
-          <span className="leading-tight">
-            <span className="block text-lg font-bold">{site.name}</span>
-            <span className="block text-xs text-muted">
-              {site.nameLatin} · Denver
-            </span>
-          </span>
-        </Link>
+        <div className="flex shrink-0 items-center gap-2">
+          <Link href="/" aria-label={`${site.name} ${site.nameLatin}, home`} className="relative">
+            <LinkPending />
+            <Logo />
+          </Link>
+          <div className="leading-tight">
+            <Link href="/" className="block text-lg font-bold">
+              {site.name}
+            </Link>
+            <Suspense fallback={<span className="block text-xs text-muted">📍 …</span>}>
+              <CurrentRegion />
+            </Suspense>
+          </div>
+        </div>
 
         {/* Wide screens: everything in one row */}
         <nav className="hidden items-center gap-0.5 text-sm lg:flex xl:gap-1">

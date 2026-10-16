@@ -118,13 +118,13 @@ async function ListingDetail({ params }: { params: Props["params"] }) {
             </p>
             <h1 className="mt-1 break-words text-3xl font-bold">{listing.title}</h1>
             <p className="mt-1 text-muted">
-              {nearLabel(listing)}, CO
+              {nearLabel(listing)}, {listing.state}
             </p>
             {listing.exactAddress ? (
               <p className="mt-2 text-sm">
-                📍 <strong>{listing.exactAddress}, {listing.city}, CO</strong>{" "}
+                📍 <strong>{listing.exactAddress}, {listing.city}, {listing.state}</strong>{" "}
                 <a
-                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${listing.exactAddress}, ${listing.city}, CO`)}`}
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${listing.exactAddress}, ${listing.city}, ${listing.state}`)}`}
                   target="_blank"
                   rel="noreferrer"
                   className="font-semibold text-brand hover:underline"

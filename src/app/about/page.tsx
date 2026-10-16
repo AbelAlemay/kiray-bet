@@ -1,16 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { regions } from "@/lib/regions";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "About",
-  description: `${site.nameLatin}: homes for rent in the Denver area, from our community.`,
+  description: `${site.nameLatin}: homes for rent from our community, in ${regions.length} U.S. metro areas.`,
 };
 
 const points = [
   {
     title: "Made for our community",
-    text: "Rooms, basements, apartments and houses around Denver, Aurora and nearby cities, in English and Amharic.",
+    text: `Rooms, basements, apartments and houses in ${regions.length} U.S. metro areas: ${regions.map((r) => r.name).join(", ")}. In English and Amharic.`,
   },
   {
     title: "Safe and private",
@@ -32,7 +33,7 @@ export default function AboutPage() {
       <p className="text-sm font-semibold text-brand">About · ስለ እኛ</p>
       <h1 className="mt-1 text-3xl font-bold">{site.taglineAm}</h1>
       <p className="mt-3 text-lg text-muted">
-        {site.nameLatin} ({site.name}, &ldquo;house for rent&rdquo;) helps people in the Denver area
+        {site.nameLatin} ({site.name}, &ldquo;house for rent&rdquo;) helps people in our community
         find a place to live and helps hosts find good renters, without passing personal details to
         strangers in group chats.
       </p>

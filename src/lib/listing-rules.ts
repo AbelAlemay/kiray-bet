@@ -1,3 +1,4 @@
+import { stateNames } from "./regions";
 import { site, utilityOptions, type ListingType, type Utility } from "./site";
 
 // Rules for what hosts may write in a listing. Shared by the posting form (instant
@@ -49,6 +50,7 @@ export type ListingInput = {
   bedrooms: number;
   bathrooms: number;
   city: string;
+  state: string;
   available_from: string;
   utilities: Utility[];
   parking: boolean;
@@ -80,7 +82,8 @@ export function parseListingForm(formData: FormData, hostId: string) {
   const title = text(formData, "title");
   const description = text(formData, "description");
   const type = site.listingTypes.find((t) => t.value === text(formData, "type"))?.value;
-  const city = site.cities.find((c) => c === text(formData, "city"));
+  const city = text(formData, "city");
+  const state = text(formData, "state").toUpperCase();
   const price = whole(text(formData, "price"), 1, 100000);
   const deposit = whole(text(formData, "deposit") || "0", 0, 100000);
   const bedrooms = whole(text(formData, "bedrooms"), 0, 20);
@@ -103,7 +106,8 @@ export function parseListingForm(formData: FormData, hostId: string) {
   if (description.length < 20) errors.description = "Write at least 20 characters about the home.";
   if (description.length > 20000) errors.description = "Please keep the description under 20,000 characters.";
   if (!type) errors.type = "Choose the type of home.";
-  if (!city) errors.city = "Choose a city.";
+  if (!/^[\p{L}][\p{L} .'-]{1,59}$/u.test(city)) errors.city = "Enter the city.";
+  if (!stateNames[state]) errors.state = "Choose the state.";
   if (price === null) errors.price = "Enter the monthly rent in whole dollars.";
   if (deposit === null) errors.deposit = "Enter the deposit in whole dollars (0 if none).";
   if (bedrooms === null) errors.bedrooms = "Enter the number of bedrooms.";
@@ -141,7 +145,8 @@ export function parseListingForm(formData: FormData, hostId: string) {
     deposit: deposit!,
     bedrooms: bedrooms!,
     bathrooms: bathrooms!,
-    city: city!,
+    city,
+    state,
     available_from: availableFrom,
     utilities,
     show_exact_address: addressChoice === "public",

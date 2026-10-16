@@ -15,7 +15,7 @@ export function Footer() {
           <strong>Equal Housing Opportunity.</strong> All listings on {site.nameLatin} are open to
           everyone. Hosts may not state a preference based on race, color, national origin,
           religion, sex, familial status, disability, or any other class protected under the Fair
-          Housing Act and Colorado law.
+          Housing Act and state and local fair housing laws.
         </p>
         <p>© {site.nameLatin}</p>
       </div>

@@ -1,5 +1,6 @@
 import { fieldClass, primaryButtonClass } from "@/components/form-styles";
 import { formatDate, formatPrice } from "@/lib/format";
+import { getRegion } from "@/lib/regions";
 import { site, utilitiesLabel } from "@/lib/site";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { approveListing, rejectListing } from "./actions";
@@ -16,6 +17,8 @@ type PendingRow = {
   bedrooms: number;
   bathrooms: number;
   city: string;
+  state: string;
+  region: string | null;
   neighborhood: string | null;
   available_from: string;
   utilities: string[];
@@ -36,7 +39,7 @@ export async function ReviewQueue({ q }: { q: string }) {
   let query = supabase
     .from("listings")
     .select(
-      "id, title, description, type, price, deposit, bedrooms, bathrooms, city, neighborhood, available_from, " +
+      "id, title, description, type, price, deposit, bedrooms, bathrooms, city, state, region, neighborhood, available_from, " +
         "utilities, show_exact_address, parking, pets_allowed, reviewed_at, created_at, updated_at, " +
         "host:profiles!listings_host_id_fkey(display_name, private_profiles(email)), " +
         "listing_addresses(street_address, unit, zip), listing_photos(path, order)",
@@ -62,7 +65,7 @@ export async function ReviewQueue({ q }: { q: string }) {
       {pending.map((l) => {
         const type = site.listingTypes.find((t) => t.value === l.type);
         const address = l.listing_addresses;
-        const fullAddress = address && `${address.street_address}${address.unit ? `, ${address.unit}` : ""}, ${l.city}, CO ${address.zip}`;
+        const fullAddress = address && `${address.street_address}${address.unit ? `, ${address.unit}` : ""}, ${l.city}, ${l.state} ${address.zip}`;
         const photos = sortedPhotos(l.listing_photos);
         return (
           <article key={l.id} id={l.id} className="scroll-mt-24 space-y-4 rounded-2xl border border-border bg-surface p-5 sm:p-6">
@@ -73,7 +76,7 @@ export async function ReviewQueue({ q }: { q: string }) {
                 </p>
                 <h2 className="text-xl font-bold">{l.title}</h2>
                 <p className="text-sm text-muted">
-                  {l.city} · {formatPrice(l.price)}/mo · deposit {formatPrice(l.deposit)} ·{" "}
+                  {l.city}, {l.state} · {getRegion(l.region).name} · {formatPrice(l.price)}/mo · deposit {formatPrice(l.deposit)} ·{" "}
                   {l.bedrooms} bd / {l.bathrooms} ba · from {formatDate(l.available_from)}
                 </p>
               </div>
