@@ -113,8 +113,14 @@ export function Header() {
             <LinkPending />
             <Logo />
           </Link>
-          <Link href="/" className="text-lg font-bold">
-            {site.name}
+          {/* Gold like the logo's door, with a soft shadow and glow so it stands off the bar. */}
+          <Link href="/" className="leading-none">
+            <span className="block text-xl font-bold text-door [text-shadow:0_2px_0_rgb(0_0_0/0.55),0_0_14px_rgb(245_199_90/0.3)]">
+              {site.name}
+            </span>
+            <span className="mt-0.5 block text-[10px] font-semibold uppercase tracking-[0.25em] text-muted">
+              {site.nameLatin}
+            </span>
           </Link>
         </div>
 
