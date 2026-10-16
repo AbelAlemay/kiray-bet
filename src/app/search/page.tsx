@@ -7,6 +7,7 @@ import { ListingsMap } from "@/components/ListingsMap";
 import { SearchFilters } from "@/components/SearchFilters";
 import { formatDate, formatPrice } from "@/lib/format";
 import { getChosenRegion } from "@/lib/region-server";
+import { RegionSwitcher } from "@/components/RegionSwitcher";
 import {
   filtersToQuery,
   getCityCounts,
@@ -130,9 +131,12 @@ async function Results({ searchParams }: { searchParams: PageProps<"/search">["s
       </aside>
       <div className="min-w-0">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-          <p className="text-sm text-muted" aria-live="polite">
-            {count} {count === 1 ? "home" : "homes"} found in {filters.city ?? region.name}
-          </p>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+            <RegionSwitcher current={region.id} />
+            <p className="text-sm text-muted" aria-live="polite">
+              {count} {count === 1 ? "home" : "homes"} found{filters.city ? ` in ${filters.city}` : ""}
+            </p>
+          </div>
           <nav aria-label="View" className="flex w-full gap-1 rounded-xl border border-border bg-surface p-1 sm:w-auto">
             {views.map((v) => (
               <Link

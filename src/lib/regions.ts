@@ -5,6 +5,7 @@
 export type Region = {
   id: string;
   name: string; // in the area switcher
+  place: string; // in sentences: "homes in the Denver area"
   headlineAm: string; // the home page headline
   taglineEn: string; // under the headline
   states: string[];
@@ -18,7 +19,8 @@ export type Region = {
 export const regions = [
   {
     id: "denver",
-    name: "Denver",
+    name: "Denver area",
+    place: "the Denver area",
     headlineAm: "የሚከራዩ ቤቶች በዴንቨር እና አካባቢው",
     taglineEn: "Homes for rent in Denver and nearby, from our community",
     states: ["CO"],
@@ -30,6 +32,7 @@ export const regions = [
   {
     id: "dmv",
     name: "DC · Maryland · Virginia",
+    place: "DC, Maryland and Virginia",
     headlineAm: "የሚከራዩ ቤቶች በዲሲ፣ በሜሪላንድ እና በቨርጂኒያ",
     taglineEn: "Homes for rent in DC, Maryland and Virginia, from our community",
     states: ["DC", "MD", "VA"],
@@ -40,7 +43,8 @@ export const regions = [
   },
   {
     id: "seattle",
-    name: "Seattle",
+    name: "Seattle area",
+    place: "the Seattle area",
     headlineAm: "የሚከራዩ ቤቶች በሲያትል እና አካባቢው",
     taglineEn: "Homes for rent in Seattle and nearby, from our community",
     states: ["WA"],
@@ -52,6 +56,7 @@ export const regions = [
   {
     id: "dfw",
     name: "Dallas–Fort Worth",
+    place: "Dallas–Fort Worth",
     headlineAm: "የሚከራዩ ቤቶች በዳላስ–ፎርት ዎርዝ እና አካባቢው",
     taglineEn: "Homes for rent in Dallas–Fort Worth, from our community",
     states: ["TX"],
@@ -62,7 +67,8 @@ export const regions = [
   },
   {
     id: "austin",
-    name: "Austin",
+    name: "Austin area",
+    place: "the Austin area",
     headlineAm: "የሚከራዩ ቤቶች በኦስቲን እና አካባቢው",
     taglineEn: "Homes for rent in Austin and nearby, from our community",
     states: ["TX"],
@@ -73,7 +79,8 @@ export const regions = [
   },
   {
     id: "houston",
-    name: "Houston",
+    name: "Houston area",
+    place: "the Houston area",
     headlineAm: "የሚከራዩ ቤቶች በሂውስተን እና አካባቢው",
     taglineEn: "Homes for rent in Houston and nearby, from our community",
     states: ["TX"],
@@ -85,6 +92,7 @@ export const regions = [
   {
     id: "msp",
     name: "Minneapolis–Saint Paul",
+    place: "Minneapolis–Saint Paul",
     headlineAm: "የሚከራዩ ቤቶች በሚኒያፖሊስ–ሴንት ፖል እና አካባቢው",
     taglineEn: "Homes for rent in Minneapolis–Saint Paul, from our community",
     states: ["MN"],
@@ -95,7 +103,8 @@ export const regions = [
   },
   {
     id: "portland",
-    name: "Portland",
+    name: "Portland area",
+    place: "the Portland area",
     headlineAm: "የሚከራዩ ቤቶች በፖርትላንድ እና አካባቢው",
     taglineEn: "Homes for rent in Portland and nearby, from our community",
     states: ["OR", "WA"],
@@ -106,7 +115,8 @@ export const regions = [
   },
   {
     id: "atlanta",
-    name: "Atlanta",
+    name: "Atlanta area",
+    place: "the Atlanta area",
     headlineAm: "የሚከራዩ ቤቶች በአትላንታ እና አካባቢው",
     taglineEn: "Homes for rent in Atlanta and nearby, from our community",
     states: ["GA"],
@@ -117,7 +127,8 @@ export const regions = [
   },
   {
     id: "bayarea",
-    name: "Oakland / SF Bay Area",
+    name: "SF Bay Area",
+    place: "the SF Bay Area",
     headlineAm: "የሚከራዩ ቤቶች በኦክላንድ፣ በሳን ፍራንሲስኮ እና አካባቢው",
     taglineEn: "Homes for rent in Oakland, San Francisco and the Bay Area, from our community",
     states: ["CA"],
@@ -128,7 +139,8 @@ export const regions = [
   },
   {
     id: "socal",
-    name: "Los Angeles / Southern California",
+    name: "Southern California",
+    place: "Southern California",
     headlineAm: "የሚከራዩ ቤቶች በሎስ አንጀለስ እና በደቡብ ካሊፎርኒያ",
     taglineEn: "Homes for rent in Los Angeles and Southern California, from our community",
     states: ["CA"],

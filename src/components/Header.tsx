@@ -6,9 +6,7 @@ import { getUnreadCount } from "@/lib/conversations";
 import { site } from "@/lib/site";
 import { Logo } from "./Logo";
 import { WithCount } from "./CountBadge";
-import { getChosenRegion } from "@/lib/region-server";
 import { MobileMenu } from "./MobileMenu";
-import { RegionSwitcher } from "./RegionSwitcher";
 import { FormPending, LinkPending } from "./Pending";
 import { SavedLink } from "./SavedLink";
 
@@ -94,12 +92,6 @@ async function MenuBadge() {
   ) : null;
 }
 
-// Reads the remembered area (a cookie), so it streams in behind a Suspense boundary.
-async function CurrentRegion() {
-  const region = await getChosenRegion();
-  return <RegionSwitcher current={region.id} />;
-}
-
 function PostLink() {
   return (
     <Link
@@ -121,14 +113,9 @@ export function Header() {
             <LinkPending />
             <Logo />
           </Link>
-          <div className="leading-tight">
-            <Link href="/" className="block text-lg font-bold">
-              {site.name}
-            </Link>
-            <Suspense fallback={<span className="block text-xs text-muted">📍 …</span>}>
-              <CurrentRegion />
-            </Suspense>
-          </div>
+          <Link href="/" className="text-lg font-bold">
+            {site.name}
+          </Link>
         </div>
 
         {/* Wide screens: everything in one row */}

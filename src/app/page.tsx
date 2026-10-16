@@ -9,6 +9,8 @@ import { getCityCounts, getLatestListings, getListingPins } from "@/lib/listings
 import { getChosenRegion } from "@/lib/region-server";
 import { site } from "@/lib/site";
 import { LinkPending } from "@/components/Pending";
+import { RegionSwitcher } from "@/components/RegionSwitcher";
+import { Skyline } from "@/components/Skyline";
 
 const steps = [
   {
@@ -61,11 +63,12 @@ async function AreaSections() {
 
   return (
     <>
-      <section className="bg-forest bg-[url(/house-pattern.svg)] bg-[length:80px] text-white">
-        <div className="mx-auto max-w-6xl px-4 pb-14 pt-12 sm:pt-20">
-          <div className="mb-3 flex flex-wrap gap-2 text-sm">
-            <p className="rounded-full bg-white/15 px-3 py-1">{region.cities.slice(0, 4).join(" · ")}</p>
-            <a href="#safety" className="rounded-full bg-white/15 px-3 py-1 transition hover:bg-white/25">
+      <section className="relative bg-forest bg-[url(/house-pattern.svg)] bg-[length:80px] text-white">
+        <Skyline region={region.id} />
+        <div className="relative mx-auto max-w-6xl px-4 pb-28 pt-8 sm:pb-44 sm:pt-12">
+          <div className="mb-6 flex flex-wrap items-center gap-3">
+            <RegionSwitcher current={region.id} variant="hero" />
+            <a href="#safety" className="rounded-full bg-white/15 px-3 py-1 text-sm transition hover:bg-white/25">
               🔒 Safe & private · ደህንነቱ የተጠበቀ
             </a>
           </div>
@@ -82,7 +85,7 @@ async function AreaSections() {
       {citiesWithHomes.length > 0 && (
         <section className="mx-auto max-w-6xl px-4 pt-10">
           <h2 className="mb-3 text-lg font-bold">
-            Homes by city · <span className="text-muted">በከተማ</span>
+            Cities in {region.place} · <span className="text-muted">ከተሞች</span>
           </h2>
           {/* Scrolls sideways on phones; wraps on wider screens. */}
           <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-2 sm:mx-0 sm:flex-wrap sm:px-0">
@@ -93,6 +96,7 @@ async function AreaSections() {
                 className="relative flex min-h-11 shrink-0 items-center gap-2 rounded-full border border-border bg-surface px-4 font-semibold hover:border-brand"
               >
                 <LinkPending />
+                <span aria-hidden className="text-muted">🏘</span>
                 {city}
                 <span className="rounded-full bg-brand-soft px-2 py-0.5 text-xs text-brand">{count}</span>
               </Link>
@@ -108,7 +112,7 @@ async function AreaSections() {
         </div>
         {latest.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-border p-10 text-center">
-            <p className="font-semibold">No homes listed in {region.name} yet.</p>
+            <p className="font-semibold">No homes listed in {region.place} yet.</p>
             <p className="mt-1 text-sm text-muted">Have a room or home to rent here? Be the first to post it, for free.</p>
             <Link
               href="/listings/new"
@@ -155,7 +159,8 @@ function AreaSkeleton() {
   return (
     <>
       <section className="bg-forest text-white">
-        <div className="mx-auto h-[26rem] max-w-6xl px-4 pt-20">
+        <div className="mx-auto h-[30rem] max-w-6xl px-4 pt-8 sm:pt-12">
+          <div className="mb-6 h-12 w-64 animate-pulse rounded-full bg-white/20" />
           <div className="h-12 w-2/3 animate-pulse rounded bg-white/15" />
           <div className="mt-8 h-14 max-w-4xl animate-pulse rounded-2xl bg-white/10" />
         </div>
