@@ -156,7 +156,7 @@ async function Results({ searchParams }: { searchParams: PageProps<"/[lang]/sear
             <p className="text-sm text-muted" aria-live="polite">
               {t(
                 `${count} ${count === 1 ? "home" : "homes"} found${filters.city ? ` in ${filters.city}` : ""}`,
-                `${filters.city ? `በ${filters.city} ` : ""}${count} ቤት${count === 1 ? "" : "ቶች"} ተገኝ${count === 1 ? "ቷል" : "ተዋል"}`,
+                `${filters.city ? `በ${filters.city} ` : ""}${count} ${count === 1 ? "ቤት ተገኝቷል" : "ቤቶች ተገኝተዋል"}`,
               )}
             </p>
           </div>

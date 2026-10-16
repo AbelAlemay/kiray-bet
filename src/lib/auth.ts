@@ -1,8 +1,10 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { cache } from "react";
+import { isLang, langCookie } from "./i18n";
 import { createServerSupabase } from "./supabase/server";
 
 export type CurrentUser = {
@@ -73,8 +75,22 @@ export function safeNext(value: unknown, fallback = "/"): string {
 // Where to go right after signing in: new users without a name first set one on the
 // account page, then continue to `next`.
 export async function pathAfterSignIn(supabase: SupabaseClient, userId: string, next: string) {
+  await syncLanguage(supabase, userId);
   const { data } = await supabase.from("profiles").select("display_name").eq("id", userId).single();
   return data?.display_name ? next : `/account?welcome=1&next=${encodeURIComponent(next)}`;
+}
+
+// On sign-in: a language chosen on this device is saved to the profile; otherwise the
+// profile's language becomes this device's.
+async function syncLanguage(supabase: SupabaseClient, userId: string) {
+  const jar = await cookies();
+  const chosen = jar.get(langCookie)?.value;
+  if (isLang(chosen)) {
+    await supabase.from("private_profiles").update({ language: chosen }).eq("user_id", userId);
+    return;
+  }
+  const { data } = await supabase.from("private_profiles").select("language").eq("user_id", userId).single();
+  if (isLang(data?.language)) jar.set(langCookie, data.language, { path: "/", maxAge: 31536000, sameSite: "lax" });
 }
 
 export function siteUrl() {

@@ -2,6 +2,7 @@
 
 import Script from "next/script";
 import { useEffect, useRef, useState } from "react";
+import { useT } from "./LangProvider";
 
 // Cloudflare Turnstile bot check. Invisible unless Cloudflare wants a click. Puts its
 // token in a hidden "turnstileToken" field of the surrounding form. Tokens work once,
@@ -29,12 +30,15 @@ export function useBotCheck() {
   const [failed, setFailed] = useState(false);
   // Cloudflare occasionally asks for a click ("Verify you are human").
   const [needsClick, setNeedsClick] = useState(false);
+  const t = useT();
   const waiting = !!siteKey && !token;
   return {
     waiting,
     failed,
     // Button label while waiting.
-    waitingLabel: needsClick ? "Tick the box above to continue" : "Checking your browser…",
+    waitingLabel: needsClick
+      ? t("Tick the box above to continue", "ለመቀጠል ከላይ ያለውን ሳጥን ምልክት ያድርጉ")
+      : t("Checking your browser…", "አሳሽዎን በማረጋገጥ ላይ…"),
     onToken: (value: string) => {
       setToken(value);
       if (value) {
@@ -116,10 +120,13 @@ export function Turnstile({
 
 // Shown when the bot check couldn't run, instead of "Checking your browser…" forever.
 export function BotCheckFailed() {
+  const t = useT();
   return (
     <p role="alert" className="text-sm text-danger">
-      Our quick safety check couldn&apos;t load. Please refresh the page. If it keeps happening,
-      try another browser or turn off ad blockers for this site.
+      {t(
+        "Our quick safety check couldn't load. Please refresh the page. If it keeps happening, try another browser or turn off ad blockers for this site.",
+        "አጭሩ የደህንነት ፍተሻችን መጫን አልቻለም። እባክዎ ገጹን ያድሱ። ችግሩ ከቀጠለ ሌላ አሳሽ ይሞክሩ ወይም ለዚህ ድረ-ገጽ የማስታወቂያ ማገጃዎችን ያጥፉ።",
+      )}
     </p>
   );
 }
