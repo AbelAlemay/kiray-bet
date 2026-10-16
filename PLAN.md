@@ -158,7 +158,7 @@ Private (owner and admin only):
 | 5 | Real search + map with approximate locations | Done |
 | 6 | In-app messaging + address requests | Done (email alerts for new messages: at launch) |
 | 7 | Favorites | Done |
-| 8 | Amharic | Next |
+| 8 | Amharic | Built Oct 15, 2026 on branch `amharic`: every page in English and Amharic (src/app/[lang]); the proxy serves the visitor's choice (cookie kb_lang, ?lang=am links) at the same address; "English \| አማርኛ" switch in the header; translations sit next to the code as t("English", "አማርኛ"); admin pages and lease documents stay English |
 | 9 | Reports, bans, Safety page, Terms, Privacy Policy | |
 | 10 | Security review, domain, launch on Vercel | Domain + Vercel done (testing); security review before public launch |
 | 11 | Promote in community Facebook and Telegram groups, churches and restaurants | |

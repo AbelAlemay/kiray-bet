@@ -24,23 +24,26 @@ const ethiopic = Menbere({
   adjustFontFallback: false,
 });
 
-export const metadata: Metadata = {
-  title: {
-    default: `${site.name} · ${site.nameLatin}`,
-    template: `%s · ${site.nameLatin}`,
-  },
-  description: site.tagline,
-  // Absolute links in share previews (the image is src/app/opengraph-image.tsx).
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
-  openGraph: {
-    siteName: `${site.name} · ${site.nameLatin}`,
-    type: "website",
-    locale: "en_US",
-  },
-  twitter: { card: "summary_large_image" },
-  // Kept out of search engines until public launch (set NEXT_PUBLIC_ALLOW_INDEXING=on).
-  robots: process.env.NEXT_PUBLIC_ALLOW_INDEXING === "on" ? undefined : { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return {
+    title: {
+      default: `${site.name} · ${site.nameLatin}`,
+      template: `%s · ${site.nameLatin}`,
+    },
+    description: t(site.tagline, `${site.taglineAm}፣ በ11 የአሜሪካ አካባቢዎች`),
+    // Absolute links in share previews (the image is src/app/opengraph-image.tsx).
+    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+    openGraph: {
+      siteName: `${site.name} · ${site.nameLatin}`,
+      type: "website",
+      locale: t("en_US", "am_ET"),
+    },
+    twitter: { card: "summary_large_image" },
+    // Kept out of search engines until public launch (set NEXT_PUBLIC_ALLOW_INDEXING=on).
+    robots: process.env.NEXT_PUBLIC_ALLOW_INDEXING === "on" ? undefined : { index: false, follow: false },
+  };
+}
 
 // Colors the phone's browser bar to match the (always dark) site.
 // viewportFit "cover" lets bottom bars pad for the iPhone home indicator.
