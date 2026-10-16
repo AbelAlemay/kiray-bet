@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getT } from "@/lib/i18n-server";
 import { site } from "@/lib/site";
 
@@ -23,6 +24,18 @@ export async function Footer() {
             `በ${site.name} ላይ ያሉ ማስታወቂያዎች ሁሉ ለሁሉም ሰው ክፍት ናቸው። ባለቤቶች በዘር፣ በቀለም፣ በትውልድ አገር፣ በሃይማኖት፣ በጾታ፣ በቤተሰብ ሁኔታ፣ በአካል ጉዳት ወይም በፌዴራል፣ በክልልና በአካባቢ የፍትሃዊ መኖሪያ ቤት ሕጎች በተጠበቀ በማንኛውም ሌላ መለያ ምርጫ ማሳየት አይችሉም።`,
           )}
         </p>
+        <nav aria-label={t("Site information", "የድረ-ገጹ መረጃ")} className="flex flex-wrap gap-x-5 gap-y-1">
+          {[
+            ["/safety", t("Safety tips", "የደህንነት ምክሮች")],
+            ["/terms", t("Terms of Service", "የአገልግሎት ውል")],
+            ["/privacy", t("Privacy Policy", "የግላዊነት ፖሊሲ")],
+            ["/contact", t("Contact", "ያግኙን")],
+          ].map(([href, label]) => (
+            <Link key={href} href={href} className="inline-block py-2 font-semibold text-foreground hover:text-brand hover:underline">
+              {label}
+            </Link>
+          ))}
+        </nav>
         <p>© {site.nameLatin}</p>
       </div>
     </footer>

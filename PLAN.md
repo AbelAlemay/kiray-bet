@@ -159,7 +159,7 @@ Private (owner and admin only):
 | 6 | In-app messaging + address requests | Done (email alerts for new messages: at launch) |
 | 7 | Favorites | Done |
 | 8 | Amharic | Built Oct 15, 2026 on branch `amharic`: every page in English and Amharic (src/app/[lang]); the proxy serves the visitor's choice (cookie kb_lang, ?lang=am links) at the same address; "English \| አማርኛ" switch in the header; translations sit next to the code as t("English", "አማርኛ"); admin pages and lease documents stay English |
-| 9 | Reports, bans, Safety page, Terms, Privacy Policy | |
+| 9 | Reports, bans, Safety page, Terms, Privacy Policy | Built Oct 15, 2026: ⚑ Report on listings and conversations (reason categories, no duplicates, 20/day cap, admin alert), admin Reports tab with take-down/ban/handled/dismiss and a read-only reported-conversation view; /safety (English and Amharic); /terms and /privacy drafts (English official, Amharic summary) awaiting lawyer review |
 | 10 | Security review, domain, launch on Vercel | Domain + Vercel done (testing); security review before public launch |
 | 11 | Promote in community Facebook and Telegram groups, churches and restaurants | |
 

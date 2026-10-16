@@ -170,7 +170,16 @@ export function LoginForm({ next, googleEnabled }: { next: string; googleEnabled
           {t(
             "First time here? This code also creates your free account. We never show your email to other users and never ask for your phone number.",
             "ለመጀመሪያ ጊዜ ነው? ይህ ኮድ ነጻ መለያዎንም ይፈጥራል። ኢሜይልዎን ለሌሎች ተጠቃሚዎች በፍጹም አናሳይም፤ ስልክ ቁጥርዎንም አንጠይቅም።",
-          )}
+          )}{" "}
+          {t("By continuing you agree to our", "በመቀጠልዎ በእኛ")}{" "}
+          <a href="/terms" target="_blank" className="font-semibold text-brand hover:underline">
+            {t("Terms", "የአገልግሎት ውል")}
+          </a>{" "}
+          {t("and", "እና")}{" "}
+          <a href="/privacy" target="_blank" className="font-semibold text-brand hover:underline">
+            {t("Privacy Policy", "የግላዊነት ፖሊሲ")}
+          </a>
+          {t(".", " ይስማማሉ።")}
         </p>
       </form>
     </div>

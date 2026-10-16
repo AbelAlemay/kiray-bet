@@ -248,6 +248,10 @@ export default async function Home() {
           <div className="mt-6">
             <PaymentWarning />
           </div>
+          <Link href="/safety" className="relative mt-4 inline-block py-2 font-semibold text-brand hover:underline">
+            <LinkPending />
+            {t("More safety tips →", "ተጨማሪ የደህንነት ምክሮች →")}
+          </Link>
         </div>
       </section>
 
