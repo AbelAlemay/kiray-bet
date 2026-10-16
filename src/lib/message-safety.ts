@@ -14,9 +14,13 @@ export function messageWarning(text: string): MessageWarning | null {
   return null;
 }
 
-export const warningText: Record<MessageWarning, string> = {
-  money:
-    "Never send a deposit or any payment before you have seen the home in person and signed a lease. Anyone who asks you to pay first is likely a scammer. · ቤቱን ሳያዩና ውል ሳይፈርሙ ገንዘብ አይላኩ።",
-  contact:
-    "Be careful sharing phone numbers, emails or links with someone you haven't met. You can keep talking here.",
+export const warningText: Record<MessageWarning, { en: string; am: string }> = {
+  money: {
+    en: "Never send a deposit or any payment before you have seen the home in person and signed a lease. Anyone who asks you to pay first is likely a scammer. · ቤቱን ሳያዩና ውል ሳይፈርሙ ገንዘብ አይላኩ።",
+    am: "ቤቱን በአካል ሳያዩና የኪራይ ውል ሳይፈርሙ ቅድመ ክፍያም ሆነ ሌላ ምንም ክፍያ በፍጹም አይላኩ። አስቀድመው እንዲከፍሉ የሚጠይቅዎ ሰው አጭበርባሪ ሊሆን ይችላል።",
+  },
+  contact: {
+    en: "Be careful sharing phone numbers, emails or links with someone you haven't met. You can keep talking here.",
+    am: "ላላገኙት ሰው ስልክ ቁጥር፣ ኢሜይል ወይም ሊንክ ሲያጋሩ ይጠንቀቁ። እዚሁ መነጋገር መቀጠል ይችላሉ።",
+  },
 };

@@ -8,6 +8,7 @@ import { messageWarning, warningText } from "@/lib/message-safety";
 import { createBrowserSupabase } from "@/lib/supabase/browser";
 import { markRead, sendMessage } from "../actions";
 import { PendingCorner } from "@/components/Pending";
+import { useT } from "@/components/LangProvider";
 
 // The message thread. New messages and read receipts arrive live (Supabase Realtime,
 // which applies the same security rules as everything else); address decisions
@@ -30,6 +31,7 @@ export function Chat({
   const [draft, setDraft] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [sending, startSending] = useTransition();
+  const t = useT();
   const end = useRef<HTMLDivElement>(null);
 
   const upsert = (incoming: ChatMessage) =>
@@ -95,7 +97,7 @@ export function Chat({
         upsert(result.message);
         setDraft("");
       } else {
-        setError(result.error ?? "Your message couldn't be sent.");
+        setError(result.error ?? t("Your message couldn't be sent.", "መልዕክትዎ መላክ አልቻለም።"));
       }
     });
   }
@@ -105,7 +107,7 @@ export function Chat({
 
   return (
     <div className="flex flex-col">
-      <ol className="space-y-3 pb-4" aria-label={`Conversation with ${otherName}`}>
+      <ol className="space-y-3 pb-4" aria-label={t(`Conversation with ${otherName}`, `ከ${otherName} ጋር ያለ ውይይት`)}>
         {messages.map((m) => {
           const mine = m.sender_id === myId;
           const warning = messageWarning(m.body);
@@ -119,12 +121,12 @@ export function Chat({
                 {m.body}
               </div>
               <span className="mt-1 px-1 text-xs text-muted">
-                {formatMessageTime(m.created_at)}
-                {m.id === lastMine?.id && m.read_at && " · Seen"}
+                {formatMessageTime(m.created_at, t.lang)}
+                {m.id === lastMine?.id && m.read_at && ` · ${t("Seen", "ታይቷል")}`}
               </span>
               {warning && (
                 <p className="mt-1 max-w-[85%] rounded-xl border border-accent/60 bg-accent/10 px-3 py-2 text-xs">
-                  ⚠ {warningText[warning]}
+                  ⚠ {t(warningText[warning].en, warningText[warning].am)}
                 </p>
               )}
             </li>
@@ -140,7 +142,7 @@ export function Chat({
         }}
         className="sticky bottom-0 -mx-4 space-y-2 border-t border-border bg-background/95 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur"
       >
-        {draftWarning && <p className="rounded-xl border border-accent/60 bg-accent/10 p-2 text-xs">⚠ {warningText[draftWarning]}</p>}
+        {draftWarning && <p className="rounded-xl border border-accent/60 bg-accent/10 p-2 text-xs">⚠ {t(warningText[draftWarning].en, warningText[draftWarning].am)}</p>}
         {error && (
           <p role="alert" className="text-sm text-danger">
             {error}
@@ -158,8 +160,8 @@ export function Chat({
             }}
             rows={Math.min(5, Math.max(1, draft.split("\n").length))}
             maxLength={4000}
-            placeholder={`Message ${otherName}…`}
-            aria-label={`Message ${otherName}`}
+            placeholder={t(`Message ${otherName}…`, `ለ${otherName} መልዕክት ይጻፉ…`)}
+            aria-label={t(`Message ${otherName}`, `ለ${otherName} መልዕክት`)}
             className="min-h-11 flex-1 resize-none rounded-xl border border-border bg-surface px-3 py-2.5 outline-none focus:border-brand"
           />
           <button
@@ -167,7 +169,7 @@ export function Chat({
             className="relative min-h-11 rounded-xl bg-brand px-5 font-semibold text-white hover:bg-brand-strong disabled:opacity-60"
           >
             <PendingCorner pending={sending} />
-            Send
+            {t("Send", "ላክ")}
           </button>
         </div>
       </form>

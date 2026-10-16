@@ -7,11 +7,12 @@ import { requireUser } from "@/lib/auth";
 import { formatPrice, nearLabel } from "@/lib/format";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { StartForm } from "./StartForm";
+import { getT } from "@/lib/i18n-server";
 
-export const metadata: Metadata = {
-  title: "Message the host",
-  robots: { index: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return { title: t("Message the host", "ባለቤቱን ያግኙ"), robots: { index: false } };
+}
 
 type Props = PageProps<"/[lang]/messages/new">;
 
@@ -36,12 +37,14 @@ async function NewMessage({ searchParams }: { searchParams: Props["searchParams"
         >()
     : { data: null };
   if (!listing) notFound();
+  const t = await getT();
 
   const summary = (
     <Link href={`/listings/${listing.id}`} className="block rounded-2xl border border-border bg-surface p-4 hover:border-brand">
       <p className="font-semibold">{listing.title}</p>
       <p className="text-sm text-muted">
-        {formatPrice(listing.price)}/mo · {nearLabel({ ...listing, crossStreets: listing.cross_streets })}
+        {formatPrice(listing.price)}
+        {t("/mo", "/በወር")} · {nearLabel({ ...listing, crossStreets: listing.cross_streets }, t.lang)}
       </p>
     </Link>
   );
@@ -51,10 +54,12 @@ async function NewMessage({ searchParams }: { searchParams: Props["searchParams"
       <div className="space-y-4">
         {summary}
         <div className="rounded-2xl bg-brand-soft p-5">
-          <p className="font-semibold">This is your listing.</p>
-          <p className="mt-1 text-sm">Renters&apos; messages about it will show up in Messages.</p>
+          <p className="font-semibold">{t("This is your listing.", "ይህ የእርስዎ ማስታወቂያ ነው።")}</p>
+          <p className="mt-1 text-sm">
+            {t("Renters' messages about it will show up in Messages.", "ስለ እሱ የተከራዮች መልዕክቶች በመልዕክቶች ገጽ ይታያሉ።")}
+          </p>
           <Link href={`/listings/${listing.id}/edit`} className="mt-3 inline-block font-semibold text-brand hover:underline">
-            Edit listing →
+            {t("Edit listing →", "ማስታወቂያውን ያስተካክሉ →")}
           </Link>
         </div>
       </div>
@@ -69,7 +74,7 @@ async function NewMessage({ searchParams }: { searchParams: Props["searchParams"
     .maybeSingle();
   if (existing) redirect(`/messages/${existing.id}`);
 
-  const hostName = listing.host?.display_name ?? "the host";
+  const hostName = listing.host?.display_name ?? t("the host", "ባለቤቱ");
   return (
     <div className="space-y-4">
       {summary}
@@ -81,10 +86,11 @@ async function NewMessage({ searchParams }: { searchParams: Props["searchParams"
   );
 }
 
-export default function NewMessagePage({ searchParams }: Props) {
+export default async function NewMessagePage({ searchParams }: Props) {
+  const t = await getT();
   return (
     <div className="mx-auto max-w-2xl px-4 pt-8">
-      <h1 className="mb-6 text-2xl font-bold sm:text-3xl">Message the host · ባለቤቱን ያግኙ</h1>
+      <h1 className="mb-6 text-2xl font-bold sm:text-3xl">{t.both("Message the host", "ባለቤቱን ያግኙ")}</h1>
       <Suspense fallback={<div className="h-40 animate-pulse rounded-2xl bg-border/50" />}>
         <NewMessage searchParams={searchParams} />
       </Suspense>

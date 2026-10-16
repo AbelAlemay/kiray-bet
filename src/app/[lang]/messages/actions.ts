@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import type { ChatMessage } from "@/lib/conversations";
 import { createServerSupabase } from "@/lib/supabase/server";
+import type { T } from "@/lib/i18n";
+import { getActionT } from "@/lib/i18n-server";
 
 // Messaging actions. All run as the signed-in user; the database's rules decide who
 // may start a conversation, post into it, read it, and see the address.
@@ -14,21 +16,32 @@ function cleanBody(raw: unknown) {
   return String(raw ?? "").replace(/\r\n/g, "\n").trim().slice(0, maxLength);
 }
 
-function friendlyError(message: string) {
-  if (message.includes("too quickly")) return "You're sending messages too quickly. Please wait a minute.";
-  if (message.includes("Too many new conversations")) return "You've started a lot of conversations today. Please try again tomorrow.";
-  return "Your message couldn't be sent. Please try again.";
+function friendlyError(message: string, t: T) {
+  if (message.includes("too quickly")) {
+    return t("You're sending messages too quickly. Please wait a minute.", "መልዕክቶችን በጣም በፍጥነት እየላኩ ነው። እባክዎ አንድ ደቂቃ ይጠብቁ።");
+  }
+  if (message.includes("Too many new conversations")) {
+    return t(
+      "You've started a lot of conversations today. Please try again tomorrow.",
+      "ዛሬ ብዙ ውይይቶችን ጀምረዋል። እባክዎ ነገ እንደገና ይሞክሩ።",
+    );
+  }
+  return t("Your message couldn't be sent. Please try again.", "መልዕክትዎ መላክ አልቻለም። እባክዎ እንደገና ይሞክሩ።");
 }
+
+const signInAgain = (t: T) => t("Please sign in again.", "እባክዎ እንደገና ይግቡ።");
+const writeSomething = (t: T) => t("Please write a message.", "እባክዎ መልዕክት ይጻፉ።");
 
 export type StartState = { error?: string };
 
 // First message to a host about a listing. Reuses the conversation if one exists.
 export async function startConversation(_prev: StartState, formData: FormData): Promise<StartState> {
   const user = await getCurrentUser();
-  if (!user) return { error: "Please sign in again." };
+  const t = await getActionT();
+  if (!user) return { error: signInAgain(t) };
   const listingId = String(formData.get("listingId") ?? "");
   const body = cleanBody(formData.get("body"));
-  if (!body) return { error: "Please write a message." };
+  if (!body) return { error: writeSomething(t) };
 
   const supabase = await createServerSupabase();
   const { data: listing } = await supabase
@@ -37,8 +50,8 @@ export async function startConversation(_prev: StartState, formData: FormData): 
     .eq("id", listingId)
     .eq("status", "active")
     .maybeSingle();
-  if (!listing) return { error: "This listing is no longer available." };
-  if (listing.host_id === user.id) return { error: "This is your own listing." };
+  if (!listing) return { error: t("This listing is no longer available.", "ይህ ማስታወቂያ ከእንግዲህ አይገኝም።") };
+  if (listing.host_id === user.id) return { error: t("This is your own listing.", "ይህ የራስዎ ማስታወቂያ ነው።") };
 
   const find = () =>
     supabase.from("conversations").select("id").eq("listing_id", listingId).eq("renter_id", user.id).maybeSingle();
@@ -48,15 +61,15 @@ export async function startConversation(_prev: StartState, formData: FormData): 
       .from("conversations")
       .insert({ listing_id: listingId, renter_id: user.id, host_id: listing.host_id });
     // A duplicate means it was just created (e.g. a double tap); use that one.
-    if (error && error.code !== "23505") return { error: friendlyError(error.message) };
+    if (error && error.code !== "23505") return { error: friendlyError(error.message, t) };
     ({ data: conversation } = await find());
   }
-  if (!conversation) return { error: friendlyError("") };
+  if (!conversation) return { error: friendlyError("", t) };
 
   const { error } = await supabase
     .from("messages")
     .insert({ conversation_id: conversation.id, sender_id: user.id, body });
-  if (error) return { error: friendlyError(error.message) };
+  if (error) return { error: friendlyError(error.message, t) };
   redirect(`/messages/${conversation.id}`);
 }
 
@@ -66,9 +79,10 @@ export async function sendMessage(
   rawBody: string,
 ): Promise<{ message?: ChatMessage; error?: string }> {
   const user = await getCurrentUser();
-  if (!user) return { error: "Please sign in again." };
+  const t = await getActionT();
+  if (!user) return { error: signInAgain(t) };
   const body = cleanBody(rawBody);
-  if (!body) return { error: "Please write a message." };
+  if (!body) return { error: writeSomething(t) };
 
   const supabase = await createServerSupabase();
   const { data, error } = await supabase
@@ -76,7 +90,7 @@ export async function sendMessage(
     .insert({ conversation_id: conversationId, sender_id: user.id, body })
     .select("id, sender_id, body, created_at, read_at")
     .single();
-  if (error) return { error: friendlyError(error.message) };
+  if (error) return { error: friendlyError(error.message, t) };
   return { message: data };
 }
 
