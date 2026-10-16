@@ -17,8 +17,8 @@ export type ListingType = (typeof site.listingTypes)[number]["value"];
 // The utilities a host pays when they're included in the rent.
 export const utilityList = "electricity, gas, water, sewer and trash";
 
-// Hosts renting out a room or basement pay the utilities; for a whole house or
-// apartment the renter does.
+// For the lease only (the site itself doesn't say who pays): hosts renting out a room or
+// basement pay the utilities; for a whole house or apartment the renter does.
 export function utilitiesIncluded(type: string) {
   return type === "room" || type === "basement";
 }

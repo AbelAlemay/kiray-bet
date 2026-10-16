@@ -9,7 +9,7 @@ import { PaymentWarning } from "@/components/PaymentWarning";
 import { SaveButton } from "@/components/SaveButton";
 import { formatDate, formatPrice, nearLabel } from "@/lib/format";
 import { getListing } from "@/lib/listings";
-import { amenityLabels, site, utilitiesIncluded } from "@/lib/site";
+import { amenityLabels, site } from "@/lib/site";
 import { LinkPending } from "@/components/Pending";
 
 type Props = PageProps<"/listings/[id]">;
@@ -148,7 +148,6 @@ async function ListingDetail({ params }: { params: Props["params"] }) {
               labelAm="የሚገኝበት"
               value={formatDate(listing.availableFrom, { month: "short", day: "numeric", year: "numeric" })}
             />
-            <Fact label="Utilities" labelAm="መብራትና ውሃ" value={utilitiesIncluded(listing.type) ? "Included" : "Paid by renter"} />
             <Fact label="Parking" labelAm="መኪና ማቆሚያ" value={yesNo(listing.parking)} />
             <Fact label="Pets allowed" labelAm="የቤት እንስሳ" value={yesNo(listing.petsAllowed)} />
           </dl>

@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Listing } from "@/lib/sample-listings";
 import { formatDate, formatPrice, nearLabel } from "@/lib/format";
-import { site, utilitiesIncluded } from "@/lib/site";
+import { site } from "@/lib/site";
 import { SaveButton } from "./SaveButton";
 import { LinkPending } from "./Pending";
 
@@ -48,7 +48,6 @@ export function ListingCard({ listing }: { listing: Listing }) {
           <p className="text-sm">
             {listing.bedrooms} bd · {listing.bathrooms} ba
             {listing.parking && " · Parking"}
-            {utilitiesIncluded(listing.type) && " · Utilities incl."}
           </p>
           <p className="text-xs text-muted">Available {formatDate(listing.availableFrom)}</p>
         </div>

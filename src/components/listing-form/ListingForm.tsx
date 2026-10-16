@@ -3,7 +3,7 @@
 import { startTransition, useActionState, useState, type ReactNode } from "react";
 import { fieldClass, labelClass, primaryButtonClass } from "@/components/form-styles";
 import { regions, stateNames } from "@/lib/regions";
-import { amenityOptions, site, utilityList } from "@/lib/site";
+import { amenityOptions, site } from "@/lib/site";
 import { BotCheckFailed, Turnstile, useBotCheck } from "@/components/Turnstile";
 import type { ListingFormState } from "@/app/listings/actions";
 import { PhotoPicker, type Photo } from "./PhotoPicker";
@@ -129,8 +129,7 @@ export function ListingForm({
         <fieldset className="space-y-2">
           <legend className="text-sm font-medium">Amenities · ምን ምን አለው?</legend>
           <p className="text-xs text-muted">
-            Tick everything the home has. Utilities ({utilityList}) are included in the rent for rooms and
-            basements; for a house or apartment the renter pays them.
+            Tick everything the home has.
           </p>
           <div className="grid grid-cols-2 gap-x-4 gap-y-1 sm:grid-cols-3">
             <label className="flex min-h-10 items-center gap-2 text-sm">
