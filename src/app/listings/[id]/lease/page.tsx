@@ -6,7 +6,7 @@ import { requireUser } from "@/lib/auth";
 import { leaseTitles } from "@/lib/leases/fields";
 import { getLeaseTemplate } from "@/lib/leases/templates-server";
 import { leaseStates, stateNames } from "@/lib/regions";
-import { includedUtilities, type ListingType } from "@/lib/site";
+import { utilitiesIncluded, utilityList, type ListingType } from "@/lib/site";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { LeaseBuilder } from "./LeaseBuilder";
 
@@ -73,9 +73,9 @@ async function Lease({ params }: { params: Props["params"] }) {
     payment_method: "",
     security_deposit: money(listing.deposit),
     late_fee: "50",
-    // Utilities are always included in the rent; internet only when the host ticked Wi-Fi.
-    utilities_landlord: listing.amenities.includes("wifi") ? `${includedUtilities.replace(" and", ",")} and internet` : includedUtilities,
-    utilities_tenant: listing.amenities.includes("wifi") ? "None" : "Internet, if wanted",
+    // Rooms and basements: the landlord pays utilities. Houses and apartments: the tenant
+    // does. Internet is the landlord's only when the host ticked Wi-Fi.
+    ...leaseUtilities(utilitiesIncluded(listing.type), listing.amenities.includes("wifi")),
     parking: listing.parking,
     pets_allowed: listing.pets_allowed,
     pre_1978: false,
@@ -106,6 +106,18 @@ async function Lease({ params }: { params: Props["params"] }) {
       />
     </>
   );
+}
+
+function leaseUtilities(included: boolean, wifi: boolean) {
+  const all = `${utilityList.replace(" and", ",")} and internet`;
+  if (included) {
+    return wifi
+      ? { utilities_landlord: all, utilities_tenant: "None" }
+      : { utilities_landlord: utilityList, utilities_tenant: "Internet, if wanted" };
+  }
+  return wifi
+    ? { utilities_landlord: "Internet", utilities_tenant: utilityList }
+    : { utilities_landlord: "None", utilities_tenant: all };
 }
 
 export default function LeasePage({ params }: Props) {

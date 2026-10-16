@@ -14,8 +14,14 @@ export const site = {
 
 export type ListingType = (typeof site.listingTypes)[number]["value"];
 
-// Utilities (electricity, gas, water, sewer, trash) are always included in the rent.
-export const includedUtilities = "electricity, gas, water, sewer and trash";
+// The utilities a host pays when they're included in the rent.
+export const utilityList = "electricity, gas, water, sewer and trash";
+
+// Hosts renting out a room or basement pay the utilities; for a whole house or
+// apartment the renter does.
+export function utilitiesIncluded(type: string) {
+  return type === "room" || type === "basement";
+}
 
 // Amenities a host can tick (same list as the database allows).
 export const amenityOptions = [
