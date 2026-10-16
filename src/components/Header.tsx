@@ -8,16 +8,16 @@ import { Logo } from "./Logo";
 import { WithCount } from "./CountBadge";
 import { getT } from "@/lib/i18n-server";
 import type { T } from "@/lib/i18n";
+import { AccountMenu } from "./AccountMenu";
 import { LangSwitch } from "./LangSwitch";
 import { MobileMenu } from "./MobileMenu";
 import { FormPending, LinkPending } from "./Pending";
 import { SavedLink } from "./SavedLink";
 
-const linkClass = "relative whitespace-nowrap rounded-lg px-3 py-2 hover:bg-brand-soft xl:px-2.5";
+const linkClass = "relative whitespace-nowrap rounded-lg px-3 py-2 hover:bg-brand-soft";
 
 const mainLinks = (t: T) => [
   { href: "/", label: t("Home", "መነሻ") },
-  { href: "/search", label: t("Browse", "ቤቶች") },
   { href: "/about", label: t("About", "ስለ እኛ") },
   { href: "/contact", label: t("Contact", "ያግኙን") },
 ];
@@ -43,12 +43,14 @@ function SignInLink({ t }: { t: T }) {
   );
 }
 
-// Reads the session, so it streams in behind a Suspense boundary.
-async function AccountLinks({ t }: { t: T }) {
+// The signed-in person's pages: a flat list in the phone menu, and the menu under
+// their name in the wide header. Reads the session, so it streams in behind Suspense.
+async function AccountLinks({ t, dropdown = false }: { t: T; dropdown?: boolean }) {
   const user = await getCurrentUser();
   if (!user) return <SignInLink t={t} />;
   const unread = await getUnreadCount(user.id);
-  return (
+  const name = user.name ?? t("Account", "መለያ");
+  const links = (
     <>
       {user.role === "admin" && (
         <Link href="/admin" className={linkClass} lang="en">
@@ -69,10 +71,11 @@ async function AccountLinks({ t }: { t: T }) {
         <LinkPending />
         <WithCount count={unread}>{t("Messages", "መልዕክቶች")}</WithCount>
       </Link>
-      <Link href="/account" className={`${linkClass} font-semibold`}>
+      <Link href="/account" className={`${linkClass} ${dropdown ? "" : "font-semibold"}`}>
         <LinkPending />
-        {user.name ?? t("Account", "መለያ")}
+        {dropdown ? t("Account settings", "የመለያ ቅንብሮች") : name}
       </Link>
+      {dropdown && <hr className="my-1 border-border" />}
       <form action={signOut} className="contents">
         <button className={`${linkClass} text-left text-muted`}>
           <FormPending />
@@ -81,6 +84,22 @@ async function AccountLinks({ t }: { t: T }) {
       </form>
     </>
   );
+  if (!dropdown) return links;
+  return (
+    <AccountMenu name={name} badge={<UnreadBadge count={unread} />}>
+      {links}
+    </AccountMenu>
+  );
+}
+
+function UnreadBadge({ count }: { count: number }) {
+  return count > 0 ? (
+    <span className="ml-0.5 inline-grid h-[18px] min-w-[18px] place-items-center rounded-full bg-red-600 px-1 text-[11px] font-bold leading-none text-white">
+      <span className="sr-only">, </span>
+      {count > 99 ? "99+" : count}
+      <span className="sr-only"> unread messages</span>
+    </span>
+  ) : null;
 }
 
 // Unread count on the closed phone menu button, so new messages aren't hidden.
@@ -130,13 +149,12 @@ export async function Header() {
           </Link>
         </div>
 
-        {/* Wide screens: everything in one row (Amharic labels are longer, so this
-            waits for extra-wide screens; narrower ones use the menu). */}
-        <nav className="hidden items-center gap-0.5 text-sm xl:flex">
+        {/* Wide screens: one row; the signed-in person's pages sit under their name. */}
+        <nav className="hidden items-center gap-1 text-sm lg:flex">
           <MainLinks t={t} withHome={false} />
           <span className="mx-1 h-5 w-px bg-border" aria-hidden />
           <Suspense fallback={<SignInLink t={t} />}>
-            <AccountLinks t={t} />
+            <AccountLinks t={t} dropdown />
           </Suspense>
           <LangSwitch compact className="ml-1" />
           <span className="ml-1">
@@ -145,7 +163,7 @@ export async function Header() {
         </nav>
 
         {/* Small screens: Post button plus a menu */}
-        <div className="flex items-center gap-2 xl:hidden">
+        <div className="flex items-center gap-2 lg:hidden">
           <span className="text-sm">
             <PostLink t={t} />
           </span>
