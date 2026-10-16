@@ -3,7 +3,7 @@
 import { startTransition, useActionState, useState, type ReactNode } from "react";
 import { fieldClass, labelClass, primaryButtonClass } from "@/components/form-styles";
 import { regions, stateNames } from "@/lib/regions";
-import { site, utilityOptions } from "@/lib/site";
+import { amenityOptions, includedUtilities, site } from "@/lib/site";
 import { BotCheckFailed, Turnstile, useBotCheck } from "@/components/Turnstile";
 import type { ListingFormState } from "@/app/listings/actions";
 import { PhotoPicker, type Photo } from "./PhotoPicker";
@@ -21,7 +21,7 @@ export type ListingFormValues = {
   city: string;
   state: string;
   availableFrom: string;
-  utilities: string[];
+  amenities: string[];
   addressVisibility: "private" | "public";
   parking: boolean;
   petsAllowed: boolean;
@@ -127,31 +127,33 @@ export function ListingForm({
           <textarea name="description" required minLength={20} maxLength={20000} rows={8} defaultValue={initial?.description} className={fieldClass} />
         </Field>
         <fieldset className="space-y-2">
-          <legend className="text-sm font-medium">Utilities included in the rent · የተካተቱ</legend>
+          <legend className="text-sm font-medium">Amenities · ምን ምን አለው?</legend>
+          <p className="text-xs text-muted">
+            Tick everything the home has. Utilities ({includedUtilities}) are always included in the rent.
+          </p>
           <div className="grid grid-cols-2 gap-x-4 gap-y-1 sm:grid-cols-3">
-            {utilityOptions.map((u) => (
-              <label key={u.value} className="flex min-h-10 items-center gap-2 text-sm">
+            <label className="flex min-h-10 items-center gap-2 text-sm">
+              <input type="checkbox" name="parking" defaultChecked={initial?.parking} className="h-5 w-5 shrink-0 accent-brand" />
+              Parking
+            </label>
+            <label className="flex min-h-10 items-center gap-2 text-sm">
+              <input type="checkbox" name="petsAllowed" defaultChecked={initial?.petsAllowed} className="h-5 w-5 shrink-0 accent-brand" />
+              Pets allowed
+            </label>
+            {amenityOptions.map((a) => (
+              <label key={a.value} className="flex min-h-10 items-center gap-2 text-sm">
                 <input
                   type="checkbox"
-                  name="utilities"
-                  value={u.value}
-                  defaultChecked={initial?.utilities.includes(u.value)}
-                  className="h-5 w-5 accent-brand"
+                  name="amenities"
+                  value={a.value}
+                  defaultChecked={initial?.amenities.includes(a.value)}
+                  className="h-5 w-5 shrink-0 accent-brand"
                 />
-                {u.label}
+                {a.label}
               </label>
             ))}
           </div>
-          <p className="text-xs text-muted">Leave all unticked if the renter pays every utility.</p>
         </fieldset>
-        <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
-          <label className="flex items-center gap-2">
-            <input type="checkbox" name="parking" defaultChecked={initial?.parking} className="h-4 w-4 accent-brand" /> Parking
-          </label>
-          <label className="flex items-center gap-2">
-            <input type="checkbox" name="petsAllowed" defaultChecked={initial?.petsAllowed} className="h-4 w-4 accent-brand" /> Pets allowed
-          </label>
-        </div>
       </Section>
 
       <Section title="Rent and dates" titleAm="ኪራይና ቀን">

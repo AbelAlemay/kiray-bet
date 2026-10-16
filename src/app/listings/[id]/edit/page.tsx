@@ -43,7 +43,7 @@ async function EditListing({ params }: { params: Props["params"] }) {
     city: listing.city,
     state: listing.state,
     availableFrom: listing.available_from,
-    utilities: listing.utilities ?? [],
+    amenities: listing.amenities ?? [],
     addressVisibility: listing.show_exact_address ? "public" : "private",
     parking: listing.parking,
     petsAllowed: listing.pets_allowed,

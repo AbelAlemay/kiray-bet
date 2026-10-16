@@ -12,9 +12,8 @@ export type Listing = {
   // Filled in from the map when approved; may be empty.
   neighborhood: string | null;
   availableFrom: string;
-  utilitiesIncluded: boolean;
-  // Included utilities, e.g. ["water", "trash"].
-  utilities: string[];
+  // Ticked amenities, e.g. ["wifi", "furnished"]. Utilities are always included.
+  amenities: string[];
   // The host chose to show the exact address publicly (then exactAddress is set).
   showExactAddress: boolean;
   exactAddress: string | null;
@@ -46,8 +45,7 @@ export const sampleListings: Listing[] = [
     city: "Aurora",
     neighborhood: "Del Mar",
     availableFrom: "2026-11-01",
-    utilitiesIncluded: false,
-    utilities: [],
+    amenities: [],
     showExactAddress: false,
     exactAddress: null,
     parking: true,
@@ -74,8 +72,7 @@ export const sampleListings: Listing[] = [
     city: "Aurora",
     neighborhood: "Mission Viejo",
     availableFrom: "2026-10-20",
-    utilitiesIncluded: true,
-    utilities: ["electricity", "gas", "water", "sewer", "trash"],
+    amenities: ["wifi"],
     showExactAddress: false,
     exactAddress: null,
     parking: true,
@@ -102,8 +99,7 @@ export const sampleListings: Listing[] = [
     city: "Denver",
     neighborhood: "Montbello",
     availableFrom: "2026-10-15",
-    utilitiesIncluded: true,
-    utilities: ["electricity", "gas", "water", "sewer", "trash"],
+    amenities: ["wifi"],
     showExactAddress: false,
     exactAddress: null,
     parking: false,
@@ -130,8 +126,7 @@ export const sampleListings: Listing[] = [
     city: "Lakewood",
     neighborhood: "Belmar",
     availableFrom: "2026-12-01",
-    utilitiesIncluded: false,
-    utilities: [],
+    amenities: [],
     showExactAddress: false,
     exactAddress: null,
     parking: true,
@@ -158,8 +153,7 @@ export const sampleListings: Listing[] = [
     city: "Centennial",
     neighborhood: "Willow Creek",
     availableFrom: "2026-11-15",
-    utilitiesIncluded: false,
-    utilities: [],
+    amenities: [],
     showExactAddress: false,
     exactAddress: null,
     parking: true,
@@ -186,8 +180,7 @@ export const sampleListings: Listing[] = [
     city: "Englewood",
     neighborhood: "Cherry Hills",
     availableFrom: "2026-10-25",
-    utilitiesIncluded: true,
-    utilities: ["electricity", "gas", "water", "sewer", "trash"],
+    amenities: ["wifi"],
     showExactAddress: false,
     exactAddress: null,
     parking: false,

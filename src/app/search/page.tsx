@@ -50,7 +50,6 @@ function activeFilterChips(filters: ListingFilters, view: View) {
   }
   if (filters.pets) chips.push({ key: "pets", label: "Pets allowed" });
   if (filters.parking) chips.push({ key: "parking", label: "Parking" });
-  if (filters.utilities) chips.push({ key: "utilities", label: "Utilities included" });
 
   return chips.map((chip) => ({
     ...chip,

@@ -1,7 +1,7 @@
 import { fieldClass, primaryButtonClass } from "@/components/form-styles";
 import { formatDate, formatPrice } from "@/lib/format";
 import { getRegion } from "@/lib/regions";
-import { site, utilitiesLabel } from "@/lib/site";
+import { amenityLabels, site } from "@/lib/site";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { approveListing, rejectListing } from "./actions";
 import { listingSearchFilter, signPhotos, sortedPhotos } from "./data";
@@ -21,7 +21,7 @@ type PendingRow = {
   region: string | null;
   neighborhood: string | null;
   available_from: string;
-  utilities: string[];
+  amenities: string[];
   show_exact_address: boolean;
   parking: boolean;
   pets_allowed: boolean;
@@ -40,7 +40,7 @@ export async function ReviewQueue({ q }: { q: string }) {
     .from("listings")
     .select(
       "id, title, description, type, price, deposit, bedrooms, bathrooms, city, state, region, neighborhood, available_from, " +
-        "utilities, show_exact_address, parking, pets_allowed, reviewed_at, created_at, updated_at, " +
+        "amenities, show_exact_address, parking, pets_allowed, reviewed_at, created_at, updated_at, " +
         "host:profiles!listings_host_id_fkey(display_name, private_profiles(email)), " +
         "listing_addresses(street_address, unit, zip), listing_photos(path, order)",
     )
@@ -103,7 +103,7 @@ export async function ReviewQueue({ q }: { q: string }) {
 
             <p className="whitespace-pre-line text-sm">{l.description}</p>
             <p className="text-sm text-muted">
-              {[l.utilities.length > 0 && `${utilitiesLabel(l.utilities)} incl.`, l.parking && "Parking", l.pets_allowed && "Pets OK"]
+              {[l.parking && "Parking", l.pets_allowed && "Pets OK", ...amenityLabels(l.amenities)]
                 .filter(Boolean)
                 .join(" · ") || "No extras"}
             </p>

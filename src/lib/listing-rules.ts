@@ -1,5 +1,5 @@
 import { stateNames } from "./regions";
-import { site, utilityOptions, type ListingType, type Utility } from "./site";
+import { amenityOptions, site, type Amenity, type ListingType } from "./site";
 
 // Rules for what hosts may write in a listing. Shared by the posting form (instant
 // feedback) and the server (the real check).
@@ -52,7 +52,7 @@ export type ListingInput = {
   city: string;
   state: string;
   available_from: string;
-  utilities: Utility[];
+  amenities: Amenity[];
   parking: boolean;
   pets_allowed: boolean;
   // true = the exact address is shown on the public listing.
@@ -97,7 +97,7 @@ export function parseListingForm(formData: FormData, hostId: string) {
   const unit = text(formData, "unit");
   const zip = text(formData, "zip");
   const photos = formData.getAll("photos").map(String);
-  const utilities = utilityOptions.map((u) => u.value).filter((u) => formData.getAll("utilities").includes(u));
+  const amenities = amenityOptions.map((a) => a.value).filter((a) => formData.getAll("amenities").includes(a));
   const addressChoice = text(formData, "addressVisibility");
 
   if (!uuidPattern.test(id)) errors.form = "Something went wrong. Please reload the page and try again.";
@@ -148,7 +148,7 @@ export function parseListingForm(formData: FormData, hostId: string) {
     city,
     state,
     available_from: availableFrom,
-    utilities,
+    amenities,
     show_exact_address: addressChoice === "public",
     parking: formData.get("parking") === "on",
     pets_allowed: formData.get("petsAllowed") === "on",

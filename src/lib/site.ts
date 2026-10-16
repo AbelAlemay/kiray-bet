@@ -14,21 +14,27 @@ export const site = {
 
 export type ListingType = (typeof site.listingTypes)[number]["value"];
 
-// Utilities a host can say are included in the rent (same list as the database allows).
-export const utilityOptions = [
-  { value: "electricity", label: "Electricity", short: "electricity", labelAm: "መብራት" },
-  { value: "gas", label: "Gas / heat", short: "gas", labelAm: "ጋዝ / ማሞቂያ" },
-  { value: "water", label: "Water", short: "water", labelAm: "ውሃ" },
-  { value: "sewer", label: "Sewer", short: "sewer", labelAm: "ፍሳሽ" },
-  { value: "trash", label: "Trash", short: "trash", labelAm: "ቆሻሻ" },
-  { value: "internet", label: "Internet / Wi-Fi", short: "internet", labelAm: "ኢንተርኔት" },
+// Utilities (electricity, gas, water, sewer, trash) are always included in the rent.
+export const includedUtilities = "electricity, gas, water, sewer and trash";
+
+// Amenities a host can tick (same list as the database allows).
+export const amenityOptions = [
+  { value: "wifi", label: "Wi-Fi included" },
+  { value: "furnished", label: "Furnished" },
+  { value: "washer_dryer", label: "Washer & dryer in unit" },
+  { value: "shared_laundry", label: "Shared laundry" },
+  { value: "ac", label: "Air conditioning" },
+  { value: "private_bath", label: "Private bathroom" },
+  { value: "private_entrance", label: "Private entrance" },
+  { value: "own_kitchen", label: "Own kitchen" },
+  { value: "dishwasher", label: "Dishwasher" },
+  { value: "yard", label: "Yard or patio" },
+  { value: "storage", label: "Storage space" },
+  { value: "near_transit", label: "Near bus or train" },
 ] as const;
 
-export type Utility = (typeof utilityOptions)[number]["value"];
+export type Amenity = (typeof amenityOptions)[number]["value"];
 
-// "Water, trash" / "All utilities" / "" for display.
-export function utilitiesLabel(utilities: readonly string[]) {
-  if (utilities.length === utilityOptions.length) return "All utilities";
-  const names = utilityOptions.filter((u) => utilities.includes(u.value)).map((u) => u.short).join(", ");
-  return names.charAt(0).toUpperCase() + names.slice(1);
+export function amenityLabels(amenities: readonly string[]) {
+  return amenityOptions.filter((a) => amenities.includes(a.value)).map((a) => a.label);
 }

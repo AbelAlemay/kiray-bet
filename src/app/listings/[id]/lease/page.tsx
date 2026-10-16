@@ -6,7 +6,7 @@ import { requireUser } from "@/lib/auth";
 import { leaseTitles } from "@/lib/leases/fields";
 import { getLeaseTemplate } from "@/lib/leases/templates-server";
 import { leaseStates, stateNames } from "@/lib/regions";
-import { utilityOptions, type ListingType } from "@/lib/site";
+import { includedUtilities, type ListingType } from "@/lib/site";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { LeaseBuilder } from "./LeaseBuilder";
 
@@ -35,7 +35,7 @@ async function Lease({ params }: { params: Props["params"] }) {
   const [{ data: listing }, { data: address }] = await Promise.all([
     supabase
       .from("listings")
-      .select("id, title, type, price, deposit, city, state, available_from, utilities, parking, pets_allowed")
+      .select("id, title, type, price, deposit, city, state, available_from, amenities, parking, pets_allowed")
       .eq("id", id)
       .eq("host_id", user.id)
       .maybeSingle(),
@@ -73,13 +73,13 @@ async function Lease({ params }: { params: Props["params"] }) {
     payment_method: "",
     security_deposit: money(listing.deposit),
     late_fee: "50",
-    // Included utilities are the landlord's; the rest are the tenant's.
-    utilities_landlord: utilityOptions.filter((u) => listing.utilities.includes(u.value)).map((u) => u.label.toLowerCase()).join(", ") || "None",
-    utilities_tenant: utilityOptions.filter((u) => !listing.utilities.includes(u.value)).map((u) => u.label.toLowerCase()).join(", ") || "None",
+    // Utilities are always included in the rent; internet only when the host ticked Wi-Fi.
+    utilities_landlord: listing.amenities.includes("wifi") ? `${includedUtilities.replace(" and", ",")} and internet` : includedUtilities,
+    utilities_tenant: listing.amenities.includes("wifi") ? "None" : "Internet, if wanted",
     parking: listing.parking,
     pets_allowed: listing.pets_allowed,
     pre_1978: false,
-    furnished: type === "room",
+    furnished: listing.amenities.includes("furnished"),
   };
 
   const versionLabel =

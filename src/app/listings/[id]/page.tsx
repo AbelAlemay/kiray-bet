@@ -9,7 +9,7 @@ import { PaymentWarning } from "@/components/PaymentWarning";
 import { SaveButton } from "@/components/SaveButton";
 import { formatDate, formatPrice, nearLabel } from "@/lib/format";
 import { getListing } from "@/lib/listings";
-import { site, utilitiesLabel } from "@/lib/site";
+import { amenityLabels, site } from "@/lib/site";
 import { LinkPending } from "@/components/Pending";
 
 type Props = PageProps<"/listings/[id]">;
@@ -148,10 +148,28 @@ async function ListingDetail({ params }: { params: Props["params"] }) {
               labelAm="የሚገኝበት"
               value={formatDate(listing.availableFrom, { month: "short", day: "numeric", year: "numeric" })}
             />
-            <Fact label="Utilities incl." labelAm="የተካተቱ" value={utilitiesLabel(listing.utilities) || "None"} />
+            <Fact label="Utilities" labelAm="መብራትና ውሃ" value="Included" />
             <Fact label="Parking" labelAm="መኪና ማቆሚያ" value={yesNo(listing.parking)} />
             <Fact label="Pets allowed" labelAm="የቤት እንስሳ" value={yesNo(listing.petsAllowed)} />
           </dl>
+
+          {listing.amenities.length > 0 && (
+            <section>
+              <h2 className="mb-2 text-xl font-bold">
+                Amenities · <span className="text-muted">ምን ምን አለው?</span>
+              </h2>
+              <ul className="grid grid-cols-1 gap-x-6 gap-y-2 sm:grid-cols-2">
+                {amenityLabels(listing.amenities).map((label) => (
+                  <li key={label} className="flex items-center gap-2">
+                    <span aria-hidden className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand-soft text-sm text-brand">
+                      ✓
+                    </span>
+                    {label}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
 
           <section>
             <h2 className="mb-2 text-xl font-bold">About this home</h2>

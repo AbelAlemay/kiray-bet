@@ -131,7 +131,7 @@ later, e-signing and stored signed copies (proposal below).
 ## 8. Data model
 Public (readable by anyone, only approved listings):
 - **listings**: id, host_id, title, description, type, price, deposit, bedrooms, bathrooms,
-  city, state, region (set from the address), neighborhood (filled by admin lookup), approx_lat, approx_lng, available_from, utilities (checklist), show_exact_address, parking,
+  city, state, region (set from the address), neighborhood (filled by admin lookup), approx_lat, approx_lng, available_from, amenities (checklist; utilities are always included, the old utilities columns are unused), show_exact_address, parking,
   pets_allowed, status (pending/active/rejected/rented), reviewed_at, created_at
 - **listing_photos**: id, listing_id, path, order
 - **profiles**: id, display_name (first name only), role (renter/host/admin), created_at

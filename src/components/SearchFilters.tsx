@@ -6,7 +6,6 @@ import { fieldClass, labelClass } from "./form-styles";
 const checkboxes = [
   { name: "pets", label: "Pets allowed" },
   { name: "parking", label: "Parking" },
-  { name: "utilities", label: "Utilities included" },
 ] as const;
 
 export function SearchFilters({

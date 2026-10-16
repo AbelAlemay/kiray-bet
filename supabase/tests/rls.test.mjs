@@ -221,6 +221,10 @@ check("hiding it again works", (await as(null, `select 1 from listing_addresses 
 rows = await db.query(`update listings set utilities = '{water,trash}' where id = $1 returning utilities_included`, [L1]);
 check("utilities checklist sets utilities_included", rows.rows[0].utilities_included === true);
 check("unknown utility rejected", await fails(SERVER, `update listings set utilities = '{cable}' where id = $1`, [L1]));
+rows = await as(RUTH, `update listings set amenities = '{wifi,furnished}' where id = $1 returning status`, [RL]);
+check("host can set amenities (back to review)", rows[0]?.status === "pending");
+await as(ADMIN, `update listings set status = 'active' where id = $1`, [RL]);
+check("unknown amenity rejected", await fails(SERVER, `update listings set amenities = '{pool}' where id = $1`, [L1]));
 check("long description allowed", (await db.query(`update listings set description = $2 where id = $1 returning id`, [L1, "x".repeat(15000)])).rows.length === 1);
 check("listing without a neighborhood allowed", (await db.query(`update listings set neighborhood = null where id = $1 returning id`, [L1])).rows.length === 1);
 

@@ -17,7 +17,6 @@ export type ListingFilters = {
   minBedrooms?: number;
   pets?: boolean;
   parking?: boolean;
-  utilities?: boolean;
   // Available on or before this date (YYYY-MM-DD).
   availableBy?: string;
   sort: "newest" | "price-asc" | "price-desc";
@@ -64,7 +63,6 @@ export function parseFilters(params: RawParams, region: RegionId = defaultRegion
     minBedrooms: positiveNumber(first(params.minBedrooms)),
     pets: first(params.pets) === "1" || undefined,
     parking: first(params.parking) === "1" || undefined,
-    utilities: first(params.utilities) === "1" || undefined,
     availableBy:
       availableBy && /^\d{4}-\d{2}-\d{2}$/.test(availableBy) && !Number.isNaN(Date.parse(availableBy))
         ? availableBy
@@ -88,7 +86,7 @@ export function filtersToQuery(filters: Partial<ListingFilters>) {
 
 const listingColumns =
   "id, title, type, price, deposit, bedrooms, bathrooms, city, neighborhood, available_from, " +
-  "utilities_included, utilities, show_exact_address, parking, pets_allowed, description, created_at, approx_lat, approx_lng, cross_streets, region, state, " +
+  "amenities, show_exact_address, parking, pets_allowed, description, created_at, approx_lat, approx_lng, cross_streets, region, state, " +
   "host:profiles!listings_host_id_fkey(display_name), listing_photos(path, order)";
 
 type ListingRow = {
@@ -102,8 +100,7 @@ type ListingRow = {
   city: string;
   neighborhood: string | null;
   available_from: string;
-  utilities_included: boolean;
-  utilities: string[];
+  amenities: string[];
   show_exact_address: boolean;
   parking: boolean;
   pets_allowed: boolean;
@@ -160,8 +157,7 @@ function toListing(row: ListingRow): Omit<Listing, "photos"> {
     city: row.city,
     neighborhood: row.neighborhood,
     availableFrom: row.available_from,
-    utilitiesIncluded: row.utilities_included,
-    utilities: row.utilities ?? [],
+    amenities: row.amenities ?? [],
     showExactAddress: row.show_exact_address,
     exactAddress: null,
     parking: row.parking,
@@ -195,7 +191,6 @@ function applyFilters<Q>(query: Q, filters: ListingFilters): Q {
   if (filters.minBedrooms) q = q.gte("bedrooms", filters.minBedrooms);
   if (filters.pets) q = q.eq("pets_allowed", true);
   if (filters.parking) q = q.eq("parking", true);
-  if (filters.utilities) q = q.eq("utilities_included", true);
   if (filters.availableBy) q = q.lte("available_from", filters.availableBy);
   return q as Q;
 }
@@ -209,7 +204,6 @@ function matchesSample(l: Listing, filters: ListingFilters) {
     (!filters.minBedrooms || l.bedrooms >= filters.minBedrooms) &&
     (!filters.pets || l.petsAllowed) &&
     (!filters.parking || l.parking) &&
-    (!filters.utilities || l.utilitiesIncluded) &&
     (!filters.availableBy || l.availableFrom <= filters.availableBy)
   );
 }
