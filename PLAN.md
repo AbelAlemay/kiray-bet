@@ -170,6 +170,11 @@ Things set up for development that must change before real users arrive:
 - [x] Supabase Auth: site_url https://kiraybet.org, redirects for kiraybet.org, www and localhost.
 - [x] Cloudflare Turnstile: real keys for kiraybet.org, www and localhost (site, Vercel, Supabase).
 - [ ] Remove the sample listings and fake hosts from supabase/seed.sql data in the database.
+- [ ] Remove the 112 test listings added Oct 15, 2026 (all 11 areas; 33 fake hosts named
+      test-host-<area>-<n>@example.com, ids starting c1000000-, listings d1000000-):
+      `delete from public.listings where host_id::text like 'c1000000-%';
+      delete from auth.users where id::text like 'c1000000-%';` then delete the matching
+      c1000000-… folders in the listing-photos storage bucket.
 - [x] Set NEXT_PUBLIC_SITE_URL to the real domain in Vercel.
 - [ ] Email alerts for new messages: needs the domain (Resend) and the Supabase secret key
       as a server-only env var to look up the recipient's email.
