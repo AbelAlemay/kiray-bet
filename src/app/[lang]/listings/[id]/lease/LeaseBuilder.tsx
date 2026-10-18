@@ -39,13 +39,11 @@ export function LeaseBuilder({
   template,
   initial,
   title,
-  draftNotice,
   versionLabel,
 }: {
   template: string;
   initial: LeaseValues;
   title: string;
-  draftNotice: boolean;
   versionLabel: string;
 }) {
   const [values, setValues] = useState<LeaseValues>(initial);
@@ -164,12 +162,6 @@ export function LeaseBuilder({
             On a phone, choose &ldquo;Print&rdquo; then &ldquo;Save as PDF&rdquo; (or Share → Save to Files) to keep a copy you can send.
           </p>
           <article aria-label={title} className="rounded-2xl bg-white p-6 text-[#1c1a17] shadow sm:p-10 print:rounded-none print:p-0 print:shadow-none">
-            {draftNotice && (
-              <p className="mb-4 rounded border-2 border-[#b3261e] p-3 text-sm font-bold text-[#b3261e]">
-                DRAFT FORM, NOT YET REVIEWED BY A LAWYER. Have this lease reviewed by a Colorado
-                attorney before relying on it.
-              </p>
-            )}
             <LeaseDocument text={text} />
             <p className="mt-8 border-t border-[#ccc] pt-2 text-[11px] text-[#666]">{versionLabel}</p>
           </article>

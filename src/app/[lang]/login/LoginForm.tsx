@@ -48,6 +48,8 @@ export function LoginForm({ next, googleEnabled }: { next: string; googleEnabled
   const [state, action, pending] = useActionState(emailSignIn, { step: "email" } as LoginState);
   const bot = useBotCheck();
   const t = useT();
+  // "I agree to the Terms": required before any code is sent (checked again on the server).
+  const [agreed, setAgreed] = useState(false);
   // New key per result, so countdowns restart from the latest number.
   const resultKey = JSON.stringify(state);
 
@@ -96,6 +98,7 @@ export function LoginForm({ next, googleEnabled }: { next: string; googleEnabled
               <form action={action} className="text-center text-sm text-muted">
                 <input type="hidden" name="email" value={state.email} />
                 <input type="hidden" name="next" value={next} />
+                <input type="hidden" name="agree" value="on" />
                 <Turnstile resetKey={state} onToken={bot.onToken} onError={bot.onError} onInteractive={bot.onInteractive} />
                 {t("Didn't get it? Check spam, or", "አልደረሰዎትም? የስፓም ሳጥኑን ይመልከቱ፣ ወይም")}{" "}
                 <button
@@ -120,11 +123,35 @@ export function LoginForm({ next, googleEnabled }: { next: string; googleEnabled
 
   return (
     <div className="space-y-5">
+      {/* Belongs to the email form below (form=…), so the browser asks for it before sending. */}
+      <label className="flex items-start gap-3 rounded-xl border border-border bg-surface p-3 text-sm">
+        <input
+          type="checkbox"
+          name="agree"
+          form="email-sign-in"
+          required
+          checked={agreed}
+          onChange={(e) => setAgreed(e.target.checked)}
+          className="mt-0.5 h-5 w-5 shrink-0 accent-brand"
+        />
+        <span>
+          {t("I am 18 or older and I agree to the", "18 ዓመት ወይም ከዚያ በላይ ነኝ፤ በ")}{" "}
+          <a href="/terms" target="_blank" className="font-semibold text-brand hover:underline">
+            {t("Terms of Service", "የአገልግሎት ውል")}
+          </a>{" "}
+          {t("and", "እና")}{" "}
+          <a href="/privacy" target="_blank" className="font-semibold text-brand hover:underline">
+            {t("Privacy Policy", "የግላዊነት ፖሊሲ")}
+          </a>
+          {t(".", " እስማማለሁ።")}
+        </span>
+      </label>
       {googleEnabled && (
         <>
           <form action={signInWithGoogle}>
             <input type="hidden" name="next" value={next} />
-            <button className="flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-surface px-4 py-3 font-semibold hover:bg-brand-soft">
+            {agreed && <input type="hidden" name="agree" value="on" />}
+            <button disabled={!agreed} className="flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-surface px-4 py-3 font-semibold hover:bg-brand-soft disabled:opacity-50">
               <span aria-hidden className="font-bold text-[#4285F4]">G</span> {t("Continue with Google", "በGoogle ይቀጥሉ")}
             </button>
           </form>
@@ -133,7 +160,7 @@ export function LoginForm({ next, googleEnabled }: { next: string; googleEnabled
           </p>
         </>
       )}
-      <form action={action} className="space-y-4">
+      <form id="email-sign-in" action={action} className="space-y-4">
         <input type="hidden" name="next" value={next} />
         <Turnstile resetKey={state} onToken={bot.onToken} onError={bot.onError} onInteractive={bot.onInteractive} />
         <label className={labelClass}>
@@ -170,16 +197,7 @@ export function LoginForm({ next, googleEnabled }: { next: string; googleEnabled
           {t(
             "First time here? This code also creates your free account. We never show your email to other users and never ask for your phone number.",
             "ለመጀመሪያ ጊዜ ነው? ይህ ኮድ ነጻ መለያዎንም ይፈጥራል። ኢሜይልዎን ለሌሎች ተጠቃሚዎች በፍጹም አናሳይም፤ ስልክ ቁጥርዎንም አንጠይቅም።",
-          )}{" "}
-          {t("By continuing you agree to our", "በመቀጠልዎ በእኛ")}{" "}
-          <a href="/terms" target="_blank" className="font-semibold text-brand hover:underline">
-            {t("Terms", "የአገልግሎት ውል")}
-          </a>{" "}
-          {t("and", "እና")}{" "}
-          <a href="/privacy" target="_blank" className="font-semibold text-brand hover:underline">
-            {t("Privacy Policy", "የግላዊነት ፖሊሲ")}
-          </a>
-          {t(".", " ይስማማሉ።")}
+          )}
         </p>
       </form>
     </div>

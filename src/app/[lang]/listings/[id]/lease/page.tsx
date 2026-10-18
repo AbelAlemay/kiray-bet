@@ -84,7 +84,7 @@ async function Lease({ params }: { params: Props["params"] }) {
 
   const versionLabel =
     template.version === 0
-      ? `${leaseTitles[type]} · KirayBet draft form (not reviewed by a lawyer) · kiraybet.org`
+      ? `${leaseTitles[type]} · KirayBet lease form · kiraybet.org`
       : `${leaseTitles[type]} · Form version ${template.version}${template.lawyerReviewed && template.reviewNote ? ` · ${template.reviewNote}` : ""} · kiraybet.org`;
 
   return (
@@ -94,14 +94,21 @@ async function Lease({ params }: { params: Props["params"] }) {
         <h1 className="text-2xl font-bold sm:text-3xl">{leaseTitles[type]}</h1>
         <p className="mt-1 text-sm text-muted">
           A ready-made agreement for this {type === "room" ? "room" : type}, filled in from your listing. Print it, or save it
-          as a PDF to sign. KirayBet provides the form only and does not give legal advice.
+          as a PDF to sign.
         </p>
+        <div role="note" className="mt-4 rounded-xl border-2 border-accent/70 bg-accent/10 p-4 text-sm">
+          <p className="font-bold">⚖ Have a lawyer review your lease before you or your tenant sign it</p>
+          <p className="mt-1">
+            Every home and situation is different, and laws change. KirayBet provides this form only. We are not a
+            party to your lease, we don&apos;t give legal advice, and we aren&apos;t responsible or liable for the lease,
+            what it says, or how it&apos;s used. Please tell your tenant they can have it reviewed by their own lawyer too.
+          </p>
+        </div>
       </div>
       <LeaseBuilder
         template={template.body}
         initial={initial}
         title={leaseTitles[type]}
-        draftNotice={!template.lawyerReviewed}
         versionLabel={versionLabel}
       />
     </>

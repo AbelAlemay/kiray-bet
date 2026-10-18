@@ -121,6 +121,16 @@ export async function emailSignIn(prev: LoginState, formData: FormData): Promise
   }
 
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  if (formData.get("agree") !== "on") {
+    return {
+      step: "email",
+      email,
+      error: t(
+        "Please tick the box to agree to the Terms of Service and Privacy Policy.",
+        "እባክዎ በአገልግሎት ውሉና በግላዊነት ፖሊሲው መስማማትዎን ለማሳየት ሳጥኑን ምልክት ያድርጉ።",
+      ),
+    };
+  }
   if (!emailPattern.test(email) || email.length > 254) {
     return {
       step: "email",
@@ -174,6 +184,7 @@ async function verifyCode(
 
 export async function signInWithGoogle(formData: FormData) {
   const next = safeNext(formData.get("next"));
+  if (formData.get("agree") !== "on") redirect(`/login?next=${encodeURIComponent(next)}`);
   const supabase = await createServerSupabase();
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",

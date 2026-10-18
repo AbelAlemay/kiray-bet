@@ -1,3 +1,7 @@
+// The Terms of Service version people agree to (its "last updated" date). Change it
+// together with the date on the Terms page to ask everyone to agree again.
+export const termsVersion = "2026-10-15";
+
 export const site = {
   name: "ኪራይ ቤት",
   nameLatin: "KirayBet",

@@ -190,7 +190,13 @@ Things set up for development that must change before real users arrive:
 - [ ] Allow search engines: set NEXT_PUBLIC_ALLOW_INDEXING=on in Vercel (off while testing).
       robots.txt and sitemap.xml are ready and follow the same switch; then add the site in
       Google Search Console.
-- [ ] Lease agreements: Colorado attorney reviews all four (Admin → Leases), marks them reviewed.
+- [x] Lease agreements made official Oct 17, 2026 (Abel's decision): no "draft" banner; hosts and
+      renters are told to have the lease reviewed by a lawyer and that KirayBet isn't a party or
+      liable (lease page, payment warning), hosts tick an acknowledgment, and the lease ends with an
+      "About this form" acknowledgment both parties sign. Attorney review still recommended.
+- [x] Required "I agree to the Terms of Service and Privacy Policy" box at sign-in (Oct 17, 2026),
+      saved as private_profiles.terms_accepted_at / terms_version; older accounts agree once at
+      /agree. Change termsVersion in src/lib/site.ts with the Terms date to ask everyone again.
 - [ ] Lease agreements for the other states (DC, MD, VA, WA, TX, MN, OR, GA, CA). Until then the
       Lease button is hidden outside Colorado (leaseStates in src/lib/regions.ts).
 - [ ] Security review, Terms of Service and Privacy Policy reviewed by a lawyer.

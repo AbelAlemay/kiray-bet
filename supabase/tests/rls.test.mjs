@@ -291,6 +291,15 @@ check("banned user can't unban themselves", await fails(SAMI, `update private_pr
 check("banned user can't message", await fails(SAMI,
   `insert into messages (conversation_id, sender_id, body) values ($1, $2, 'hi')`, [C, SAMI]));
 
+// Terms acceptance
+await as(RUTH, `select public.accept_terms('2026-10-15')`);
+rows = await as(RUTH, `select terms_accepted_at is not null as ok, terms_version from private_profiles where user_id = $1`, [RUTH]);
+check("user records accepting the Terms", rows[0]?.ok === true && rows[0]?.terms_version === "2026-10-15");
+check("anon can't accept terms", await fails(null, `select public.accept_terms('x')`));
+check("user can't set acceptance time directly", await fails(SAMI, `update private_profiles set terms_accepted_at = now() where user_id = $1`, [SAMI]));
+rows = await as(DAWIT, `select terms_accepted_at from private_profiles where user_id = $1`, [DAWIT]);
+check("accepting only marks your own profile", rows[0]?.terms_accepted_at === null);
+
 // Sample listings
 const L2 = "b0000000-0000-4000-8000-000000000002";
 check("host can't mark own listing as a sample", await fails(DAWIT, `update listings set is_sample = true where id = $1`, [L1]));

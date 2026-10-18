@@ -6,6 +6,7 @@ import { connection } from "next/server";
 import { cache } from "react";
 import { isLang, langCookie } from "./i18n";
 import { createServerSupabase } from "./supabase/server";
+import { termsVersion } from "./site";
 
 export type CurrentUser = {
   id: string;
@@ -14,6 +15,8 @@ export type CurrentUser = {
   role: "renter" | "host" | "admin";
   language: "en" | "am";
   messageEmails: boolean;
+  // Ticked "I agree" to the current Terms of Service and Privacy Policy.
+  termsAccepted: boolean;
   // "aal2" once this session was confirmed with an authenticator app code.
   twoStepVerified: boolean;
 };
@@ -35,7 +38,7 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
 
   const [{ data: profile }, { data: privateProfile }] = await Promise.all([
     supabase.from("profiles").select("display_name, role").eq("id", userId).single(),
-    supabase.from("private_profiles").select("email, language, message_emails").eq("user_id", userId).single(),
+    supabase.from("private_profiles").select("email, language, message_emails, terms_version").eq("user_id", userId).single(),
   ]);
   if (!profile || !privateProfile) return null;
 
@@ -46,6 +49,7 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
     role: profile.role,
     language: privateProfile.language,
     messageEmails: privateProfile.message_emails ?? true,
+    termsAccepted: privateProfile.terms_version === termsVersion,
     twoStepVerified,
   };
 });
@@ -54,6 +58,8 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
 export async function requireUser(returnTo: string): Promise<CurrentUser> {
   const user = await getCurrentUser();
   if (!user) redirect(`/login?next=${encodeURIComponent(returnTo)}`);
+  // Accounts from before the "I agree" box (or from before the Terms changed) agree first.
+  if (!user.termsAccepted) redirect(`/agree?next=${encodeURIComponent(returnTo)}`);
   return user;
 }
 
@@ -75,9 +81,10 @@ export function safeNext(value: unknown, fallback = "/"): string {
 }
 
 // Where to go right after signing in: new users without a name first set one on the
-// account page, then continue to `next`.
+// account page, then continue to `next`. Signing in requires ticking "I agree to the
+// Terms", so this also records that agreement.
 export async function pathAfterSignIn(supabase: SupabaseClient, userId: string, next: string) {
-  await syncLanguage(supabase, userId);
+  await Promise.all([syncLanguage(supabase, userId), supabase.rpc("accept_terms", { version: termsVersion })]);
   const { data } = await supabase.from("profiles").select("display_name").eq("id", userId).single();
   return data?.display_name ? next : `/account?welcome=1&next=${encodeURIComponent(next)}`;
 }
