@@ -11,8 +11,7 @@ export const site = {
   // KirayBet's own social media accounts (footer links, and for search engines).
   socials: [
     { name: "Instagram", handle: "@kiraybet.us", url: "https://www.instagram.com/kiraybet.us/" },
-    // Switch to facebook.com/<username> once the Page has a username.
-    { name: "Facebook", handle: "KirayBet", url: "https://www.facebook.com/profile.php?id=61595176095750" },
+    { name: "Facebook", handle: "kiraybetus", url: "https://www.facebook.com/kiraybetus" },
   ],
   // Other ways people write the name, for search engines.
   otherNames: ["Kiray Bet", "Kiraybet", "ኪራይ ቤት"],
