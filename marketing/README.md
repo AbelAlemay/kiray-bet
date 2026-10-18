@@ -1,6 +1,10 @@
 # KirayBet marketing assets
 
+- `content-kit.md`: two-week posting plan, captions, messages to send, answers to common questions.
 - `print/poster-letter.pdf` / `.png`: US Letter poster for shops and churches (300 dpi).
+- `print/poster-letter-light.pdf`: same poster on white, saves ink on home printers.
+- `print/handout-cards-4-per-page.pdf`: four cut-out cards per page for counters.
+- `posts/how-it-works-1..6.png`: a 6-slide carousel; `posts/safety-tip-1..3.png`; `posts/for-hosts-post-your-home.png` (its QR opens the "Post a home" page).
 - `social/poster-chat-and-instagram-post-1080x1350.png`: group chats (WhatsApp, Telegram, Facebook) and Instagram posts.
 - `social/story-1080x1920.png`: Instagram, WhatsApp and Telegram stories / status.
 - `social/facebook-cover-1640x624.png`, `social/x-twitter-header-1500x500.png`: page banners.
