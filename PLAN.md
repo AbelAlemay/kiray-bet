@@ -210,3 +210,15 @@ Things set up for development that must change before real users arrive:
 - **Privacy:** Colorado has a consumer privacy law; the Privacy Policy must say what we
   collect, why, and how users can delete their account and data.
 - Have a lawyer review the Terms of Service and Privacy Policy before launch.
+
+## 12. Mobile app (later)
+Discussed Oct 17, 2026 and put on hold until the site has more users and followers.
+- Plan: a real iPhone and Android app built with Expo (React Native), sharing the same
+  Supabase database, accounts and security rules as the website. Main gain: push
+  notifications for new messages.
+- Needed first (App Store rules, also good for the website): delete your account from inside
+  the app, block a user, App Store privacy answers. Apple Developer ($99/year) and Google Play
+  ($25 once) accounts in Abel's name.
+- Phases: groundwork (delete account, block, push tokens), browse/search/chat with push,
+  posting from the phone, TestFlight testing, store launch. About 6 to 9 weeks.
+- Open questions: app name in the stores, separate repository, test phones.
