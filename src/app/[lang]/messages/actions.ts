@@ -46,12 +46,15 @@ export async function startConversation(_prev: StartState, formData: FormData): 
   const supabase = await createServerSupabase();
   const { data: listing } = await supabase
     .from("listings")
-    .select("id, host_id")
+    .select("id, host_id, is_sample")
     .eq("id", listingId)
     .eq("status", "active")
     .maybeSingle();
   if (!listing) return { error: t("This listing is no longer available.", "ይህ ማስታወቂያ ከእንግዲህ አይገኝም።") };
   if (listing.host_id === user.id) return { error: t("This is your own listing.", "ይህ የራስዎ ማስታወቂያ ነው።") };
+  if (listing.is_sample) {
+    return { error: t("This is a sample listing, so there's no host to contact.", "ይህ ናሙና ማስታወቂያ ነው፤ የሚገናኙት ባለቤት የለም።") };
+  }
 
   const find = () =>
     supabase.from("conversations").select("id").eq("listing_id", listingId).eq("renter_id", user.id).maybeSingle();

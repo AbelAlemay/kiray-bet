@@ -171,12 +171,16 @@ Things set up for development that must change before real users arrive:
       supabase/config.toml), alerts from alerts@kiraybet.org.
 - [x] Supabase Auth: site_url https://kiraybet.org, redirects for kiraybet.org, www and localhost.
 - [x] Cloudflare Turnstile: real keys for kiraybet.org, www and localhost (site, Vercel, Supabase).
-- [ ] Remove the sample listings and fake hosts from supabase/seed.sql data in the database.
-- [ ] Remove the 112 test listings added Oct 15, 2026 (all 11 areas; 33 fake hosts named
-      test-host-<area>-<n>@example.com, ids starting c1000000-, listings d1000000-):
-      `delete from public.listings where host_id::text like 'c1000000-%';
+- [x] Remove the old sample listings and fake hosts from supabase/seed.sql data in the database (Oct 17, 2026).
+- [x] Trim the Oct 15 test listings to 3 sample listings per area (33, Oct 17, 2026). They stay on
+      purpose until real hosts fill each area: listings.is_sample = true shows a "Sample listing"
+      badge and notice, hides them from search engines, and blocks messaging their fake hosts
+      (33 hosts named test-host-<area>-<n>@example.com, ids starting c1000000-). To remove an
+      area's samples later: `delete from public.listings where is_sample and region = '<area>';`
+      To remove all: `delete from public.listings where is_sample;
       delete from auth.users where id::text like 'c1000000-%';` then delete the matching
-      c1000000-… folders in the listing-photos storage bucket.
+      c1000000-… folders in the listing-photos storage bucket (photos of the 79 test listings
+      deleted Oct 17 are still in the bucket, unused).
 - [x] Set NEXT_PUBLIC_SITE_URL to the real domain in Vercel.
 - [x] Email alerts for new messages (Oct 15, 2026): sent by the database every 5 minutes
       (pg_cron job "message-alerts", private.send_message_alerts) for messages unread 5+ minutes,

@@ -14,7 +14,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
   const supabase = createPublicClient();
   const { data } = supabase
-    ? await supabase.from("listings").select("id, updated_at").eq("status", "active").limit(5000)
+    ? await supabase.from("listings").select("id, updated_at").eq("status", "active").eq("is_sample", false).limit(5000)
     : { data: [] };
   return [
     ...pages,

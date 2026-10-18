@@ -23,6 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${listing.title} · ${formatPrice(listing.price)}${t("/mo", "/በወር")}`,
     description: `${nearLabel(listing, t.lang)}. ${listing.description}`,
+    ...(listing.sample && { robots: { index: false } }),
   };
 }
 
@@ -52,6 +53,20 @@ async function ListingDetail({ params }: { params: Props["params"] }) {
 
   return (
     <>
+      {listing.sample && (
+        <div role="note" className="mb-5 rounded-2xl border-2 border-amber-300 bg-amber-50 p-4 text-gray-900 dark:bg-amber-950/40 dark:text-amber-50">
+          <p className="font-bold">🏷 {t.both("Sample listing", "ናሙና ማስታወቂያ")}</p>
+          <p className="mt-1 text-sm">
+            {t(
+              `This home isn't real. It's here to show what listings look like on ${site.nameLatin}, so there's no host to contact.`,
+              `ይህ እውነተኛ ቤት አይደለም። ማስታወቂያዎች በ${site.name} ላይ ምን እንደሚመስሉ ለማሳየት ብቻ ነው፤ ስለዚህ የሚገናኙት ባለቤት የለም።`,
+            )}{" "}
+            <Link href="/listings/new" className="font-semibold text-brand hover:underline">
+              {t("Post a real home →", "እውነተኛ ቤት ይለጥፉ →")}
+            </Link>
+          </p>
+        </div>
+      )}
       <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
         <div className="space-y-6">
           {listing.approxLat != null && listing.approxLng != null ? (
@@ -167,37 +182,48 @@ async function ListingDetail({ params }: { params: Props["params"] }) {
               <span className="text-3xl font-bold">{formatPrice(listing.price)}</span>
               <span className="text-muted">{perMonth}</span>
             </p>
-            <p className="text-sm text-muted">
-              {t("Hosted by", "ባለቤት፦")} <span className="font-semibold text-foreground">{listing.hostName}</span> ·{" "}
-              {t("posted", "የተለጠፈው")} {formatDate(listing.postedAt, undefined, t.lang)}
-            </p>
-            <Link
-              href={contactHref}
-              className="relative block rounded-xl bg-brand px-4 py-3 text-center font-semibold text-white hover:bg-brand-strong"
-            >
-              <LinkPending />
-              {t.both("Contact host", "ባለቤቱን ያግኙ")}
-            </Link>
-            <SaveButton listingId={listing.id} variant="button" />
-            <ul className="space-y-1 text-xs text-muted">
-              <li>
-                ✉{" "}
-                {t(
-                  "No account needed in advance: just confirm your email to send a message.",
-                  "አስቀድሞ መለያ አያስፈልግም፦ መልዕክት ለመላክ ኢሜይልዎን ብቻ ያረጋግጡ።",
-                )}
-              </li>
-              <li>
-                🔒{" "}
-                {t(
-                  `No phone numbers needed. You chat privately inside ${site.nameLatin}.`,
-                  `ስልክ ቁጥር አያስፈልግም። በ${site.name} ውስጥ በግል ይነጋገራሉ።`,
-                )}
-              </li>
-              <li>✓ {t("This listing was reviewed before it went live.", "ይህ ማስታወቂያ ከመውጣቱ በፊት ተገምግሟል።")}</li>
-            </ul>
-            <PaymentWarning compact />
-            <ReportButton targetType="listing" targetId={listing.id} label={t("Report this listing", "ይህን ማስታወቂያ ሪፖርት ያድርጉ")} />
+            {listing.sample ? (
+              <>
+                <p className="rounded-xl bg-amber-50 px-4 py-3 text-center text-sm font-semibold text-gray-900 dark:bg-amber-950/40 dark:text-amber-50">
+                  🏷 {t("Sample listing: no host to contact", "ናሙና ማስታወቂያ፦ የሚገናኙት ባለቤት የለም")}
+                </p>
+                <SaveButton listingId={listing.id} variant="button" />
+              </>
+            ) : (
+              <>
+                <p className="text-sm text-muted">
+                  {t("Hosted by", "ባለቤት፦")} <span className="font-semibold text-foreground">{listing.hostName}</span> ·{" "}
+                  {t("posted", "የተለጠፈው")} {formatDate(listing.postedAt, undefined, t.lang)}
+                </p>
+                <Link
+                  href={contactHref}
+                  className="relative block rounded-xl bg-brand px-4 py-3 text-center font-semibold text-white hover:bg-brand-strong"
+                >
+                  <LinkPending />
+                  {t.both("Contact host", "ባለቤቱን ያግኙ")}
+                </Link>
+                <SaveButton listingId={listing.id} variant="button" />
+                <ul className="space-y-1 text-xs text-muted">
+                  <li>
+                    ✉{" "}
+                    {t(
+                      "No account needed in advance: just confirm your email to send a message.",
+                      "አስቀድሞ መለያ አያስፈልግም፦ መልዕክት ለመላክ ኢሜይልዎን ብቻ ያረጋግጡ።",
+                    )}
+                  </li>
+                  <li>
+                    🔒{" "}
+                    {t(
+                      `No phone numbers needed. You chat privately inside ${site.nameLatin}.`,
+                      `ስልክ ቁጥር አያስፈልግም። በ${site.name} ውስጥ በግል ይነጋገራሉ።`,
+                    )}
+                  </li>
+                  <li>✓ {t("This listing was reviewed before it went live.", "ይህ ማስታወቂያ ከመውጣቱ በፊት ተገምግሟል።")}</li>
+                </ul>
+                <PaymentWarning compact />
+                <ReportButton targetType="listing" targetId={listing.id} label={t("Report this listing", "ይህን ማስታወቂያ ሪፖርት ያድርጉ")} />
+              </>
+            )}
           </div>
         </aside>
       </div>
@@ -212,13 +238,19 @@ async function ListingDetail({ params }: { params: Props["params"] }) {
               {near}
             </span>
           </p>
-          <Link
-            href={contactHref}
-            className="relative shrink-0 whitespace-nowrap rounded-xl bg-brand px-4 py-3 font-semibold text-white hover:bg-brand-strong sm:px-5"
-          >
-            <LinkPending />
-            {t("Contact host", "ባለቤቱን ያግኙ")}
-          </Link>
+          {listing.sample ? (
+            <span className="shrink-0 whitespace-nowrap rounded-xl bg-amber-300 px-4 py-3 font-semibold text-gray-900">
+              🏷 {t("Sample listing", "ናሙና")}
+            </span>
+          ) : (
+            <Link
+              href={contactHref}
+              className="relative shrink-0 whitespace-nowrap rounded-xl bg-brand px-4 py-3 font-semibold text-white hover:bg-brand-strong sm:px-5"
+            >
+              <LinkPending />
+              {t("Contact host", "ባለቤቱን ያግኙ")}
+            </Link>
+          )}
         </div>
       </div>
     </>

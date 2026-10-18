@@ -291,6 +291,16 @@ check("banned user can't unban themselves", await fails(SAMI, `update private_pr
 check("banned user can't message", await fails(SAMI,
   `insert into messages (conversation_id, sender_id, body) values ($1, $2, 'hi')`, [C, SAMI]));
 
+// Sample listings
+const L2 = "b0000000-0000-4000-8000-000000000002";
+check("host can't mark own listing as a sample", await fails(DAWIT, `update listings set is_sample = true where id = $1`, [L1]));
+await as(SERVER, `update listings set is_sample = true where id = $1`, [L2]);
+check("anyone can see a listing is a sample", (await as(null, `select is_sample from listings where id = $1`, [L2]))[0]?.is_sample === true);
+check("can't message the host of a sample listing", await fails(RUTH,
+  `insert into conversations (listing_id, renter_id, host_id) values ($1, $2, (select host_id from listings where id = $1))`, [L2, RUTH]));
+check("can't ask a sample listing for its address", await fails(RUTH,
+  `insert into address_requests (listing_id, renter_id) values ($1, $2)`, [L2, RUTH]));
+
 // Rate limit
 for (let i = 0; i < 4; i++) await as(RUTH, insertListing, [RUTH]);
 check("6th listing in a day is blocked", await fails(RUTH, insertListing, [RUTH]));

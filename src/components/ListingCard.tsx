@@ -37,9 +37,16 @@ export async function ListingCard({ listing }: { listing: Listing }) {
               className="object-cover"
             />
           )}
-          <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-xs font-semibold text-gray-900">
-            {t.both(type.label, type.labelAm)}
-          </span>
+          <div className="absolute left-3 top-3 flex flex-wrap gap-1.5 pr-12">
+            <span className="rounded-full bg-white/90 px-2.5 py-1 text-xs font-semibold text-gray-900">
+              {t.both(type.label, type.labelAm)}
+            </span>
+            {listing.sample && (
+              <span className="rounded-full bg-amber-300 px-2.5 py-1 text-xs font-bold text-gray-900 shadow-sm">
+                {t.both("Sample listing", "ናሙና")}
+              </span>
+            )}
+          </div>
           <span className="absolute bottom-3 right-3 rounded-lg bg-black/60 px-2.5 py-1 text-sm font-bold text-white">
             {formatPrice(listing.price)}{t("/mo", "/በወር")}
           </span>

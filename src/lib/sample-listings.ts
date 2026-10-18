@@ -32,6 +32,8 @@ export type Listing = {
   crossStreets: string | null;
   region: string;
   state: string;
+  // A made-up home that shows how the site looks; labeled "Sample", no host to contact.
+  sample: boolean;
 };
 
 export const sampleListings: Listing[] = [
@@ -61,6 +63,7 @@ export const sampleListings: Listing[] = [
     crossStreets: null,
     region: "denver",
     state: "CO",
+    sample: true,
   },
   {
     id: "2",
@@ -88,6 +91,7 @@ export const sampleListings: Listing[] = [
     crossStreets: null,
     region: "denver",
     state: "CO",
+    sample: true,
   },
   {
     id: "3",
@@ -115,6 +119,7 @@ export const sampleListings: Listing[] = [
     crossStreets: null,
     region: "denver",
     state: "CO",
+    sample: true,
   },
   {
     id: "4",
@@ -142,6 +147,7 @@ export const sampleListings: Listing[] = [
     crossStreets: null,
     region: "denver",
     state: "CO",
+    sample: true,
   },
   {
     id: "5",
@@ -169,6 +175,7 @@ export const sampleListings: Listing[] = [
     crossStreets: null,
     region: "denver",
     state: "CO",
+    sample: true,
   },
   {
     id: "6",
@@ -196,5 +203,6 @@ export const sampleListings: Listing[] = [
     crossStreets: null,
     region: "denver",
     state: "CO",
+    sample: true,
   },
 ];

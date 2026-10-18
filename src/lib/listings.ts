@@ -86,7 +86,7 @@ export function filtersToQuery(filters: Partial<ListingFilters>) {
 
 const listingColumns =
   "id, title, type, price, deposit, bedrooms, bathrooms, city, neighborhood, available_from, " +
-  "amenities, show_exact_address, parking, pets_allowed, description, created_at, approx_lat, approx_lng, cross_streets, region, state, " +
+  "amenities, show_exact_address, parking, pets_allowed, description, created_at, approx_lat, approx_lng, cross_streets, region, state, is_sample, " +
   "host:profiles!listings_host_id_fkey(display_name), listing_photos(path, order)";
 
 type ListingRow = {
@@ -111,6 +111,7 @@ type ListingRow = {
   cross_streets: string | null;
   region: string;
   state: string;
+  is_sample: boolean;
   host: { display_name: string | null } | null;
   listing_photos: { path: string; order: number }[];
 };
@@ -170,6 +171,7 @@ function toListing(row: ListingRow): Omit<Listing, "photos"> {
     crossStreets: row.cross_streets,
     region: row.region,
     state: row.state,
+    sample: row.is_sample,
   };
 }
 

@@ -27,16 +27,18 @@ async function NewMessage({ searchParams }: { searchParams: Props["searchParams"
   const { data: listing } = /^[0-9a-f-]{36}$/i.test(id)
     ? await supabase
         .from("listings")
-        .select("id, title, price, city, neighborhood, cross_streets, host_id, host:profiles!listings_host_id_fkey(display_name)")
+        .select("id, title, price, city, neighborhood, cross_streets, host_id, is_sample, host:profiles!listings_host_id_fkey(display_name)")
         .eq("id", id)
         .eq("status", "active")
         .maybeSingle()
         .overrideTypes<
-          { id: string; title: string; price: number; city: string; neighborhood: string | null; cross_streets: string | null; host_id: string; host: { display_name: string | null } | null },
+          { id: string; title: string; price: number; city: string; neighborhood: string | null; cross_streets: string | null; host_id: string; is_sample: boolean; host: { display_name: string | null } | null },
           { merge: false }
         >()
     : { data: null };
   if (!listing) notFound();
+  // Sample listings have no real host; their page says so.
+  if (listing.is_sample) redirect(`/listings/${listing.id}`);
   const t = await getT();
 
   const summary = (
