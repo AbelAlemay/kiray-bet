@@ -9,15 +9,15 @@ import { fieldsUsed, renderLease, type LeaseValues } from "@/lib/leases/render";
 type Group = { title: string; fields: LeaseField[] };
 
 const groups: Group[] = [
-  { title: "People", fields: ["landlord_name", "landlord_notice_address", "landlord_contact", "tenant_names", "other_occupants"] },
-  { title: "The home", fields: ["property_address", "city", "zip", "furnished", "furnishings", "shared_spaces", "house_rules", "pre_1978"] },
+  { title: "People", fields: ["landlord_name", "landlord_notice_address", "landlord_contact", "landlord_email", "tenant_names", "other_occupants"] },
+  { title: "The home", fields: ["property_address", "city", "zip", "furnished", "furnishings", "shared_spaces", "house_rules", "radon_info", "pre_1978", "lead_info"] },
   { title: "Dates and money", fields: ["lease_start", "fixed_term", "lease_end", "monthly_rent", "rent_due_day", "payment_method", "security_deposit", "late_fee"] },
   { title: "Utilities, parking and pets", fields: ["utilities_landlord", "utilities_tenant", "parking", "parking_details", "pets_allowed", "pet_details", "pet_deposit", "pet_rent"] },
 ];
 
 const booleanFields = new Set<LeaseField>(["fixed_term", "parking", "pets_allowed", "pre_1978", "furnished"]);
 const dateFields = new Set<LeaseField>(["lease_start", "lease_end"]);
-const longFields = new Set<LeaseField>(["house_rules", "shared_spaces", "furnishings"]);
+const longFields = new Set<LeaseField>(["house_rules", "shared_spaces", "furnishings", "radon_info", "lead_info"]);
 // Only shown when the related switch is on.
 const dependsOn: Partial<Record<LeaseField, LeaseField>> = {
   lease_end: "fixed_term",
@@ -26,6 +26,7 @@ const dependsOn: Partial<Record<LeaseField, LeaseField>> = {
   pet_deposit: "pets_allowed",
   pet_rent: "pets_allowed",
   furnishings: "furnished",
+  lead_info: "pre_1978",
 };
 
 // "2026-11-01" -> "November 1, 2026" for the printed lease.
@@ -49,6 +50,8 @@ export function LeaseBuilder({
 }) {
   const [values, setValues] = useState<LeaseValues>(initial);
   const [step, setStep] = useState<"fill" | "review">("fill");
+  // The host accepts that KirayBet only supplies the form before seeing the lease.
+  const [agreed, setAgreed] = useState(false);
   const used = new Set(fieldsUsed(template));
 
   const set = (field: LeaseField, value: string | boolean) => setValues((v) => ({ ...v, [field]: value }));
@@ -68,8 +71,9 @@ export function LeaseBuilder({
             type="button"
             role="tab"
             aria-selected={step === s}
+            disabled={s === "review" && !agreed}
             onClick={() => setStep(s)}
-            className={`min-h-10 flex-1 rounded-lg px-3 text-sm font-semibold ${step === s ? "bg-brand text-white" : "text-muted hover:text-foreground"}`}
+            className={`min-h-10 flex-1 rounded-lg px-3 text-sm font-semibold disabled:opacity-50 ${step === s ? "bg-brand text-white" : "text-muted hover:text-foreground"}`}
           >
             {i + 1}. {s === "fill" ? "Fill in" : "Review & print"}
           </button>
@@ -130,6 +134,20 @@ export function LeaseBuilder({
               </fieldset>
             );
           })}
+          <label className="flex items-start gap-3 rounded-2xl border border-border bg-surface p-4 text-sm">
+            <input
+              type="checkbox"
+              required
+              checked={agreed}
+              onChange={(e) => setAgreed(e.target.checked)}
+              className="mt-0.5 h-5 w-5 shrink-0 accent-brand"
+            />
+            <span>
+              I understand this is a free sample form. KirayBet is not a party to my lease, does not give legal
+              advice, and is not responsible for how I use this form. I&apos;m responsible for making sure my lease
+              is right for my home and follows the law, and I can have a lawyer review it.
+            </span>
+          </label>
           <button className={primaryButtonClass}>Review the lease →</button>
         </form>
       ) : (
