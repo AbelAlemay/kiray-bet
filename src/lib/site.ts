@@ -8,6 +8,15 @@ export const site = {
   tagline: "Homes for rent from our community, in 11 U.S. metro areas",
   // General headline (pages show the chosen area's own headline from regions.ts).
   taglineAm: "የሚከራዩ ቤቶች ከማህበረሰባችን",
+  // Other ways people write the name, for search engines.
+  otherNames: ["Kiray Bet", "Kiraybet", "ኪራይ ቤት"],
+  // For search results and share previews.
+  seoTitle: "KirayBet (Kiray Bet · ኪራይ ቤት): Homes for rent in our community",
+  seoTitleAm: "ኪራይ ቤት (KirayBet · Kiray Bet)፦ ከማህበረሰባችን የሚከራዩ ቤቶች",
+  seoDescription:
+    "KirayBet (Kiray Bet) helps the Ethiopian and Eritrean (Habesha) community find houses, apartments, basements and rooms for rent in Denver, Washington DC, Seattle, Dallas, Houston, Atlanta, Minneapolis, Los Angeles and more. Free, private, in English and Amharic.",
+  seoDescriptionAm:
+    "ኪራይ ቤት (KirayBet) የኢትዮጵያና የኤርትራ (ሐበሻ) ማህበረሰብ በዴንቨር፣ በዋሽንግተን ዲሲ፣ በሲያትል፣ በዳላስ፣ በሂውስተን፣ በአትላንታ፣ በሚኒያፖሊስ፣ በሎስ አንጀለስና በሌሎችም የሚከራዩ ቤቶችን፣ አፓርትመንቶችን፣ ቤዝመንቶችንና ክፍሎችን እንዲያገኝ ይረዳል። ነጻ፣ የግል፣ በአማርኛና በእንግሊዝኛ።",
   listingTypes: [
     { value: "house", label: "House", labelAm: "ሙሉ ቤት" },
     { value: "apartment", label: "Apartment", labelAm: "አፓርትመንት" },

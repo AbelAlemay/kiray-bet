@@ -28,10 +28,10 @@ export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
   return {
     title: {
-      default: `${site.name} · ${site.nameLatin}`,
+      default: t(site.seoTitle, site.seoTitleAm),
       template: `%s · ${site.nameLatin}`,
     },
-    description: t(site.tagline, `${site.taglineAm}፣ በ11 የአሜሪካ አካባቢዎች`),
+    description: t(site.seoDescription, site.seoDescriptionAm),
     // Absolute links in share previews (the image is src/app/opengraph-image.tsx).
     metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
     openGraph: {
@@ -42,6 +42,36 @@ export async function generateMetadata(): Promise<Metadata> {
     twitter: { card: "summary_large_image" },
     // Open to search engines since launch; NEXT_PUBLIC_ALLOW_INDEXING=off hides the site again.
     robots: process.env.NEXT_PUBLIC_ALLOW_INDEXING !== "off" ? undefined : { index: false, follow: false },
+  };
+}
+
+// The site's name, other spellings and logo for search results (schema.org).
+function structuredData() {
+  const url = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": `${url}/#website`,
+        name: site.nameLatin,
+        alternateName: site.otherNames,
+        url: `${url}/`,
+        inLanguage: ["en", "am"],
+        publisher: { "@id": `${url}/#organization` },
+      },
+      {
+        "@type": "Organization",
+        "@id": `${url}/#organization`,
+        name: site.nameLatin,
+        alternateName: site.otherNames,
+        url: `${url}/`,
+        logo: `${url}/app-icons/512`,
+        description: site.seoDescription,
+        // Add social profile links here as they're created (Facebook, Instagram, Telegram…).
+        sameAs: [],
+      },
+    ],
   };
 }
 
@@ -68,6 +98,11 @@ export default async function RootLayout({ children }: LayoutProps<"/[lang]">) {
     >
       {/* Pages with a fixed bottom bar on phones (data-bottom-bar) get room below the footer. */}
       <body className="min-h-full flex flex-col font-sans has-[[data-bottom-bar]]:pb-24 lg:has-[[data-bottom-bar]]:pb-0">
+        <script
+          type="application/ld+json"
+          // Tells search engines the site's name (and other spellings) and logo.
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData()) }}
+        />
         <LangProvider lang={t.lang}>
           <SavedProvider>
             <Header />
