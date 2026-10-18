@@ -187,7 +187,7 @@ Things set up for development that must change before real users arrive:
       at most one per conversation per hour, never with the message text; Resend key in Supabase
       Vault as resend_api_key; people can turn them off on the account page.
 - [ ] Optional: Google sign-in (Google Cloud OAuth client, then NEXT_PUBLIC_GOOGLE_SIGN_IN=on).
-- [ ] Allow search engines: set NEXT_PUBLIC_ALLOW_INDEXING=on in Vercel (off while testing).
+- [x] Allow search engines (Oct 17, 2026): on by default; NEXT_PUBLIC_ALLOW_INDEXING=off in Vercel hides the site again.
       robots.txt and sitemap.xml are ready and follow the same switch; then add the site in
       Google Search Console.
 - [x] Lease agreements made official Oct 17, 2026 (Abel's decision): no "draft" banner; hosts and

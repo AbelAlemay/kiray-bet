@@ -40,8 +40,8 @@ export async function generateMetadata(): Promise<Metadata> {
       locale: t("en_US", "am_ET"),
     },
     twitter: { card: "summary_large_image" },
-    // Kept out of search engines until public launch (set NEXT_PUBLIC_ALLOW_INDEXING=on).
-    robots: process.env.NEXT_PUBLIC_ALLOW_INDEXING === "on" ? undefined : { index: false, follow: false },
+    // Open to search engines since launch; NEXT_PUBLIC_ALLOW_INDEXING=off hides the site again.
+    robots: process.env.NEXT_PUBLIC_ALLOW_INDEXING !== "off" ? undefined : { index: false, follow: false },
   };
 }
 
