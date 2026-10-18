@@ -12,6 +12,12 @@ const socialIcons: Record<string, ReactNode> = {
       <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
     </>
   ),
+  Telegram: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="m7.5 11.6 8.6-3.4c.4-.2.8.1.7.6l-1.5 7c-.1.5-.6.6-1 .4l-2.4-1.8-1.2 1.2c-.2.2-.5.1-.5-.2v-1.8l4.2-3.8-5.3 3.1-2-.6c-.5-.2-.5-.5.4-.7Z" />
+    </>
+  ),
   Facebook: (
     <>
       <circle cx="12" cy="12" r="9" />

@@ -12,6 +12,7 @@ export const site = {
   socials: [
     { name: "Instagram", handle: "@kiraybet.us", url: "https://www.instagram.com/kiraybet.us/" },
     { name: "Facebook", handle: "kiraybetus", url: "https://www.facebook.com/kiraybetus" },
+    { name: "Telegram", handle: "@kiraybetus", url: "https://t.me/kiraybetus" },
   ],
   // Other ways people write the name, for search engines.
   otherNames: ["Kiray Bet", "Kiraybet", "ኪራይ ቤት"],
