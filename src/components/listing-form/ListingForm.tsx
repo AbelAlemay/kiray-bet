@@ -2,10 +2,11 @@
 
 import { startTransition, useActionState, useState, type ReactNode } from "react";
 import { fieldClass, labelClass, primaryButtonClass } from "@/components/form-styles";
-import { regions, stateNames } from "@/lib/regions";
+import { stateNames } from "@/lib/regions";
 import { amenityOptions, exclusiveAmenities, site } from "@/lib/site";
 import { BotCheckFailed, Turnstile, useBotCheck } from "@/components/Turnstile";
 import type { ListingFormState } from "@/app/[lang]/listings/actions";
+import { CityInput } from "./CityInput";
 import { PhotoPicker, type Photo } from "./PhotoPicker";
 import { PendingCorner } from "@/components/Pending";
 import { useT } from "@/components/LangProvider";
@@ -81,6 +82,8 @@ export function ListingForm({
   const bot = useBotCheck();
   const botWaiting = !editing && bot.waiting;
   const [uploading, setUploading] = useState(false);
+  // The chosen state narrows the city suggestions.
+  const [usState, setUsState] = useState(initial?.state ?? "");
   const t = useT();
   const errors = state.errors ?? {};
 
@@ -196,24 +199,15 @@ export function ListingForm({
 
       <Section title="Location" titleAm="አድራሻ">
         <div className={pairClass}>
-          <Field label={t("City", "ከተማ")} error={errors.city}>
-            <input
-              name="city"
-              required
-              maxLength={60}
-              list="kiraybet-cities"
-              autoComplete="address-level2"
-              defaultValue={initial?.city}
-              className={fieldClass}
-            />
-            <datalist id="kiraybet-cities">
-              {[...new Set(regions.flatMap((r) => r.cities))].sort().map((c) => (
-                <option key={c} value={c} />
-              ))}
-            </datalist>
-          </Field>
           <Field label={t("State", "ስቴት")} error={errors.state}>
-            <select name="state" required defaultValue={initial?.state ?? ""} autoComplete="address-level1" className={fieldClass}>
+            <select
+              name="state"
+              required
+              value={usState}
+              onChange={(e) => setUsState(e.target.value)}
+              autoComplete="address-level1"
+              className={fieldClass}
+            >
               <option value="" disabled>
                 {t("Choose…", "ይምረጡ…")}
               </option>
@@ -223,6 +217,9 @@ export function ListingForm({
                 </option>
               ))}
             </select>
+          </Field>
+          <Field label={t("City", "ከተማ")} error={errors.city}>
+            <CityInput state={usState} defaultValue={initial?.city} />
           </Field>
         </div>
         <div className="space-y-4">
