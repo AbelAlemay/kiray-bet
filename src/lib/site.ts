@@ -8,6 +8,8 @@ export const site = {
   tagline: "Homes for rent from our community, in 11 U.S. metro areas",
   // General headline (pages show the chosen area's own headline from regions.ts).
   taglineAm: "የሚከራዩ ቤቶች ከማህበረሰባችን",
+  // KirayBet's own social media accounts (footer links, and for search engines).
+  socials: [{ name: "Instagram", handle: "@kiraybet.us", url: "https://www.instagram.com/kiraybet.us/" }],
   // Other ways people write the name, for search engines.
   otherNames: ["Kiray Bet", "Kiraybet", "ኪራይ ቤት"],
   // For search results and share previews.

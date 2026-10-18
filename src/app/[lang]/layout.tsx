@@ -68,8 +68,8 @@ function structuredData() {
         url: `${url}/`,
         logo: `${url}/app-icons/512`,
         description: site.seoDescription,
-        // Add social profile links here as they're created (Facebook, Instagram, Telegram…).
-        sameAs: [],
+        // Our social media accounts (add new ones in site.socials).
+        sameAs: site.socials.map((s) => s.url),
       },
     ],
   };
