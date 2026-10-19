@@ -310,6 +310,44 @@ function telegramPost() {
 </div>`);
 }
 
+
+// Website-only intro (for other people's groups: no channel link).
+function websitePost() {
+  return base(1080, 1350, `
+<div style="position:relative;width:1080px;height:1350px;overflow:hidden;background:${C.bg}">
+  <div style="position:absolute;inset:-20% -20% auto -20%;height:62%;background:radial-gradient(ellipse at 50% 30%, rgba(83,129,89,.5), rgba(83,129,89,0) 65%)"></div>
+  <div style="position:absolute;left:0;right:0;bottom:0;height:190px;-webkit-mask-image:linear-gradient(to top,#000 30%,transparent)">${skylineAll("#3a4d3f", 0.5)}</div>
+  <div style="position:relative;height:100%;padding:56px 70px 44px;display:flex;flex-direction:column;justify-content:space-between">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      ${logoRow(76, 54)}
+      <span style="background:${C.door};color:${C.bg};border-radius:999px;padding:10px 22px;font-size:26px;font-weight:800">አዲስ · NEW</span>
+    </div>
+    <div style="text-align:center">
+      <div class="am" style="font-size:104px;font-weight:700;line-height:1.1;color:${C.door};text-shadow:0 5px 0 rgba(0,0,0,.4)">ቤት ይፈልጋሉ?</div>
+      <div class="am" style="font-size:104px;font-weight:700;line-height:1.1;text-shadow:0 5px 0 rgba(0,0,0,.4)">ቤት ያከራያሉ?</div>
+      <div class="am" style="margin-top:18px;font-size:36px;line-height:1.4">ከማህበረሰባችን የሚከራዩ ቤቶች፣ ቤዝመንቶችና ክፍሎች · <b style="color:${C.door}">ነጻ</b></div>
+      <div style="margin-top:6px;font-size:28px;color:${C.muted}">Homes, basements and rooms for rent from our community · Free</div>
+    </div>
+    <div style="border:2px solid ${C.border};background:rgba(30,28,25,.9);border-radius:36px;padding:34px 40px;display:flex;align-items:center;gap:40px">
+      <div style="background:#fff;border-radius:28px;padding:20px;box-shadow:0 0 0 6px ${C.door};flex-shrink:0">
+        <div style="position:relative;width:290px;height:290px">${qrSvg}<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center"><div style="background:#fff;border-radius:22%;padding:5px;display:flex">${iconSvg(58)}</div></div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:18px">
+        <div class="am" style="font-size:32px;font-weight:700;white-space:nowrap">🏠 ይፈልጉ ወይም በነጻ ይለጥፉ</div>
+        <div style="font-size:23px;color:${C.muted};margin-top:-10px">Search, or post your place for free</div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:12px;font-size:26px">
+          <li>${check("#fff")} <span class="am">ስልክ ቁጥር አያስፈልግም</span></li>
+          <li>${check("#fff")} <span class="am">አድራሻ በባለቤቱ ፈቃድ ብቻ</span></li>
+          <li>${check("#fff")} <span class="am">አማርኛ</span> &amp; English</li>
+        </ul>
+        <div style="font-size:58px;font-weight:800;color:${C.door};text-shadow:0 4px 0 rgba(0,0,0,.45)">kiraybet.org</div>
+      </div>
+    </div>
+    <div style="text-align:center;font-size:22px;line-height:1.5;color:${C.muted}">Denver · DC · MD · VA · Seattle · Dallas · Austin · Houston<br>Minneapolis · Portland · Atlanta · Bay Area · Southern California</div>
+  </div>
+</div>`);
+}
+
 // ---------- render ----------
 const jobs = [
   // [file, html, width, height, scale]
@@ -321,6 +359,7 @@ const jobs = [
   ...howTo.map((c, i) => [`posts/how-it-works-${i + 1}.png`, card({ badge: c.badge ?? "እንዴት ይሠራል? · How it works", num: `${i + 1}/${howTo.length}`, ...c }), 1080, 1350, 1]),
   ...tips.map((c, i) => [`posts/safety-tip-${i + 1}.png`, card({ badge: "የደህንነት ምክር · Safety tip", ...c }), 1080, 1350, 1]),
   ["posts/telegram-intro-website-and-channel.png", telegramPost(), 1080, 1350, 1],
+  ["posts/group-intro-website-only.png", websitePost(), 1080, 1350, 1],
   ["posts/for-hosts-post-your-home.png", card({ badge: "ለባለቤቶች · For hosts", titleAm: "ክፍል ወይም ቤዝመንት ያከራያሉ?", titleEn: "Renting out a room or basement?", bodyAm: "ከማህበረሰባችን ተከራዮችን በነጻ ያግኙ። ትክክለኛውን አድራሻ ማን እንደሚያይ እርስዎ ይወስናሉ።", bodyEn: "Reach renters from our community for free. You decide who sees your exact address. Scan to post your home.", qr: qrPost }), 1080, 1350, 1],
   ["social/facebook-cover-1640x624.png", banner(1640, 624), 1640, 624, 1],
   ["social/x-twitter-header-1500x500.png", banner(1500, 500), 1500, 500, 1],
