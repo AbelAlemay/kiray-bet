@@ -222,3 +222,9 @@ Discussed Oct 17, 2026 and put on hold until the site has more users and followe
 - Phases: groundwork (delete account, block, push tokens), browse/search/chat with push,
   posting from the phone, TestFlight testing, store launch. About 6 to 9 weeks.
 - Open questions: app name in the stores, separate repository, test phones.
+
+## 13. Ideas on hold (waiting for user feedback)
+- **Optional host phone number** (Oct 18, 2026): off by default, hosts only, shown only to signed-in
+  renters, stored privately like the exact address, Call/Text (maybe WhatsApp) buttons next to
+  "Message host". Needs wording changes from "we never ask for your phone number" to "never
+  required" (footer, home, About, Safety, Privacy). Listing descriptions keep blocking numbers.
