@@ -265,6 +265,51 @@ const highlight = (key) => base(1080, 1920, `
   <svg width="640" height="640" viewBox="0 0 64 64" fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round">${hl[key]}</svg>
 </div>`);
 
+
+// ---------- Telegram intro post: website + channel, two QR codes ----------
+const qrTg = await QRCode.toString("https://t.me/kiraybetus", { type: "svg", errorCorrectionLevel: "H", margin: 0, color: { dark: "#141311", light: "#ffffff" } });
+const tgIcon = (size) => `<svg width="${size}" height="${size}" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#2AABEE"/><path d="M5.4 11.7 16.9 7.3c.5-.2 1 .1.8.9l-2 9.3c-.1.6-.6.8-1.2.5l-3.2-2.4-1.6 1.5c-.2.2-.4.3-.7.3l.2-3.3 6-5.4c.3-.2-.1-.4-.4-.2l-7.4 4.7-3.2-1c-.7-.2-.7-.7.2-1z" fill="#fff"/></svg>`;
+function telegramPost() {
+  const qrBox = (svg, ring, center) => `<div style="background:#fff;border-radius:26px;padding:18px;box-shadow:0 0 0 5px ${ring}"><div style="position:relative;width:250px;height:250px">${svg}<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center"><div style="background:#fff;border-radius:22%;padding:5px;display:flex">${center}</div></div></div></div>`;
+  return base(1080, 1350, `
+<div style="position:relative;width:1080px;height:1350px;overflow:hidden;background:${C.bg}">
+  <div style="position:absolute;inset:-20% -20% auto -20%;height:62%;background:radial-gradient(ellipse at 50% 30%, rgba(83,129,89,.5), rgba(83,129,89,0) 65%)"></div>
+  <div style="position:absolute;right:-180px;bottom:120px;width:620px;height:620px;border-radius:50%;background:radial-gradient(circle, rgba(42,171,238,.22), rgba(42,171,238,0) 70%)"></div>
+  <div style="position:absolute;left:0;right:0;bottom:0;height:190px;-webkit-mask-image:linear-gradient(to top,#000 30%,transparent)">${skylineAll("#3a4d3f", 0.5)}</div>
+  <div style="position:relative;height:100%;padding:56px 70px 44px;display:flex;flex-direction:column;justify-content:space-between">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      ${logoRow(76, 54)}
+      <span style="background:${C.door};color:${C.bg};border-radius:999px;padding:10px 22px;font-size:26px;font-weight:800">አዲስ · NEW</span>
+    </div>
+    <div style="text-align:center">
+      <div class="am" style="font-size:104px;font-weight:700;line-height:1.1;color:${C.door};text-shadow:0 5px 0 rgba(0,0,0,.4)">ቤት ይፈልጋሉ?</div>
+      <div class="am" style="font-size:104px;font-weight:700;line-height:1.1;text-shadow:0 5px 0 rgba(0,0,0,.4)">ቤት ያከራያሉ?</div>
+      <div class="am" style="margin-top:18px;font-size:36px;line-height:1.4">ከማህበረሰባችን የሚከራዩ ቤቶች፣ ቤዝመንቶችና ክፍሎች · <b style="color:${C.door}">ነጻ</b></div>
+      <div style="margin-top:6px;font-size:28px;color:${C.muted}">Homes, basements and rooms for rent from our community · Free</div>
+    </div>
+    <div style="display:flex;gap:28px">
+      <div style="flex:1;border:2px solid ${C.border};background:rgba(30,28,25,.9);border-radius:32px;padding:30px 24px;display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center">
+        <div class="am" style="font-size:30px;font-weight:700">🏠 ቤት ይፈልጉ ወይም ይለጥፉ</div>
+        <div style="font-size:22px;color:${C.muted};margin-top:-10px">Search or post a home</div>
+        ${qrBox(qrSvg, C.door, iconSvg(50))}
+        <div style="font-size:46px;font-weight:800;color:${C.door}">kiraybet.org</div>
+      </div>
+      <div style="flex:1;border:2px solid rgba(42,171,238,.55);background:rgba(18,33,44,.9);border-radius:32px;padding:30px 24px;display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center">
+        <div class="am" style="font-size:30px;font-weight:700">📢 አዳዲስ ቤቶች በየሳምንቱ</div>
+        <div style="font-size:22px;color:${C.muted};margin-top:-10px">New homes every week on Telegram</div>
+        ${qrBox(qrTg, "#2AABEE", tgIcon(52))}
+        <div style="font-size:42px;font-weight:800;color:#5ec4f5">t.me/kiraybetus</div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:center;gap:30px;font-size:25px;color:${C.fg};font-weight:600;white-space:nowrap">
+      <span><b style="color:${C.door}">✓</b> <span class="am">ነጻ</span> · Free</span>
+      <span><b style="color:${C.door}">✓</b> <span class="am">ስልክ ቁጥር አያስፈልግም</span></span>
+      <span><b style="color:${C.door}">✓</b> <span class="am">አማርኛ</span> &amp; English</span>
+    </div>
+  </div>
+</div>`);
+}
+
 // ---------- render ----------
 const jobs = [
   // [file, html, width, height, scale]
@@ -275,6 +320,7 @@ const jobs = [
   ["print/handout-cards-4-per-page.png", handouts(), 1275, 1650, 2],
   ...howTo.map((c, i) => [`posts/how-it-works-${i + 1}.png`, card({ badge: c.badge ?? "እንዴት ይሠራል? · How it works", num: `${i + 1}/${howTo.length}`, ...c }), 1080, 1350, 1]),
   ...tips.map((c, i) => [`posts/safety-tip-${i + 1}.png`, card({ badge: "የደህንነት ምክር · Safety tip", ...c }), 1080, 1350, 1]),
+  ["posts/telegram-intro-website-and-channel.png", telegramPost(), 1080, 1350, 1],
   ["posts/for-hosts-post-your-home.png", card({ badge: "ለባለቤቶች · For hosts", titleAm: "ክፍል ወይም ቤዝመንት ያከራያሉ?", titleEn: "Renting out a room or basement?", bodyAm: "ከማህበረሰባችን ተከራዮችን በነጻ ያግኙ። ትክክለኛውን አድራሻ ማን እንደሚያይ እርስዎ ይወስናሉ።", bodyEn: "Reach renters from our community for free. You decide who sees your exact address. Scan to post your home.", qr: qrPost }), 1080, 1350, 1],
   ["social/facebook-cover-1640x624.png", banner(1640, 624), 1640, 624, 1],
   ["social/x-twitter-header-1500x500.png", banner(1500, 500), 1500, 500, 1],
