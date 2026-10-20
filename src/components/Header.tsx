@@ -131,10 +131,15 @@ function PostLink({ t }: { t: T }) {
   return (
     <Link
       href="/listings/new"
-      className="relative block whitespace-nowrap rounded-lg bg-brand px-3 py-2.5 font-semibold text-white hover:bg-brand-strong max-[359px]:px-2"
+      className="relative block whitespace-nowrap rounded-lg bg-brand px-3 py-2.5 font-semibold text-white hover:bg-brand-strong max-[399px]:px-2 max-[359px]:px-3"
     >
       <LinkPending />
-      {t("Post a home", "ቤት ያስተዋውቁ")}
+      {/* Small phones: a short label, so the language switch and menu still fit. */}
+      <span className="max-[419px]:hidden">{t("Post a home", "ቤት ያስተዋውቁ")}</span>
+      <span className="min-[420px]:hidden" aria-hidden>
+        +<span className="max-[359px]:hidden"> {t("Post", "ይለጥፉ")}</span>
+      </span>
+      <span className="sr-only min-[420px]:hidden">{t("Post a home", "ቤት ያስተዋውቁ")}</span>
     </Link>
   );
 }
@@ -143,8 +148,8 @@ export async function Header() {
   const t = await getT();
   return (
     <header className="sticky top-0 z-20 print:hidden border-b border-border bg-surface/90 backdrop-blur">
-      <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 max-[359px]:gap-2 max-[359px]:px-3">
-        <div className="flex shrink-0 items-center gap-2">
+      <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 max-[399px]:gap-1.5 max-[399px]:px-3">
+        <div className="flex shrink-0 items-center gap-2 max-[399px]:gap-1.5">
           <Link
             href="/"
             aria-label={t(
@@ -154,11 +159,11 @@ export async function Header() {
             className="relative"
           >
             <LinkPending />
-            <Logo />
+            <Logo className="h-10 w-10 max-[399px]:h-9 max-[399px]:w-9" />
           </Link>
           {/* Gold like the logo's door, with a soft shadow and glow so it stands off the bar. */}
           <Link href="/" className="leading-none">
-            <span className="block text-xl font-bold text-door [text-shadow:0_2px_0_rgb(0_0_0/0.55),0_0_14px_rgb(245_199_90/0.3)]">
+            <span className="block text-xl font-bold max-[399px]:text-lg text-door [text-shadow:0_2px_0_rgb(0_0_0/0.55),0_0_14px_rgb(245_199_90/0.3)]">
               {site.name}
             </span>
             <span className="mt-0.5 block text-[10px] font-semibold uppercase tracking-[0.25em] text-muted">
@@ -180,8 +185,9 @@ export async function Header() {
           </span>
         </nav>
 
-        {/* Small screens: Post button plus a menu */}
-        <div className="flex items-center gap-2 lg:hidden">
+        {/* Small screens: language, Post button and a menu */}
+        <div className="flex items-center gap-2 lg:hidden max-[399px]:gap-1">
+          <LangSwitch small />
           <span className="text-sm">
             <PostLink t={t} />
           </span>
@@ -192,7 +198,6 @@ export async function Header() {
               </Suspense>
             }
           >
-            <LangSwitch className="mb-1 self-start [&_button]:!py-2" />
             <MainLinks t={t} />
             <hr className="my-1 border-border" />
             <Suspense fallback={<SignInLink t={t} />}>
