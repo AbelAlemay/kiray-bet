@@ -106,6 +106,21 @@ const skylines: Record<RegionId, ReactNode> = {
       {box(720, 280, 40)}
       {box(812, 96, 62)}
       {dome(860, 58, 84, 46)}
+      {/* Lincoln Memorial */}
+      {box(170, 150, 10)}
+      {box(180, 130, 14)}
+      {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
+        <rect key={i} x={188 + i * 15} y={G - 50} width={7} height={36} />
+      ))}
+      <rect x={182} y={G - 60} width={126} height={10} />
+      <rect x={186} y={G - 66} width={118} height={6} />
+      {/* Washington National Cathedral */}
+      {box(1120, 160, 46)}
+      {box(1180, 40, 104)}
+      {spire(1188, 104, 118)}
+      {spire(1212, 104, 118)}
+      {box(1130, 22, 70)}
+      {box(1258, 22, 70)}
     </>
   ),
   seattle: (
@@ -121,6 +136,14 @@ const skylines: Record<RegionId, ReactNode> = {
       {box(700, 44, 176)}
       {box(708, 28, 188)}
       {box(760, 38, 140)}
+      {/* The Olympic Mountains across the water */}
+      {far("M0 170 L40 140 L70 152 L110 120 L140 136 L180 108 L220 132 L260 116 L300 140 L340 128 L400 160 L420 220 H0Z")}
+      {/* Seattle Great Wheel */}
+      <g fill="none" stroke="currentColor" strokeWidth={2}>
+        <circle cx={410} cy={G - 54} r={42} />
+        <path d={`M410 ${G - 96} V${G - 12} M368 ${G - 54} H452 M380 ${G - 84} L440 ${G - 24} M440 ${G - 84} L380 ${G - 24}`} strokeWidth={1.2} />
+      </g>
+      <path d={`M396 ${G} L410 ${G - 54} L424 ${G}Z`} />
     </>
   ),
   dfw: (
@@ -136,6 +159,12 @@ const skylines: Record<RegionId, ReactNode> = {
       {box(680, 48, 186)}
       {/* Fountain Place */}
       <path d={`M748 ${G} V${G - 120} L780 ${G - 178} L792 ${G - 150} V${G}Z`} />
+      {/* Margaret Hunt Hill Bridge */}
+      <rect x={120} y={G - 30} width={300} height={4} />
+      <path d={`M250 ${G - 28} Q270 ${G - 130} 290 ${G - 28}`} fill="none" stroke="currentColor" strokeWidth={5} />
+      <path d={`M270 ${G - 110} L150 ${G - 30} M270 ${G - 110} L390 ${G - 30} M270 ${G - 90} L190 ${G - 30} M270 ${G - 90} L350 ${G - 30}`} fill="none" stroke="currentColor" strokeWidth={1.2} />
+      {/* AT&T Stadium */}
+      <path d={`M1110 ${G} V${G - 30} Q1220 ${G - 76} 1330 ${G - 30} V${G}Z`} />
     </>
   ),
   austin: (
@@ -152,20 +181,45 @@ const skylines: Record<RegionId, ReactNode> = {
       {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
         <rect key={i} x={790 + (i % 2 ? 6 : i % 3 ? -4 : 0)} y={G - 22 * (i + 1)} width={38} height={22} />
       ))}
+      {/* Hill Country and the Pennybacker Bridge */}
+      {far("M0 170 Q90 140 180 158 T360 150 T440 166 V220 H0Z")}
+      <rect x={90} y={G - 34} width={280} height={4} />
+      <path d={`M150 ${G - 32} Q230 ${G - 104} 310 ${G - 32}`} fill="none" stroke="currentColor" strokeWidth={5} />
+      {/* Hangers from the arch down to the road */}
+      {[170, 190, 210, 230, 250, 270, 290].map((x) => {
+        const h = Math.round(36 * (1 - ((x - 230) / 80) ** 2));
+        return <rect key={x} x={x} y={G - 32 - h} width={1.5} height={h} />;
+      })}
+      {/* UT Tower */}
+      {box(1160, 70, 28)}
+      {box(1182, 26, 128)}
+      {box(1178, 34, 112)}
+      <path d={`M1182 ${G - 128} L1195 ${G - 140} L1208 ${G - 128}Z`} />
     </>
   ),
   houston: (
     <>
-      {blocks(380, 1100, 50, 140, 17)}
-      {/* JPMorgan Chase Tower */}
+      {/* NRG Stadium and the Astrodome */}
+      <path d={`M120 ${G} V${G - 38} Q200 ${G - 64} 280 ${G - 38} V${G}Z`} />
+      <path d={`M296 ${G} V${G - 18} Q340 ${G - 52} 384 ${G - 18} V${G}Z`} />
+      {blocks(420, 1010, 34, 110, 17)}
+      {/* JPMorgan Chase Tower, the tallest */}
       <path d={`M636 ${G} V${G - 192} L642 ${G - 200} H684 V${G}Z`} />
+      {/* Wells Fargo Plaza, rounded glass */}
       <rect x={694} y={G - 188} width={44} height={188} rx={6} />
-      {/* Bank of America Center */}
+      {/* Bank of America Center, stepped Dutch gables */}
       {box(748, 50, 150)}
       <path d={`M748 ${G - 150} L758 ${G - 166} L768 ${G - 150} L773 ${G - 174} L778 ${G - 150} L788 ${G - 166} L798 ${G - 150}Z`} />
+      {/* Heritage Plaza, the Maya-temple top */}
+      {box(810, 44, 140)}
+      <path d={`M810 ${G - 140} H854 V${G - 146} H848 V${G - 152} H842 V${G - 158} H822 V${G - 152} H816 V${G - 146} H810Z`} />
       {/* Williams Tower */}
       {box(920, 34, 176)}
       {spire(937, 176, 196)}
+      {/* San Jacinto Monument, with its star */}
+      <path d={`M1180 ${G} L1188 ${G - 150} H1200 L1208 ${G} Z`} />
+      {box(1166, 56, 14)}
+      <path d={`M1194 ${G - 170} l3.5 7.2 7.9 1.1 -5.7 5.6 1.3 7.9 -7 -3.7 -7 3.7 1.3 -7.9 -5.7 -5.6 7.9 -1.1z`} />
     </>
   ),
   msp: (
@@ -184,6 +238,10 @@ const skylines: Record<RegionId, ReactNode> = {
       {/* Cathedral of Saint Paul */}
       {box(950, 70, 40)}
       {dome(985, 40, 66, 34)}
+      {/* Stone Arch Bridge */}
+      <path d={`M100 ${G} V${G - 40} H400 V${G} ${[0, 1, 2, 3, 4, 5].map((i) => `H${380 - i * 50} Q${360 - i * 50} ${G - 26} ${340 - i * 50} ${G}`).join(" ")} Z`} />
+      {/* U.S. Bank Stadium, the sharp prow */}
+      <path d={`M1100 ${G} V${G - 40} L1150 ${G - 52} L1300 ${G - 88} L1340 ${G - 40} V${G}Z`} />
     </>
   ),
   portland: (
@@ -196,20 +254,28 @@ const skylines: Record<RegionId, ReactNode> = {
       {box(640, 42, 150)}
       {/* "Big Pink" */}
       <rect x={700} y={G - 162} width={46} height={162} rx={8} />
+      {far("M0 160 Q80 132 170 146 T340 144 T380 160 V220 H0Z")}
     </>
   ),
   atlanta: (
     <>
-      {blocks(440, 1060, 30, 110, 29)}
-      {/* 191 Peachtree */}
+      {/* Stone Mountain on the horizon */}
+      {far("M1040 220 Q1080 128 1200 118 Q1320 116 1380 170 L1440 200 V220Z")}
+      {/* Mercedes-Benz Stadium, the pinwheel roof */}
+      <path d={`M140 ${G} V${G - 40} L178 ${G - 70} L214 ${G - 46} L250 ${G - 78} L288 ${G - 50} L322 ${G - 72} L350 ${G - 40} V${G}Z`} />
+      {blocks(440, 1000, 30, 104, 29)}
+      {/* 191 Peachtree, the twin crowns */}
       {box(600, 44, 150)}
       <path d={`M600 ${G - 150} L611 ${G - 166} L622 ${G - 150} L633 ${G - 166} L644 ${G - 150}Z`} />
-      {/* Bank of America Plaza */}
+      {/* Bank of America Plaza, the gold pyramid and spire */}
       {box(660, 46, 150)}
       <path d={`M660 ${G - 150} L683 ${G - 182} L706 ${G - 150}Z`} />
       {spire(683, 182, 206)}
-      {/* Westin Peachtree Plaza */}
+      {/* Westin Peachtree Plaza, the glass cylinder */}
       <rect x={720} y={G - 142} width={36} height={142} rx={14} />
+      {/* Georgia State Capitol, the gold dome */}
+      {box(770, 96, 30)}
+      {dome(818, 38, 56, 32)}
       {/* One Atlantic Center */}
       {box(900, 40, 150)}
       <path d={`M900 ${G - 150} L920 ${G - 176} L940 ${G - 150}Z`} />
@@ -250,6 +316,15 @@ const skylines: Record<RegionId, ReactNode> = {
       <path d={`M744 ${G} V${G - 168} L786 ${G - 188} L784 ${G - 204} L790 ${G - 186} V${G}Z`} />
       {palm(960, 110)}
       {palm(1010, 130)}
+      {/* Griffith Observatory */}
+      {box(210, 90, 18)}
+      {box(236, 38, 34)}
+      <path d={`M236 ${G - 34} Q255 ${G - 62} 274 ${G - 34}Z`} />
+      <path d={`M210 ${G - 18} Q218 ${G - 34} 226 ${G - 18}Z M284 ${G - 18} Q292 ${G - 34} 300 ${G - 18}Z`} />
+      {/* The Hollywood sign */}
+      <text x={1130} y={G - 74} fontSize={30} fontWeight={800} fontFamily="Arial, sans-serif" letterSpacing={3} transform={`rotate(-4 1130 ${G - 74})`}>
+        HOLLYWOOD
+      </text>
     </>
   ),
 };

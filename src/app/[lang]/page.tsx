@@ -78,7 +78,7 @@ async function AreaSections() {
     <>
       <section className="relative bg-forest bg-[url(/house-pattern.svg)] bg-[length:80px] text-white">
         <Skyline region={region.id} />
-        <div className="relative mx-auto max-w-6xl px-4 pb-28 pt-8 text-center sm:pb-44 sm:pt-12">
+        <div className="relative mx-auto max-w-6xl px-4 pb-36 pt-8 text-center sm:pb-52 sm:pt-12">
           <div className="mb-8 flex justify-center">
             <RegionSwitcher current={region.id} variant="hero" />
           </div>
@@ -92,7 +92,7 @@ async function AreaSections() {
         </div>
         <a
           href="#safety"
-          className="absolute bottom-1 right-2 px-2 py-2.5 text-sm font-semibold text-white/90 [text-shadow:0_1px_4px_rgb(0_0_0/0.6)] hover:underline"
+          className="absolute bottom-0.5 right-1 px-2 py-2.5 text-xs font-semibold text-white/90 [text-shadow:0_1px_4px_rgb(0_0_0/0.8)] hover:underline sm:bottom-1 sm:right-2 sm:text-sm"
         >
           🔒 {t.both("Safe & private", "ደህንነቱ የተጠበቀ")}
         </a>
