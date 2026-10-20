@@ -7,6 +7,13 @@ import type { RegionId } from "@/lib/regions";
 
 const G = 220;
 
+// Solid colors (not see-through) so the banner's pattern doesn't show inside the buildings.
+// Front to back: landmarks, plain buildings, foothills, far mountains.
+const NEAR = "#223b2b";
+const MID = "#2b4c37";
+const HILL = "#30543d";
+const FAR = "#375e45";
+
 // Plain buildings between the landmarks. Seeded, so every visit draws the same city.
 function blocks(from: number, to: number, low: number, high: number, seed: number) {
   let n = seed;
@@ -21,12 +28,13 @@ function blocks(from: number, to: number, low: number, high: number, seed: numbe
     out.push(<rect key={x} x={x} y={G - h} width={Math.min(w, to - x)} height={h} />);
     x += w + 2;
   }
-  return <g opacity={0.7}>{out}</g>;
+  return <g fill={MID}>{out}</g>;
 }
 
 const box = (x: number, w: number, h: number) => <rect x={x} y={G - h} width={w} height={h} />;
 const spire = (cx: number, from: number, to: number) => <rect x={cx - 1} y={G - to} width={2} height={to - from} />;
-const far = (d: string) => <path d={d} opacity={0.45} />;
+const far = (d: string) => <path d={d} fill={FAR} />;
+const hills = (d: string) => <path d={d} fill={HILL} />;
 
 // A dome on a drum: the Capitol in DC, Austin and Saint Paul.
 function dome(cx: number, w: number, drum: number, rise: number) {
@@ -57,14 +65,36 @@ function palm(x: number, h: number) {
 const skylines: Record<RegionId, ReactNode> = {
   denver: (
     <>
-      {far("M0 150 L80 112 L150 135 L230 72 L300 120 L360 96 L430 130 L520 62 L600 116 L680 92 L760 126 L850 56 L930 110 L1010 86 L1090 122 L1180 66 L1260 112 L1340 92 L1440 130 V220 H0Z")}
-      {blocks(380, 1090, 28, 90, 11)}
-      {box(600, 34, 125)}
+      {/* The Front Range behind the city, foothills in front of it */}
+      {far("M0 120 L40 104 L72 116 L118 70 L150 92 L186 60 L214 78 L250 52 L290 84 L330 66 L372 96 L420 74 L470 104 L520 88 L580 112 L650 94 L720 118 L790 96 L860 116 L930 84 L990 104 L1040 68 L1068 80 L1096 56 L1128 56 L1150 76 L1196 62 L1240 92 L1290 74 L1340 98 L1390 82 L1440 100 V220 H0Z")}
+      {hills("M0 170 Q60 140 130 156 T270 150 T420 162 T600 158 T800 166 T1000 156 T1200 162 T1440 150 V220 H0Z")}
+      {/* Empower Field at Mile High */}
+      <path d={`M150 ${G} V${G - 34} Q196 ${G - 62} 240 ${G - 50} Q286 ${G - 62} 332 ${G - 34} V${G}Z`} />
+      {blocks(470, 980, 18, 64, 11)}
+      {/* Daniels & Fisher clock tower */}
+      {box(522, 16, 108)}
+      <path d={`M520 ${G - 108} L530 ${G - 126} L540 ${G - 108}Z`} />
+      {spire(530, 126, 136)}
+      {/* Four Seasons */}
+      {box(566, 30, 136)}
+      <path d={`M566 ${G - 136} H572 V${G - 146} L581 ${G - 158} L590 ${G - 146} V${G - 136} H596 V${G - 130} H566Z`} />
+      {/* Republic Plaza, the tallest */}
+      <path d={`M606 ${G} V${G - 176} H610 V${G - 182} H646 V${G - 176} H650 V${G}Z`} />
       {/* Wells Fargo Center, "the cash register" */}
-      <path d={`M640 ${G} V${G - 130} Q640 ${G - 160} 665 ${G - 160} Q690 ${G - 160} 690 ${G - 130} V${G}Z`} />
-      {box(700, 46, 172)}
-      <path d={`M756 ${G} V${G - 150} L796 ${G - 166} V${G}Z`} />
-      {box(806, 36, 112)}
+      <path d={`M662 ${G} V${G - 140} Q662 ${G - 170} 690 ${G - 172} Q718 ${G - 170} 718 ${G - 140} V${G}Z`} />
+      {/* 1801 California, with its sloped top */}
+      <path d={`M728 ${G} V${G - 156} L752 ${G - 174} L774 ${G - 160} V${G}Z`} />
+      {box(784, 40, 124)}
+      {/* Colorado State Capitol, the gold dome */}
+      {box(836, 92, 30)}
+      {dome(882, 40, 58, 34)}
+      {/* Denver International Airport's tent roof */}
+      <path
+        d={`M1120 ${G} V${G - 22} L1138 ${G - 50} L1156 ${G - 26} L1174 ${G - 56} L1192 ${G - 28} L1210 ${G - 60} L1228 ${G - 28} L1246 ${G - 56} L1264 ${G - 26} L1282 ${G - 50} L1300 ${G - 22} V${G}Z`}
+      />
+      {[1138, 1174, 1210, 1246, 1282].map((x) => (
+        <rect key={x} x={x - 1} y={G - (x === 1210 ? 70 : x === 1174 || x === 1246 ? 66 : 60)} width={2} height={14} />
+      ))}
     </>
   ),
   dmv: (
@@ -231,8 +261,9 @@ export function Skyline({ region }: { region: RegionId }) {
       aria-hidden
       viewBox="0 0 1440 220"
       preserveAspectRatio="xMidYMax slice"
-      className="skyline pointer-events-none absolute inset-x-0 bottom-0 h-32 w-full text-black opacity-50 sm:h-48"
-      fill="currentColor"
+      className="skyline pointer-events-none absolute inset-x-0 bottom-0 h-32 w-full sm:h-48"
+      fill={NEAR}
+      color={NEAR}
     >
       {skylines[region]}
     </svg>

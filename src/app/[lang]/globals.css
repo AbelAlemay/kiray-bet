@@ -65,7 +65,7 @@ body {
 /* The area skyline on the home page: fades toward the ground, and drifts in when the
    area changes. */
 .skyline {
-  mask-image: linear-gradient(to bottom, #000 45%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 60%, rgb(0 0 0 / 0.45) 100%);
   animation: skyline-in 0.9s ease-out both;
 }
 @keyframes skyline-in {
