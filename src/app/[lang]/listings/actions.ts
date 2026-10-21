@@ -4,7 +4,7 @@ import { updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { after } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
-import { geocodeAddress } from "@/lib/geocode";
+import { geocodeAddress, type GeocodeResult } from "@/lib/geocode";
 import { regionFor, regions } from "@/lib/regions";
 import { listingAlert, notifyAdmin } from "@/lib/notify";
 import { parseListingForm, type AddressInput, type ListingErrors } from "@/lib/listing-rules";
@@ -79,6 +79,7 @@ export async function createListing(_prev: ListingFormState, formData: FormData)
       ...address,
       exact_lat: located.point.lat,
       exact_lng: located.point.lng,
+      location_precision: located.point.precision,
     }),
     supabase
       .from("listing_photos")
@@ -123,7 +124,7 @@ export async function updateListing(_prev: ListingFormState, formData: FormData)
     currentAddress.zip !== address.zip ||
     current.city.toLowerCase() !== listing.city.toLowerCase() ||
     current.state !== listing.state;
-  let point: { lat: number; lng: number; city: string | null } | undefined;
+  let point: GeocodeResult | undefined;
   if (addressChanged) {
     const located = await locate(address, listing.city, listing.state, t);
     if ("error" in located) return { errors: { street: located.error } };
@@ -137,7 +138,7 @@ export async function updateListing(_prev: ListingFormState, formData: FormData)
   if (point) {
     const { error } = await supabase
       .from("listing_addresses")
-      .upsert({ listing_id: id, ...address, exact_lat: point.lat, exact_lng: point.lng });
+      .upsert({ listing_id: id, ...address, exact_lat: point.lat, exact_lng: point.lng, location_precision: point.precision });
     if (error) return { errors: { form: saveFailed(t) } };
   }
 

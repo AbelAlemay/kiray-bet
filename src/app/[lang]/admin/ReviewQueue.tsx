@@ -29,7 +29,7 @@ type PendingRow = {
   created_at: string;
   updated_at: string;
   host: { display_name: string | null; private_profiles: { email: string } | null } | null;
-  listing_addresses: { street_address: string; unit: string | null; zip: string } | null;
+  listing_addresses: { street_address: string; unit: string | null; zip: string; location_precision: "exact" | "street" | "zip" } | null;
   listing_photos: { path: string; order: number }[];
 };
 
@@ -42,7 +42,7 @@ export async function ReviewQueue({ q }: { q: string }) {
       "id, title, description, type, price, deposit, bedrooms, bathrooms, city, state, region, neighborhood, available_from, " +
         "amenities, show_exact_address, parking, pets_allowed, reviewed_at, created_at, updated_at, " +
         "host:profiles!listings_host_id_fkey(display_name, private_profiles(email)), " +
-        "listing_addresses(street_address, unit, zip), listing_photos(path, order)",
+        "listing_addresses(street_address, unit, zip, location_precision), listing_photos(path, order)",
     )
     .eq("status", "pending");
   if (q) query = query.or(await listingSearchFilter(supabase, q));
@@ -120,6 +120,14 @@ export async function ReviewQueue({ q }: { q: string }) {
                 >
                   Check on map / Street View
                 </a>
+              </p>
+            )}
+            {address && address.location_precision !== "exact" && (
+              <p role="note" className="rounded-xl border border-accent/60 bg-accent/10 p-3 text-sm">
+                ⚠ <strong>Exact address not found in the map databases</strong> (common for brand-new streets). The map
+                location was estimated from{" "}
+                {address.location_precision === "street" ? "the street name in this ZIP code" : "the ZIP code area only"}.
+                Check the address on Google Maps before approving.
               </p>
             )}
 
